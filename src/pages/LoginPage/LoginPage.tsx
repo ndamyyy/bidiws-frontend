@@ -1,0 +1,326 @@
+// ============================================================
+// BIDIWS — LoginPage
+// Fichier : src/pages/LoginPage/LoginPage.tsx
+// ============================================================
+
+import { JSX, useState }        from "react";
+import { useAuth }         from "../../hooks/useAuth";
+import type { Role }       from "../../types";
+import "./LoginPage.css";
+
+// ─────────────────────────────────────────
+// TYPES
+// ─────────────────────────────────────────
+
+interface RoleOption {
+  role  : Role;
+  label : string;
+  desc  : string;
+  color : string;
+  icon  : JSX.Element;
+}
+
+// ─────────────────────────────────────────
+// ICÔNES
+// ─────────────────────────────────────────
+
+const IconTruck = ({ color }: { color: string }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="1" y="3" width="15" height="13"/>
+    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+    <circle cx="5.5" cy="18.5" r="2.5"/>
+    <circle cx="18.5" cy="18.5" r="2.5"/>
+  </svg>
+);
+
+const IconHome = ({ color }: { color: string }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    <polyline points="9 22 9 12 15 12 15 22"/>
+  </svg>
+);
+
+const IconGrid = ({ color }: { color: string }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+    <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+  </svg>
+);
+
+const IconUser = ({ color }: { color: string }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+  </svg>
+);
+
+const IconBuilding = ({ color }: { color: string }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="2"/>
+    <path d="M3 9h18M9 21V9"/>
+  </svg>
+);
+
+const IconCheck = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+
+// ─────────────────────────────────────────
+// RÔLES DISPONIBLES
+// ─────────────────────────────────────────
+
+const ROLE_OPTIONS: RoleOption[] = [
+  {
+    role : 'SYNDIC',
+    label: "Syndic / Bailleur",
+    desc : "Tableau de bord & pilotage global",
+    color: "#1b3a6b",
+    icon : <IconGrid color="#1b3a6b" />,
+  },
+  {
+    role : 'GARDIEN',
+    label: "Gardien",
+    desc : "Alertes collecte en temps réel",
+    color: "#4caf50",
+    icon : <IconHome color="#4caf50" />,
+  },
+  {
+    role : 'CHAUFFEUR',
+    label: "Chauffeur",
+    desc : "Validation des arrêts de tournée",
+    color: "#f59e0b",
+    icon : <IconTruck color="#f59e0b" />,
+  },
+  {
+    role : 'HABITANT',
+    label: "Habitant",
+    desc : "Consulter les horaires de collecte",
+    color: "#6b84a3",
+    icon : <IconUser color="#6b84a3" />,
+  },
+  {
+    role : 'MAIRIE',
+    label: "Mairie / Collectivité",
+    desc : "Supervision et reporting",
+    color: "#9c27b0",
+    icon : <IconBuilding color="#9c27b0" />,
+  },
+];
+
+// ─────────────────────────────────────────
+// COMPOSANT
+// ─────────────────────────────────────────
+
+export default function LoginPage() {
+  const { login, isLoading } = useAuth();
+
+  const [selectedRole, setSelectedRole] = useState<Role>('SYNDIC');
+  const [email,        setEmail]        = useState<string>("");
+  const [motDePasse,   setMotDePasse]   = useState<string>("");
+  const [error,        setError]        = useState<string>("");
+
+  // ── Pré-remplir l'email selon le rôle sélectionné (mock) ──
+  const handleRoleSelect = (role: Role): void => {
+    setSelectedRole(role);
+    setError("");
+
+    // Emails de démo correspondant aux mocks
+    const demoEmails: Partial<Record<Role, string>> = {
+      'SYNDIC':    "syndic@bidiws.com",
+      'GARDIEN':   "gardien1@bidiws.com",
+      'CHAUFFEUR': "chauffeur1@bidiws.com",
+      'HABITANT':  "habitant@bidiws.com",
+      'MAIRIE':    "syndic@bidiws.com",
+      'ADMIN':     "admin@bidiws.com",
+    };
+    setEmail(demoEmails[role] ?? "");
+    setMotDePasse("Demo1234!");
+  };
+
+  // ── Soumission ──
+  const handleSubmit = async (): Promise<void> => {
+    setError("");
+
+    if (!email.trim()) {
+      setError("Veuillez saisir votre adresse email.");
+      return;
+    }
+    if (!motDePasse.trim()) {
+      setError("Veuillez saisir votre mot de passe.");
+      return;
+    }
+
+    try {
+      await login({ email: email.trim(), motDePasse });
+    } catch {
+      setError("Email ou mot de passe incorrect. Vérifiez vos identifiants.");
+    }
+  };
+
+  return (
+    <div className="login">
+
+      {/* ── Blobs décoratifs ── */}
+      <div className="login__blob login__blob--top-left"    />
+      <div className="login__blob login__blob--bottom-right"/>
+      <div className="login__blob login__blob--center"      />
+
+      {/* ══════════════════════════════
+          PANNEAU GAUCHE — Branding
+      ══════════════════════════════ */}
+      <div className="login__left">
+
+        {/* Logo */}
+        <div className="login__brand">
+          <div className="login__brand-logo">
+            <div className="login__brand-icon">
+              <IconTruck color="#4caf50" />
+            </div>
+            <span className="login__brand-name">
+              BIDI<span>WS</span>
+            </span>
+          </div>
+          <div className="login__brand-tagline">
+            L'Étoile du Suivi Urbain
+          </div>
+        </div>
+
+        {/* Headline */}
+        <h1 className="login__headline">
+          La collecte des déchets,<br />
+          <span>enfin visible</span><br />
+          en temps réel.
+        </h1>
+
+        <p className="login__description">
+          BIDIWS connecte gardiens, chauffeurs, syndics et mairies
+          pour éliminer l'incertitude sur le passage du camion
+          et réduire le temps des bacs sur la voie publique.
+        </p>
+
+        {/* Features */}
+        <div className="login__features">
+          {[
+            { icon: "⚡", text: <><strong>Notification instantanée</strong> dès que le camion est passé</> },
+            { icon: "📍", text: <><strong>Suivi GPS temps réel</strong> du camion sur votre secteur</> },
+            { icon: "📊", text: <><strong>Dashboard complet</strong> pour les gestionnaires et mairies</> },
+          ].map((f, i) => (
+            <div key={i} className="login__feature">
+              <div className="login__feature-icon">
+                <span style={{ fontSize: 16 }}>{f.icon}</span>
+              </div>
+              <span className="login__feature-text">{f.text}</span>
+            </div>
+          ))}
+        </div>
+
+      </div>
+
+      {/* ══════════════════════════════
+          PANNEAU DROIT — Formulaire
+      ══════════════════════════════ */}
+      <div className="login__right">
+        <div className="login__card">
+
+          <h2 className="login__card-title">Connexion</h2>
+          <p className="login__card-subtitle">
+            Choisissez votre espace et connectez-vous
+          </p>
+
+          {/* ── Sélection rôle ── */}
+          <div className="login__roles">
+            {ROLE_OPTIONS.map((option) => {
+              const isActive = selectedRole === option.role;
+              return (
+                <button
+                  key={option.role}
+                  className={`login__role-btn ${isActive ? "login__role-btn--active" : ""}`}
+                  onClick={() => handleRoleSelect(option.role)}
+                >
+                  {/* Icône */}
+                  <div
+                    className="login__role-icon"
+                    style={{
+                      background: isActive
+                        ? `${option.color}22`
+                        : "rgba(255,255,255,0.04)",
+                      border: `1px solid ${isActive ? option.color + "55" : "rgba(255,255,255,0.08)"}`,
+                    }}
+                  >
+                    {option.icon}
+                  </div>
+
+                  {/* Info */}
+                  <div className="login__role-info">
+                    <div className="login__role-label">{option.label}</div>
+                    <div className="login__role-desc">{option.desc}</div>
+                  </div>
+
+                  {/* Check */}
+                  {isActive && (
+                    <div
+                      className="login__role-check"
+                      style={{ background: option.color }}
+                    >
+                      <IconCheck />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* ── Champs ── */}
+          <div className="login__fields">
+            <div className="login__field">
+              <label className="login__field-label">Email</label>
+              <input
+                className="login__field-input"
+                type="email"
+                placeholder="votre@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              />
+            </div>
+            <div className="login__field">
+              <label className="login__field-label">Mot de passe</label>
+              <input
+                className="login__field-input"
+                type="password"
+                placeholder="••••••••"
+                value={motDePasse}
+                onChange={(e) => setMotDePasse(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              />
+            </div>
+          </div>
+
+          {/* ── Erreur ── */}
+          {error && <div className="login__error">{error}</div>}
+
+          {/* ── Submit ── */}
+          <button
+            className="login__submit"
+            onClick={handleSubmit}
+            disabled={isLoading}
+          >
+            {isLoading
+              ? <span className="login__spinner" />
+              : <>Accéder à mon espace</>
+            }
+          </button>
+
+          {/* ── Footer ── */}
+          <div className="login__footer">
+            BIDIWS v1.0 — Plateforme intelligente de suivi des collectes
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  );
+}

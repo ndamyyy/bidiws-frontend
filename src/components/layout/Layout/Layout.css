@@ -1,0 +1,35 @@
+/* ============================================================
+   BIDIWS — Layout
+   Fichier : src/components/layout/Layout/Layout.css
+   ============================================================ */
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: #0d1b2a;
+}
+
+.layout__main {
+  flex: 1;
+  margin-left: 240px;   /* largeur sidebar */
+  padding-top: 64px;    /* hauteur topbar  */
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.layout__content {
+  padding: 32px 36px;
+  max-width: 1100px;
+  animation: contentFadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes contentFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

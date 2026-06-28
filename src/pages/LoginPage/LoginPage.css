@@ -1,0 +1,415 @@
+/* ============================================================
+   BIDIWS — LoginPage
+   Fichier : src/pages/LoginPage/LoginPage.css
+   ============================================================ */
+
+/* ─── Page entière ─── */
+.login {
+  min-height: 100vh;
+  display: flex;
+  background: #0d1b2a;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── Blobs décoratifs ─── */
+.login__blob {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+}
+
+.login__blob--top-left {
+  width: 500px;
+  height: 500px;
+  top: -150px;
+  left: -150px;
+  background: radial-gradient(circle, rgba(27, 58, 107, 0.4) 0%, transparent 70%);
+}
+
+.login__blob--bottom-right {
+  width: 400px;
+  height: 400px;
+  bottom: -100px;
+  right: -100px;
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.15) 0%, transparent 70%);
+}
+
+.login__blob--center {
+  width: 300px;
+  height: 300px;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(27, 58, 107, 0.15) 0%, transparent 70%);
+}
+
+/* ─── Panneau gauche (branding) ─── */
+.login__left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+  position: relative;
+  z-index: 1;
+}
+
+.login__brand {
+  margin-bottom: 48px;
+}
+
+.login__brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.login__brand-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(27, 58, 107, 0.8), rgba(76, 175, 80, 0.5));
+  border: 1px solid rgba(76, 175, 80, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 40px rgba(76, 175, 80, 0.15);
+}
+
+.login__brand-name {
+  font-family: "Syne", sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  color: #f0f4ff;
+  letter-spacing: -1px;
+}
+
+.login__brand-name span {
+  color: #4caf50;
+}
+
+.login__brand-tagline {
+  font-size: 13px;
+  color: #6b84a3;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.login__headline {
+  font-family: "Syne", sans-serif;
+  font-size: 42px;
+  font-weight: 800;
+  color: #f0f4ff;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  margin-bottom: 20px;
+}
+
+.login__headline span {
+  color: #4caf50;
+}
+
+.login__description {
+  font-size: 15px;
+  color: #6b84a3;
+  line-height: 1.7;
+  max-width: 420px;
+  margin-bottom: 40px;
+}
+
+/* ─── Features liste ─── */
+.login__features {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login__feature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.login__feature-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.login__feature-text {
+  font-size: 14px;
+  color: #8a9bae;
+}
+
+.login__feature-text strong {
+  color: #f0f4ff;
+  font-weight: 600;
+}
+
+/* ─── Panneau droit (formulaire) ─── */
+.login__right {
+  width: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.login__card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 40px;
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  animation: cardSlideIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.login__card-title {
+  font-family: "Syne", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #f0f4ff;
+  margin: 0 0 6px;
+  letter-spacing: -0.3px;
+}
+
+.login__card-subtitle {
+  font-size: 13px;
+  color: #6b84a3;
+  margin: 0 0 28px;
+}
+
+/* ─── Sélection rôle ─── */
+.login__roles {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.login__role-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%;
+}
+
+.login__role-btn:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.login__role-btn--active {
+  border-color: #4caf50;
+  background: rgba(76, 175, 80, 0.08);
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.1);
+}
+
+.login__role-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.login__role-info {
+  flex: 1;
+}
+
+.login__role-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b84a3;
+  transition: color 0.2s;
+}
+
+.login__role-btn--active .login__role-label {
+  color: #f0f4ff;
+}
+
+.login__role-desc {
+  font-size: 12px;
+  color: #3d5166;
+  margin-top: 2px;
+}
+
+.login__role-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #4caf50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  animation: checkPop 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes checkPop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ─── Champs email / mot de passe ─── */
+.login__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.login__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login__field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b84a3;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.login__field-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #f0f4ff;
+  font-family: "DM Sans", sans-serif;
+  outline: none;
+  transition: border-color 0.18s, background 0.18s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.login__field-input::placeholder {
+  color: #3d5166;
+}
+
+.login__field-input:focus {
+  border-color: rgba(76, 175, 80, 0.5);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* ─── Erreur ─── */
+.login__error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: #ef4444;
+  margin-bottom: 16px;
+  animation: errorShake 0.3s ease both;
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  25%       { transform: translateX(-6px); }
+  75%       { transform: translateX(6px); }
+}
+
+/* ─── Bouton submit ─── */
+.login__submit {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #1b3a6b, #2196f3 150%);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-family: "Syne", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 0.18s, box-shadow 0.18s, opacity 0.18s;
+  box-shadow: 0 4px 24px rgba(27, 58, 107, 0.4);
+  letter-spacing: 0.02em;
+}
+
+.login__submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(27, 58, 107, 0.5);
+}
+
+.login__submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── Spinner ─── */
+.login__spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Footer ─── */
+.login__footer {
+  text-align: center;
+  font-size: 11px;
+  color: #3d5166;
+  margin-top: 24px;
+}
+
+/* ─── Responsive mobile ─── */
+@media (max-width: 900px) {
+  .login__left {
+    display: none;
+  }
+
+  .login__right {
+    width: 100%;
+    padding: 24px;
+  }
+}
