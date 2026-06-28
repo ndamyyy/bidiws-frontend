@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 // ============================================================
 // BIDIWS — App.tsx + Routes
 // Fichier : src/App.tsx
@@ -16,7 +17,8 @@ import LoginPage from "./pages/LoginPage/LoginPage";
 import Layout from "./components/layout/Layout/Layout";
 
 // ─── Pages Syndic ──────────────────────────────────────────
-// import DashboardPage from "./pages/syndic/DashboardPage/DashboardPage";
+import DashboardPage from "./pages/syndic/DashboardPage/DashboardPage";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 // import TourneesPage from "./pages/syndic/TourneesPage/TourneesPage";
 // import ResidencesPage from "./pages/syndic/ResidencesPage/ResidencesPage";
 // import NotificationsPage from "./pages/syndic/NotificationsPage/NotificationsPage";
@@ -57,17 +59,17 @@ const queryClient = new QueryClient({
 // selon le rôle de l'utilisateur connecté
 // ─────────────────────────────────────────
 
-// const redirectByRole: Record<string, string> = {
-//   SYNDIC:    "/syndic/dashboard",
-//   BAILLEUR:  "/syndic/dashboard",
-//   MAIRIE:    "/syndic/dashboard",
-//   GARDIEN:   "/gardien/home",
-//   CHAUFFEUR: "/chauffeur/tournee",
-//   HABITANT:  "/habitant/home",
-//   ADMIN:     "/admin/dashboard",
-// };
+const redirectByRole: Record<string, string> = {
+  SYNDIC:    "/syndic/dashboard",
+  BAILLEUR:  "/syndic/dashboard",
+  MAIRIE:    "/syndic/dashboard",
+  GARDIEN:   "/gardien/home",
+  CHAUFFEUR: "/chauffeur/tournee",
+  HABITANT:  "/habitant/home",
+  ADMIN:     "/admin/dashboard",
+};
 
-//  export { redirectByRole };
+export { redirectByRole };
 
 // ─────────────────────────────────────────
 // APP
@@ -95,11 +97,11 @@ export default function App() {
                 {/* ── Syndic / Bailleur / Mairie ── */}
                 <Route
                   path="/syndic/dashboard"
-                  // element={
-                  //   <ProtectedRoute roles={["SYNDIC", "BAILLEUR", "MAIRIE", "ADMIN"]}>
-                  //     <DashboardPage />
-                  //   </ProtectedRoute>
-                  // }
+                  element={
+                    <ProtectedRoute roles={["SYNDIC", "BAILLEUR", "MAIRIE", "ADMIN"]}>
+                      <DashboardPage />
+                    </ProtectedRoute>
+                  }
                 />
                 <Route
                   path="/syndic/tournees"
