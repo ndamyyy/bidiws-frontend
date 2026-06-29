@@ -1,0 +1,239 @@
+/* ============================================================
+   BIDIWS — ChauffeurTourneePage
+   Fichier : src/pages/chauffeur/ChauffeurTourneePage/ChauffeurTourneePage.css
+   ============================================================ */
+
+.chauffeur__header { margin-bottom: 24px; }
+
+.chauffeur__title {
+  font-family: "Syne", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #f0f4ff;
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.chauffeur__subtitle { font-size: 13px; color: #6b84a3; }
+
+/* ─── GPS Toggle ─── */
+.chauffeur__gps {
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s;
+  animation: fadeUp 0.4s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.chauffeur__gps--on {
+  background: rgba(76, 175, 80, 0.1);
+  border: 1.5px solid rgba(76, 175, 80, 0.3);
+}
+
+.chauffeur__gps--off {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.chauffeur__gps-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.chauffeur__gps-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.chauffeur__gps-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #f0f4ff;
+}
+
+.chauffeur__gps-desc {
+  font-size: 12px;
+  margin-top: 2px;
+  transition: color 0.3s;
+}
+
+/* ─── Toggle switch ─── */
+.toggle-switch {
+  width: 52px;
+  height: 28px;
+  border-radius: 14px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.25s;
+  border: none;
+  outline: none;
+  flex-shrink: 0;
+}
+
+.toggle-switch__thumb {
+  position: absolute;
+  top: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: left 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── Progression ─── */
+.chauffeur__progress {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 18px;
+  animation: fadeUp 0.4s 0.08s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.chauffeur__progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.chauffeur__progress-title {
+  font-family: "Syne", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f0f4ff;
+}
+
+.chauffeur__progress-count {
+  font-size: 13px;
+  color: #4caf50;
+  font-weight: 600;
+}
+
+/* ─── Liste arrêts ─── */
+.chauffeur__arrets {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: fadeUp 0.4s 0.15s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.chauffeur__arrets-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: "Syne", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f0f4ff;
+}
+
+/* ─── Arret item ─── */
+.c-arret-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.18s;
+}
+
+.c-arret-item:last-child { border-bottom: none; }
+
+.c-arret-item--current {
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.c-arret-item__step {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.c-arret-item__step--done {
+  background: rgba(76, 175, 80, 0.15);
+  border: 1.5px solid #4caf50;
+}
+
+.c-arret-item__step--current {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1.5px solid #f59e0b;
+  animation: glowAmber 2s infinite;
+}
+
+.c-arret-item__step--pending {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  color: #6b84a3;
+}
+
+@keyframes glowAmber {
+  0%, 100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.3); }
+  50%       { box-shadow: 0 0 20px rgba(245, 158, 11, 0.6); }
+}
+
+.c-arret-item__info { flex: 1; }
+
+.c-arret-item__name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #f0f4ff;
+}
+
+.c-arret-item__addr {
+  font-size: 12px;
+  color: #6b84a3;
+  margin-top: 2px;
+}
+
+.c-arret-item__heure {
+  font-size: 11px;
+  color: #4caf50;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* ─── Bouton valider ─── */
+.btn-valider-chauffeur {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  color: #fff;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: transform 0.18s, box-shadow 0.18s;
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.35);
+  white-space: nowrap;
+}
+
+.btn-valider-chauffeur:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(76, 175, 80, 0.45);
+}
