@@ -1,0 +1,27 @@
+/* src/components/ui/AnimatedCard/AnimatedCard.css */
+.animated-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px 18px;
+  cursor: default;
+  transition: border-color var(--t-fast) var(--ease-smooth);
+}
+
+@media (min-width: 768px) {
+  .animated-card {
+    padding: 22px 24px;
+  }
+}
+
+.animated-card--clickable {
+  cursor: pointer;
+}
+
+.animated-card--clickable:hover {
+  border-color: var(--border-default);
+}
+
+.animated-card--glow:hover {
+  box-shadow: var(--shadow-card), var(--shadow-glow);
+}

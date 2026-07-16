@@ -4,11 +4,12 @@
 // Fichier : src/App.tsx
 // ============================================================
 
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthContext";
 import { NotificationProvider } from "./context/NotificationContext";
-// Role values are used as runtime strings here; import the type elsewhere if needed
+// Role values are used as runtime strings here; 
 
 // ─── Pages publiques ───────────────────────────────────────
 import LoginPage from "./pages/LoginPage/LoginPage";
@@ -38,6 +39,8 @@ import HabitantHomePage from "./pages/habitant/HabitantHomePage/HabitantHomePage
 // ─── Pages Admin ───────────────────────────────────────────
 // import AdminDashboardPage from "./pages/admin/AdminDashboardPage/AdminDashboardPage";
 // import AdminUsersPage from "./pages/admin/AdminUsersPage/AdminUsersPage";
+
+
 
 // ─────────────────────────────────────────
 // QUERY CLIENT
