@@ -4,7 +4,12 @@
 // ============================================================
 
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { getAllResidences, getResidenceById } from "../api/residences.api";
+import {
+  getAllResidences,
+  getResidenceById,
+  getResidencesByGardien,
+  type ResidenceGardien,
+} from "../api/residences.api";
 import type { Residence } from "../types";
 
 // ─────────────────────────────────────────
@@ -27,5 +32,19 @@ export function useResidence(id: number | undefined): UseQueryResult<Residence> 
     queryKey: ["residences", id],
     queryFn: () => getResidenceById(id as number),
     enabled: id !== undefined,
+  });
+}
+
+// ─────────────────────────────────────────
+// RÉSIDENCES D'UN GARDIEN
+// ─────────────────────────────────────────
+
+export function useResidencesGardien(
+  gardienId: number | undefined
+): UseQueryResult<ResidenceGardien[]> {
+  return useQuery({
+    queryKey: ["residence-gardiens", "gardien", gardienId],
+    queryFn: () => getResidencesByGardien(gardienId as number),
+    enabled: gardienId !== undefined,
   });
 }

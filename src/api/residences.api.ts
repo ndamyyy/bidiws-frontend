@@ -80,3 +80,28 @@ export const assignerGardien = async (
     principal,
   });
 };
+
+// ─────────────────────────────────────────
+// RÉSIDENCES D'UN GARDIEN
+// GET /residence-gardiens/gardien/:gardienId
+// Forme du DTO NON vérifiée contre le backend réel (pas de compte de
+// test disponible pour cette session) — supposée dénormalisée avec le
+// nom de résidence par analogie avec les autres réponses de liens du
+// projet (ex: ArretConteneur). À confirmer/ajuster au premier test réel.
+// ─────────────────────────────────────────
+
+export interface ResidenceGardien {
+  residenceId : number;
+  residenceNom: string;
+  gardienId   : number;
+  principal   : boolean;
+}
+
+export const getResidencesByGardien = async (
+  gardienId: number
+): Promise<ResidenceGardien[]> => {
+  const response = await apiClient.get<ResidenceGardien[]>(
+    `/residence-gardiens/gardien/${gardienId}`
+  );
+  return response.data;
+};

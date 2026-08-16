@@ -4,10 +4,23 @@
 // ============================================================
 
 import { JSX } from "react/jsx-runtime";
-import { useAuth } from "../../../hooks/useAuth" 
-import { MOCK_NOTIFICATIONS, getResidencesByGardienId }  from "../../../mocks/data";
-import type { Notification }                              from "../../../types";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "../../../hooks/useAuth";
+import { useNotifications } from "../../../hooks/useNotifications";
+import { useResidencesGardien } from "../../../hooks/useResidences";
+import { useTournee } from "../../../hooks/useTournees";
+import { getArretsByResidence } from "../../../api/arrets.api";
+import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import "./GardienHomePage.css";
+
+// ─────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────
+
+const formatHeure = (iso: string | undefined): string => {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+};
 
 // ─────────────────────────────────────────
 // ICÔNES
@@ -50,21 +63,43 @@ const IconSmall = ({ name, color }: { name: string; color: string }) => {
 
 export default function GardienHomePage() {
   const { utilisateur } = useAuth();
+  const { notifications } = useNotifications();
 
-  // Résidences du gardien connecté (mock: id=2)
-  const userId     = utilisateur?.id ?? 2;
-  const residences = getResidencesByGardienId(userId);
-  const residence  = residences[0];
+  // ── Résidence(s) du gardien connecté ──
+  const gardienId = utilisateur?.id;
+  const { data: residencesGardien, isLoading: isLoadingResidences } =
+    useResidencesGardien(gardienId);
 
-  // Notifications du gardien
-  const mesNotifs: Notification[] = MOCK_NOTIFICATIONS.filter(
-    n => n.destinataireId === userId
-  );
+  const residenceLien = residencesGardien?.find(r => r.principal) ?? residencesGardien?.[0];
+  const residenceId   = residenceLien?.residenceId;
 
-  // Statut de la collecte
-  const derniereNotif = mesNotifs[0];
-  const isConfirmed   = derniereNotif?.type === 'COLLECTE_CONFIRMEE';
-  const isApproching  = derniereNotif?.type === 'APPROCHE';
+  // ── Arrêt "actuel" ──
+  // Pas d'endpoint filtré par date côté backend, et Arret n'a pas de
+  // date propre (elle vit sur la Tournee via tourneeId) : on prend le
+  // plus récent par createdAt comme dernier statut connu. Ce n'est pas
+  // une garantie que c'est l'arrêt "d'aujourd'hui", juste le plus
+  // raisonnable en attendant un vrai filtre côté backend.
+  const { data: arrets, isLoading: isLoadingArrets } = useQuery({
+    queryKey: ["arrets", "residence", residenceId],
+    queryFn: () => getArretsByResidence(residenceId as number),
+    enabled: residenceId !== undefined,
+  });
+
+  const arretActuel = arrets
+    ? [...arrets].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]
+    : undefined;
+
+  // ── Tournée de l'arrêt actuel (type de collecte, chauffeur, camion) ──
+  const { data: tournee, isLoading: isLoadingTournee } = useTournee(arretActuel?.tourneeId);
+
+  // ── Notifications du gardien, scopées à cette résidence ──
+  const mesNotifs = notifications.filter(n => n.residenceId === residenceId);
+
+  // ── Statut de la collecte — basé sur l'arrêt, pas la dernière notif ──
+  const isConfirmed  = arretActuel?.statut === 'COLLECTE_CONFIRMEE';
+  const isApproching = arretActuel?.statut === 'EN_APPROCHE';
+
+  const isChargement = isLoadingResidences || isLoadingArrets || isLoadingTournee;
 
   const heroClass = isConfirmed
     ? "gardien__hero--confirmed"
@@ -79,13 +114,17 @@ export default function GardienHomePage() {
     ? "rgba(33,150,243,0.2)"
     : "rgba(245,158,11,0.2)";
 
+  if (isChargement) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <div>
       {/* ── En-tête ── */}
       <div className="gardien__header">
         <h1 className="gardien__title">Ma résidence</h1>
         <p className="gardien__subtitle">
-          {residence?.nom ?? "Résidence non assignée"}
+          {residenceLien?.residenceNom ?? "Résidence non assignée"}
         </p>
       </div>
 
@@ -126,10 +165,10 @@ export default function GardienHomePage() {
       {/* ── Infos du jour ── */}
       <div className="gardien__info-grid">
         {[
-          { label: "Type de collecte", value: "Ordures ménagères", icon: "trash" },
-          { label: "Chauffeur",        value: "Karim Ba",          icon: "user"  },
-          { label: "Camion",           value: "TK-4521",           icon: "truck" },
-          { label: "Créneau estimé",   value: "09h00 – 11h00",     icon: "clock" },
+          { label: "Type de collecte", value: tournee?.typeCollecte.libelle ?? "—", icon: "trash" },
+          { label: "Chauffeur",        value: tournee ? `${tournee.chauffeur.prenom} ${tournee.chauffeur.nom}` : "—", icon: "user"  },
+          { label: "Camion",           value: tournee?.camion.immatriculation ?? "—", icon: "truck" },
+          { label: "Créneau estimé",   value: formatHeure(arretActuel?.heureEstimee), icon: "clock" },
         ].map(item => (
           <div key={item.label} className="info-card">
             <div className="info-card__icon">
