@@ -11,7 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { login as apiLogin, logout as apiLogout } from "../api/auth.api";
+import { login as apiLogin, logout as apiLogout, getMe } from "../api/auth.api";
 import { getToken, removeToken } from "../api/axios";
 import type { AuthUser, LoginRequest, Utilisateur } from "../types";
 
@@ -88,9 +88,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoading(true);
     try {
       const response = await apiLogin(data);
-      localStorage.setItem("bidiws_user", JSON.stringify(response.utilisateur));
-      setAuthUser({ token: response.token, utilisateur: response.utilisateur });
-      navigate(redirectByRole[response.utilisateur.role]);
+      const utilisateur = await getMe();
+      localStorage.setItem("bidiws_user", JSON.stringify(utilisateur));
+      setAuthUser({ token: response.token, utilisateur });
+      navigate(redirectByRole[utilisateur.role]);
     } finally {
       setIsLoading(false);
     }

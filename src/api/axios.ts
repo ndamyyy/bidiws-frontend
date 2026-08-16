@@ -14,7 +14,7 @@ import type {
 // CONSTANTES
 // ─────────────────────────────────────────
 
-const BASE_URL = (import.meta as { env?: { VITE_API_URL?: string } }).env?.VITE_API_URL ?? "http://localhost:8080/api";
+const BASE_URL = (import.meta as { env?: { VITE_API_URL?: string } }).env?.VITE_API_URL ?? "http://localhost:8081/bidiws";
 const TOKEN_KEY = "bidiws_token";
 
 // ─────────────────────────────────────────
