@@ -375,6 +375,41 @@
   .login__field-input { padding: 12px 16px; font-size: 14px; }
 }
 
+.login__field-wrap { position: relative; }
+.login__field-wrap .login__field-input { padding-right: 40px; }
+
+.login__field-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity var(--t-fast) var(--ease-smooth);
+}
+.login__field-toggle:hover { opacity: 1; }
+
+.login__admin-link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 12px;
+  padding: 4px;
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color var(--t-fast) var(--ease-smooth);
+}
+.login__admin-link:hover { color: var(--text-primary); }
+
 .login__error {
   background: rgba(255, 79, 100, 0.08);
   border: 1px solid rgba(255, 79, 100, 0.2);

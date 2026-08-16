@@ -3,7 +3,7 @@
 // Fichier : src/pages/LoginPage/LoginPage.tsx
 // ============================================================
 
-import { JSX, useState }        from "react";
+import { JSX, useRef, useState } from "react";
 import { useAuth }         from "../../hooks/useAuth";
 import type { Role }       from "../../types";
 import "./LoginPage.css";
@@ -88,6 +88,21 @@ const IconBarChart = ({ color }: { color: string }) => (
   </svg>
 );
 
+const IconEye = ({ color }: { color: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+
+const IconEyeOff = ({ color }: { color: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+    <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
+
 // ─────────────────────────────────────────
 // RÔLES DISPONIBLES
 // ─────────────────────────────────────────
@@ -137,14 +152,25 @@ const ROLE_OPTIONS: RoleOption[] = [
 export default function LoginPage() {
   const { login, isLoading } = useAuth();
 
-  const [selectedRole, setSelectedRole] = useState<Role>('SYNDIC');
-  const [email,        setEmail]        = useState<string>("");
-  const [motDePasse,   setMotDePasse]   = useState<string>("");
-  const [error,        setError]        = useState<string>("");
+  const [selectedRole,    setSelectedRole]    = useState<Role>('SYNDIC');
+  const [email,           setEmail]           = useState<string>("");
+  const [motDePasse,      setMotDePasse]      = useState<string>("");
+  const [error,           setError]           = useState<string>("");
+  const [showMotDePasse,  setShowMotDePasse]  = useState<boolean>(false);
+
+  const emailInputRef = useRef<HTMLInputElement>(null);
 
   const handleRoleSelect = (role: Role): void => {
     setSelectedRole(role);
     setError("");
+  };
+
+  // ── Lien admin : pas de rôle dédié, juste le même formulaire ──
+  const handleAdminClick = (): void => {
+    setEmail("");
+    setMotDePasse("");
+    setError("");
+    emailInputRef.current?.focus();
   };
 
   // ── Soumission ──
@@ -284,6 +310,7 @@ export default function LoginPage() {
             <div className="login__field">
               <label className="login__field-label">Email</label>
               <input
+                ref={emailInputRef}
                 className="login__field-input"
                 type="email"
                 placeholder="votre@email.com"
@@ -294,14 +321,25 @@ export default function LoginPage() {
             </div>
             <div className="login__field">
               <label className="login__field-label">Mot de passe</label>
-              <input
-                className="login__field-input"
-                type="password"
-                placeholder="••••••••"
-                value={motDePasse}
-                onChange={(e) => setMotDePasse(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              />
+              <div className="login__field-wrap">
+                <input
+                  className="login__field-input"
+                  type={showMotDePasse ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={motDePasse}
+                  onChange={(e) => setMotDePasse(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                />
+                <button
+                  type="button"
+                  className="login__field-toggle"
+                  onClick={() => setShowMotDePasse((v) => !v)}
+                  tabIndex={-1}
+                  title={showMotDePasse ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                >
+                  {showMotDePasse ? <IconEyeOff color="#6b84a3" /> : <IconEye color="#6b84a3" />}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -318,6 +356,15 @@ export default function LoginPage() {
               ? <span className="login__spinner" />
               : <>Accéder à mon espace</>
             }
+          </button>
+
+          {/* ── Lien admin ── */}
+          <button
+            type="button"
+            className="login__admin-link"
+            onClick={handleAdminClick}
+          >
+            Connexion administrateur
           </button>
 
           {/* ── Footer ── */}
