@@ -4,23 +4,23 @@
 // ============================================================
 
 import apiClient from "./axios";
-import type { Arret, ArretValiderRequest, SignalGpsRequest } from "../types";
+import type { Arret, ArretConteneur, StatutArret, SignalGpsRequest } from "../types";
 
 // ─────────────────────────────────────────
 // ARRÊTS D'UNE TOURNÉE
-// GET /api/tournees/:tourneeId/arrets
+// GET /arrets/tournee/:tourneeId
 // ─────────────────────────────────────────
 
 export const getArretsByTournee = async (tourneeId: number): Promise<Arret[]> => {
   const response = await apiClient.get<Arret[]>(
-    `/tournees/${tourneeId}/arrets`
+    `/arrets/tournee/${tourneeId}`
   );
   return response.data;
 };
 
 // ─────────────────────────────────────────
 // UN ARRÊT PAR ID
-// GET /api/arrets/:id
+// GET /arrets/:id
 // ─────────────────────────────────────────
 
 export const getArretById = async (id: number): Promise<Arret> => {
@@ -30,57 +30,68 @@ export const getArretById = async (id: number): Promise<Arret> => {
 
 // ─────────────────────────────────────────
 // ARRÊTS D'UNE RÉSIDENCE (historique)
-// GET /api/residences/:residenceId/arrets
+// GET /arrets/residence/:residenceId
 // ─────────────────────────────────────────
 
 export const getArretsByResidence = async (
   residenceId: number
 ): Promise<Arret[]> => {
   const response = await apiClient.get<Arret[]>(
-    `/residences/${residenceId}/arrets`
+    `/arrets/residence/${residenceId}`
   );
   return response.data;
 };
 
 // ─────────────────────────────────────────
-// VALIDER UN ARRÊT (chauffeur)
-// PUT /api/arrets/:id/valider
+// CONTENEURS D'UN ARRÊT (détail par bac)
+// GET /arrets/:id/conteneurs
+// ─────────────────────────────────────────
+
+export const getConteneursByArret = async (id: number): Promise<ArretConteneur[]> => {
+  const response = await apiClient.get<ArretConteneur[]>(`/arrets/${id}/conteneurs`);
+  return response.data;
+};
+
+// ─────────────────────────────────────────
+// CHANGER LE STATUT D'UN ARRÊT (chauffeur)
+// PATCH /arrets/:id/statut?statut=X
 // ─────────────────────────────────────────
 
 export const validerArret = async (
   id: number,
-  data: ArretValiderRequest
+  statut: StatutArret
 ): Promise<Arret> => {
-  const response = await apiClient.put<Arret>(`/arrets/${id}/valider`, data);
+  const response = await apiClient.patch<Arret>(
+    `/arrets/${id}/statut`,
+    null,
+    { params: { statut } }
+  );
   return response.data;
 };
 
 // ─────────────────────────────────────────
 // SIGNALER UN INCIDENT SUR UN ARRÊT
-// PUT /api/arrets/:id/incident
+// PATCH /arrets/:id/incident
 // ─────────────────────────────────────────
 
 export interface IncidentRequest {
-  description : string;
-  photoUrl   ?: string;
+  descriptionIncident : string;
+  photoIncidentUrl   ?: string;
 }
 
 export const signalerIncident = async (
   id: number,
   data: IncidentRequest
 ): Promise<Arret> => {
-  const response = await apiClient.put<Arret>(`/arrets/${id}/incident`, data);
+  const response = await apiClient.patch<Arret>(`/arrets/${id}/incident`, data);
   return response.data;
 };
 
 // ─────────────────────────────────────────
 // ENVOYER UN SIGNAL GPS
-// POST /api/arrets/gps
+// POST /signaux-gps (tourneeId dans le body)
 // ─────────────────────────────────────────
 
-export const envoyerSignalGps = async (
-  tourneeId: number,
-  data: SignalGpsRequest
-): Promise<void> => {
-  await apiClient.post(`/tournees/${tourneeId}/gps`, data);
+export const envoyerSignalGps = async (data: SignalGpsRequest): Promise<void> => {
+  await apiClient.post("/signaux-gps", data);
 };

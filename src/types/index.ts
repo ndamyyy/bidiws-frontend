@@ -185,6 +185,20 @@ export interface Arret {
   updatedAt            : string;
 }
 
+// Détail d'un bac/conteneur rattaché à un arrêt — forme exacte du
+// backend ArretConteneurResponseDto (vérifiée en conditions réelles,
+// session du 16/08/2026)
+export interface ArretConteneur {
+  id                     : number;
+  conteneurId            : number;
+  conteneurCode          : string;
+  statut                 : 'EN_ATTENTE' | 'EN_APPROCHE' | 'COLLECTE_PROBABLE' | 'COLLECTE_CONFIRMEE' | 'INCIDENT';
+  modeDetection          : 'VALIDATION_CHAUFFEUR' | 'CAPTEUR_BENNE' | 'RFID' | 'GPS_AUTO' | null;
+  scoreConfiance         : number | null;
+  horodatageConfirmation : string | null;
+  niveauRemplissagePct   : number | null;
+}
+
 export interface SignalGps {
   id          : number;
   tourneeId   : number;
@@ -262,11 +276,13 @@ export interface ArretValiderRequest {
 }
 
 export interface SignalGpsRequest {
+  tourneeId   : number;
   latitude    : number;
   longitude   : number;
   vitesseKmh ?: number;
   cap        ?: number;
   precisionM ?: number;
+  horodatage  : string;
   source      : SourceGps;
 }
 
@@ -275,6 +291,7 @@ export interface SignalementRequest {
   arretId     ?: number;
   type         : TypeSignalement;
   description ?: string;
+  photoUrl    ?: string;
   latitude    ?: number;
   longitude   ?: number;
 }
@@ -284,9 +301,7 @@ export interface SignalementRequest {
 // ─────────────────────────────────────────
 
 export interface AuthResponse {
-  token       : string;
-  type        : string;       // "Bearer"
-  utilisateur : Utilisateur;
+  token : string;
 }
 
 export interface PageResponse<T> {
@@ -305,6 +320,7 @@ export interface ApiError {
   timestamp : string;
   path      : string;
 }
+
 
 // ─────────────────────────────────────────
 // TYPES UTILITAIRES FRONTEND
