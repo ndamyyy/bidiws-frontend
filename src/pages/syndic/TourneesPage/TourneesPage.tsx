@@ -194,12 +194,12 @@ export default function TourneesPage() {
             {/* Header */}
             <div className="tournee-card__head">
               <div className="tournee-card__head-left">
-                <div className="tournee-card__type">{t.typeCollecte.libelle}</div>
+                <div className="tournee-card__type">{t.typeCollecteLibelle}</div>
                 <div className="tournee-card__meta">
                   <IconTruck color="#6b84a3" />
-                  {t.chauffeur.prenom} {t.chauffeur.nom}
-                  &nbsp;·&nbsp; {t.camion.immatriculation}
-                  {t.zone && <>&nbsp;·&nbsp; Secteur {t.zone.code}</>}
+                  {t.chauffeurPrenom} {t.chauffeurNom}
+                  &nbsp;·&nbsp; {t.camionImmatriculation}
+                  {t.zoneNom && <>&nbsp;·&nbsp; {t.zoneNom}</>}
                 </div>
               </div>
               <div className="tournee-card__head-right">

@@ -236,10 +236,10 @@ export default function DashboardPage() {
             <div key={t.id} className="tournee-item">
               <div className="tournee-item__header">
                 <div>
-                  <div className="tournee-item__name">{t.typeCollecte.libelle}</div>
+                  <div className="tournee-item__name">{t.typeCollecteLibelle}</div>
                   <div className="tournee-item__meta">
-                    {t.chauffeur.prenom} {t.chauffeur.nom} · {t.camion.immatriculation}
-                    {t.zone && ` · Secteur ${t.zone.code}`}
+                    {t.chauffeurPrenom} {t.chauffeurNom} · {t.camionImmatriculation}
+                    {t.zoneNom && ` · ${t.zoneNom}`}
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

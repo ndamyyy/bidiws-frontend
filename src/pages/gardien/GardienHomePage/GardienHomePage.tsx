@@ -165,9 +165,9 @@ export default function GardienHomePage() {
       {/* ── Infos du jour ── */}
       <div className="gardien__info-grid">
         {[
-          { label: "Type de collecte", value: tournee?.typeCollecte.libelle ?? "—", icon: "trash" },
-          { label: "Chauffeur",        value: tournee ? `${tournee.chauffeur.prenom} ${tournee.chauffeur.nom}` : "—", icon: "user"  },
-          { label: "Camion",           value: tournee?.camion.immatriculation ?? "—", icon: "truck" },
+          { label: "Type de collecte", value: tournee?.typeCollecteLibelle ?? "—", icon: "trash" },
+          { label: "Chauffeur",        value: tournee ? `${tournee.chauffeurPrenom} ${tournee.chauffeurNom}` : "—", icon: "user"  },
+          { label: "Camion",           value: tournee?.camionImmatriculation ?? "—", icon: "truck" },
           { label: "Créneau estimé",   value: formatHeure(arretActuel?.heureEstimee), icon: "clock" },
         ].map(item => (
           <div key={item.label} className="info-card">

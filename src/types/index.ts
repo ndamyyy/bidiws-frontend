@@ -150,18 +150,33 @@ export interface Camion {
   actif           : boolean;
 }
 
+// Forme plate confirmée contre le vrai TourneeResponseDto (testé en
+// Postman) — le backend dénormalise typeCollecte/camion/chauffeur/zone
+// au lieu de les imbriquer. `createdAt` n'a pas pu être confirmé
+// (absent de l'échantillon vérifié, tentative de retest en session
+// bloquée par des 500 backend sur /tournees) — laissé optionnel par
+// prudence plutôt que deviné. `arrets` conservé tel quel : absent de
+// l'échantillon DTO mais toujours utilisé comme état imbriqué mutable
+// par ChauffeurTourneePage/TourneesPage (mocks) — sortir ce champ du
+// type est un changement plus large que le simple aplatissement demandé
+// ici, à traiter quand ces pages seront débranchées des mocks.
 export interface Tournee {
-  id              : number;
-  dateTournee     : string;       // "YYYY-MM-DD"
-  typeCollecte    : TypeCollecte;
-  camion          : Camion;
-  chauffeur       : Utilisateur;
-  zone           ?: Zone;
-  statut          : StatutTournee;
-  heureDebut     ?: string;
-  heureFin       ?: string;
-  createdAt       : string;
-  arrets          : Arret[];
+  id                    : number;
+  dateTournee           : string;       // "YYYY-MM-DD"
+  typeCollecteId        : number;
+  typeCollecteLibelle   : string;
+  camionId              : number;
+  camionImmatriculation : string;
+  chauffeurId           : number;
+  chauffeurNom          : string;
+  chauffeurPrenom       : string;
+  zoneId               ?: number;
+  zoneNom              ?: string;
+  statut                : StatutTournee;
+  heureDebut           ?: string;
+  heureFin             ?: string;
+  createdAt            ?: string;
+  arrets                 : Arret[];
 }
 
 export interface Arret {

@@ -185,8 +185,8 @@ export default function ChauffeurTourneePage() {
       <div className="chauffeur__header">
         <h1 className="chauffeur__title">Ma tournée</h1>
         <p className="chauffeur__subtitle">
-          {tournee.typeCollecte.libelle} · {tournee.camion.immatriculation}
-          {tournee.zone && ` · Secteur ${tournee.zone.code}`}
+          {tournee.typeCollecteLibelle} · {tournee.camionImmatriculation}
+          {tournee.zoneNom && ` · ${tournee.zoneNom}`}
         </p>
       </div>
 
