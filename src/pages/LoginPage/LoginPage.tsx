@@ -67,6 +67,27 @@ const IconCheck = () => (
   </svg>
 );
 
+const IconBolt = ({ color }: { color: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+  </svg>
+);
+
+const IconMapPin = ({ color }: { color: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+    <circle cx="12" cy="10" r="3"/>
+  </svg>
+);
+
+const IconBarChart = ({ color }: { color: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="20" x2="12" y2="10"/>
+    <line x1="18" y1="20" x2="18" y2="4"/>
+    <line x1="6" y1="20" x2="6" y2="16"/>
+  </svg>
+);
+
 // ─────────────────────────────────────────
 // RÔLES DISPONIBLES
 // ─────────────────────────────────────────
@@ -162,10 +183,9 @@ export default function LoginPage() {
   return (
     <div className="login">
 
-      {/* ── Blobs décoratifs ── */}
-      <div className="login__blob login__blob--top-left"    />
-      <div className="login__blob login__blob--bottom-right"/>
-      <div className="login__blob login__blob--center"      />
+      {/* ── Orbes décoratifs ── */}
+      <div className="login__orb login__orb--1" />
+      <div className="login__orb login__orb--2" />
 
       {/* ══════════════════════════════
           PANNEAU GAUCHE — Branding
@@ -203,13 +223,13 @@ export default function LoginPage() {
         {/* Features */}
         <div className="login__features">
           {[
-            { icon: "⚡", text: <><strong>Notification instantanée</strong> dès que le camion est passé</> },
-            { icon: "📍", text: <><strong>Suivi GPS temps réel</strong> du camion sur votre secteur</> },
-            { icon: "📊", text: <><strong>Dashboard complet</strong> pour les gestionnaires et mairies</> },
+            { icon: <IconBolt color="#39FF8C" />, text: <><strong>Notification instantanée</strong> dès que le camion est passé</> },
+            { icon: <IconMapPin color="#39FF8C" />, text: <><strong>Suivi GPS temps réel</strong> du camion sur votre secteur</> },
+            { icon: <IconBarChart color="#39FF8C" />, text: <><strong>Dashboard complet</strong> pour les gestionnaires et mairies</> },
           ].map((f, i) => (
             <div key={i} className="login__feature">
               <div className="login__feature-icon">
-                <span style={{ fontSize: 16 }}>{f.icon}</span>
+                {f.icon}
               </div>
               <span className="login__feature-text">{f.text}</span>
             </div>
