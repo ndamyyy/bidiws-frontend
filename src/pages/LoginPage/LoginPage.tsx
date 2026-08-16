@@ -142,22 +142,9 @@ export default function LoginPage() {
   const [motDePasse,   setMotDePasse]   = useState<string>("");
   const [error,        setError]        = useState<string>("");
 
-  // ── Pré-remplir l'email selon le rôle sélectionné (mock) ──
   const handleRoleSelect = (role: Role): void => {
     setSelectedRole(role);
     setError("");
-
-    // Emails de démo correspondant aux mocks
-    const demoEmails: Partial<Record<Role, string>> = {
-      'SYNDIC':    "syndic@bidiws.com",
-      'GARDIEN':   "gardien1@bidiws.com",
-      'CHAUFFEUR': "chauffeur1@bidiws.com",
-      'HABITANT':  "habitant@bidiws.com",
-      'MAIRIE':    "syndic@bidiws.com",
-      'ADMIN':     "admin@bidiws.com",
-    };
-    setEmail(demoEmails[role] ?? "");
-    setMotDePasse("Demo1234!");
   };
 
   // ── Soumission ──
