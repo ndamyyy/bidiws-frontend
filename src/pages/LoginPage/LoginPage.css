@@ -234,7 +234,7 @@
 
 .login__card {
   width: 100%;
-  background: rgba(18, 26, 46, 0.7);
+  background: var(--bg-card-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-subtle);

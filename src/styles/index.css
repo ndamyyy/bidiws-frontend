@@ -13,7 +13,8 @@
   --bg-card:        #16203A;
   --bg-card-hover:  #1C2A4A;
   --bg-input:       #1A2440;
-  
+  --bg-card-glass:  rgba(18, 26, 46, 0.7);
+
   /* ── Accent : Signal ── */
   --signal:         #39FF8C;
   --signal-dim-05:  rgba(57, 255, 140, 0.05);
@@ -604,6 +605,7 @@ h4, .h4 { font-family: var(--font-display); font-size: clamp(16px, 2vw, 20px); f
   --bg-card:        #FFFFFF;
   --bg-card-hover:  #EEF1F6;
   --bg-input:       #F1F3F7;
+  --bg-card-glass:  rgba(255, 255, 255, 0.75);
 
   /* Accent inchangés (identité de marque) — seules les variantes
      "dim" sont éclaircies pour rester visibles sur fond clair. */

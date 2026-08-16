@@ -5,8 +5,8 @@
 
 .topbar {
   height: 64px;
-  background: rgba(10, 21, 32, 0.95);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-card-glass);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -24,13 +24,13 @@
   font-family: "Syne", sans-serif;
   font-size: 18px;
   font-weight: 700;
-  color: #f0f4ff;
+  color: var(--text-primary);
   letter-spacing: -0.3px;
 }
 
 .topbar__subtitle {
   font-size: 12px;
-  color: #6b84a3;
+  color: var(--text-secondary);
   margin-top: 1px;
   font-weight: 400;
 }
@@ -47,8 +47,8 @@
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,8 +57,8 @@
 }
 
 .topbar__theme-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--bg-card-hover);
+  border-color: var(--border-default);
 }
 
 /* ─── Bouton notification ─── */
@@ -67,8 +67,8 @@
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -77,8 +77,8 @@
 }
 
 .topbar__notif-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--bg-card-hover);
+  border-color: var(--border-default);
 }
 
 .topbar__notif-badge {
@@ -88,23 +88,23 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #ef4444;
+  background: var(--critical);
   color: #fff;
   font-size: 10px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #0a1520;
+  border: 2px solid var(--bg-elevated);
 }
 
 /* ─── Date ─── */
 .topbar__date {
   font-size: 12px;
-  color: #6b84a3;
+  color: var(--text-secondary);
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
 }
 
