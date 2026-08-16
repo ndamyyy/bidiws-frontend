@@ -7,6 +7,7 @@
 import {
   createContext,
   useState,
+  useEffect,
   useCallback,
   type ReactNode,
 } from "react";
@@ -24,6 +25,7 @@ export interface AuthContextType {
   utilisateur    : Utilisateur | null;
   isAuthenticated: boolean;
   isLoading      : boolean;
+  isInitializing : boolean;
   login          : (data: LoginRequest) => Promise<void>;
   logout         : () => void;
 }
@@ -49,26 +51,12 @@ const redirectByRole: Record<Utilisateur["role"], string> = {
 };
 
 // ─────────────────────────────────────────
-// SESSION INITIALE
+// DURÉE MINIMALE DU SPLASH
+// Évite un flash trop brutal si la validation du token répond
+// quasi instantanément ; ne rallonge jamais une réponse lente.
 // ─────────────────────────────────────────
 
-const getInitialAuthUser = (): AuthUser | null => {
-  const token = getToken();
-  const stored = localStorage.getItem("bidiws_user");
-
-  if (!token || !stored) {
-    return null;
-  }
-
-  try {
-    const utilisateur: Utilisateur = JSON.parse(stored);
-    return { token, utilisateur };
-  } catch {
-    removeToken();
-    localStorage.removeItem("bidiws_user");
-    return null;
-  }
-};
+const MIN_SPLASH_MS = 450;
 
 // ─────────────────────────────────────────
 // PROVIDER
@@ -79,9 +67,47 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [authUser, setAuthUser] = useState<AuthUser | null>(getInitialAuthUser);
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isInitializing, setIsInitializing] = useState<boolean>(true);
   const navigate = useNavigate();
+
+  // ── Revalider la session au montage ──
+  // Le localStorage seul ne suffit pas à savoir si le token est encore
+  // valide (peut avoir expiré côté serveur) — on le vérifie réellement
+  // via GET /utilisateurs/moi pendant l'affichage du SplashScreen.
+  useEffect(() => {
+    let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const revaliderSession = async (): Promise<void> => {
+      const token = getToken();
+      if (!token) return;
+
+      try {
+        const utilisateur = await getMe();
+        if (cancelled) return;
+        localStorage.setItem("bidiws_user", JSON.stringify(utilisateur));
+        setAuthUser({ token, utilisateur });
+      } catch {
+        removeToken();
+        localStorage.removeItem("bidiws_user");
+      }
+    };
+
+    const minDelay = new Promise<void>((resolve) => {
+      timeoutId = setTimeout(resolve, MIN_SPLASH_MS);
+    });
+
+    Promise.all([revaliderSession(), minDelay]).finally(() => {
+      if (!cancelled) setIsInitializing(false);
+    });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   // ── Login ──
   const login = useCallback(async (data: LoginRequest): Promise<void> => {
@@ -109,6 +135,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     utilisateur    : authUser?.utilisateur ?? null,
     isAuthenticated: authUser !== null,
     isLoading,
+    isInitializing,
     login,
     logout,
   };

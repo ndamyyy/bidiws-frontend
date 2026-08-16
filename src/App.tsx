@@ -10,10 +10,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthContext";
 import { WebSocketProvider } from "./context/WebSocketContext";
 import { NotificationProvider } from "./context/NotificationContext";
-// Role values are used as runtime strings here; 
+import { useAuth } from "./hooks/useAuth";
+// Role values are used as runtime strings here;
 
 // ─── Pages publiques ───────────────────────────────────────
 import LoginPage from "./pages/LoginPage/LoginPage";
+import SplashScreen from "./components/SplashScreen/SplashScreen";
 
 // ─── Layout ────────────────────────────────────────────────
 import Layout from "./components/layout/Layout/Layout";
@@ -81,12 +83,33 @@ export { redirectByRole };
 
 export default function App() {
   return (
-  <BrowserRouter>
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <WebSocketProvider>
-        <NotificationProvider>
-          <Routes>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <AppShell />
+        </AuthProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
+  );
+}
+
+// ─────────────────────────────────────────
+// APP SHELL
+// Attend la revalidation de la session (isInitializing) avant de
+// monter le routing — affiche le SplashScreen à la place entre-temps.
+// ─────────────────────────────────────────
+
+function AppShell() {
+  const { isInitializing } = useAuth();
+
+  if (isInitializing) {
+    return <SplashScreen />;
+  }
+
+  return (
+    <WebSocketProvider>
+      <NotificationProvider>
+        <Routes>
 
               {/* ── Route publique ── */}
               <Route path="/login" element={<LoginPage />} />
@@ -210,11 +233,8 @@ export default function App() {
               {/* ── 404 — redirect login ── */}
               <Route path="*" element={<Navigate to="/login" replace />} />
 
-                      </Routes>
-        </NotificationProvider>
-        </WebSocketProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  </BrowserRouter>
-);
+        </Routes>
+      </NotificationProvider>
+    </WebSocketProvider>
+  );
 }
