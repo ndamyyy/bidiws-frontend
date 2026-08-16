@@ -1,14 +1,16 @@
+/* eslint-disable react-refresh/only-export-components */
 // ============================================================
 // BIDIWS — App.tsx + Routes
 // Fichier : src/App.tsx
 // ============================================================
 
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthContext";
 import { WebSocketProvider } from "./context/WebSocketContext";
 import { NotificationProvider } from "./context/NotificationContext";
-// Role values are used as runtime strings here; import the type elsewhere if needed
+// Role values are used as runtime strings here; 
 
 // ─── Pages publiques ───────────────────────────────────────
 import LoginPage from "./pages/LoginPage/LoginPage";
@@ -17,26 +19,29 @@ import LoginPage from "./pages/LoginPage/LoginPage";
 import Layout from "./components/layout/Layout/Layout";
 
 // ─── Pages Syndic ──────────────────────────────────────────
-// import DashboardPage from "./pages/syndic/DashboardPage/DashboardPage";
-// import TourneesPage from "./pages/syndic/TourneesPage/TourneesPage";
-// import ResidencesPage from "./pages/syndic/ResidencesPage/ResidencesPage";
-// import NotificationsPage from "./pages/syndic/NotificationsPage/NotificationsPage";
+import DashboardPage from "./pages/syndic/DashboardPage/DashboardPage";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import TourneesPage from "./pages/syndic/TourneesPage/TourneesPage";
+import ResidencesPage from "./pages/syndic/ResidencesPage/ResidencesPage";
+import NotificationsPage from "./pages/syndic/NotificationsPages/NotificationsPage";
 
 // ─── Pages Gardien ─────────────────────────────────────────
-// import GardienHomePage from "./pages/gardien/GardienHomePage/GardienHomePage";
+import GardienHomePage from "./pages/gardien/GardienHomePage/GardienHomePage";
 // import GardienAlertsPage from "./pages/gardien/GardienAlertsPage/GardienAlertsPage";
 // import GardienHistoPage from "./pages/gardien/GardienHistoPage/GardienHistoPage";
 
 // ─── Pages Chauffeur ───────────────────────────────────────
-// import ChauffeurTourneePage from "./pages/chauffeur/ChauffeurTourneePage/ChauffeurTourneePage";
+import ChauffeurTourneePage from "./pages/chauffeur/ChauffeurTourneePage/ChauffeurTourneePage";
 // import ChauffeurGpsPage from "./pages/chauffeur/ChauffeurGpsPage/ChauffeurGpsPage";
 
 // ─── Pages Habitant ────────────────────────────────────────
-// import HabitantHomePage from "./pages/habitant/HabitantHomePage/HabitantHomePage";
+import HabitantHomePage from "./pages/habitant/HabitantHomePage/HabitantHomePage";
 
 // ─── Pages Admin ───────────────────────────────────────────
 // import AdminDashboardPage from "./pages/admin/AdminDashboardPage/AdminDashboardPage";
 // import AdminUsersPage from "./pages/admin/AdminUsersPage/AdminUsersPage";
+
+
 
 // ─────────────────────────────────────────
 // QUERY CLIENT
@@ -58,17 +63,17 @@ const queryClient = new QueryClient({
 // selon le rôle de l'utilisateur connecté
 // ─────────────────────────────────────────
 
-// const redirectByRole: Record<string, string> = {
-//   SYNDIC:    "/syndic/dashboard",
-//   BAILLEUR:  "/syndic/dashboard",
-//   MAIRIE:    "/syndic/dashboard",
-//   GARDIEN:   "/gardien/home",
-//   CHAUFFEUR: "/chauffeur/tournee",
-//   HABITANT:  "/habitant/home",
-//   ADMIN:     "/admin/dashboard",
-// };
+const redirectByRole: Record<string, string> = {
+  SYNDIC:    "/syndic/dashboard",
+  BAILLEUR:  "/syndic/dashboard",
+  MAIRIE:    "/syndic/dashboard",
+  GARDIEN:   "/gardien/home",
+  CHAUFFEUR: "/chauffeur/tournee",
+  HABITANT:  "/habitant/home",
+  ADMIN:     "/admin/dashboard",
+};
 
-//  export { redirectByRole };
+export { redirectByRole };
 
 // ─────────────────────────────────────────
 // APP
@@ -97,45 +102,45 @@ export default function App() {
                 {/* ── Syndic / Bailleur / Mairie ── */}
                 <Route
                   path="/syndic/dashboard"
-                  // element={
-                  //   <ProtectedRoute roles={["SYNDIC", "BAILLEUR", "MAIRIE", "ADMIN"]}>
-                  //     <DashboardPage />
-                  //   </ProtectedRoute>
-                  // }
+                  element={
+                    <ProtectedRoute roles={["SYNDIC", "BAILLEUR", "MAIRIE", "ADMIN"]}>
+                      <DashboardPage />
+                    </ProtectedRoute>
+                  }
                 />
                 <Route
                   path="/syndic/tournees"
-                  // element={
-                  //   <ProtectedRoute roles={["SYNDIC", "BAILLEUR", "MAIRIE", "ADMIN"]}>
-                  //     <TourneesPage />
-                  //   </ProtectedRoute>
-                  // }
+                  element={
+                    <ProtectedRoute roles={["SYNDIC", "BAILLEUR", "MAIRIE", "ADMIN"]}>
+                      <TourneesPage />
+                    </ProtectedRoute>
+                  }
                 />
                 <Route
                   path="/syndic/residences"
-                  // element={
-                  //   <ProtectedRoute roles={["SYNDIC", "BAILLEUR", "MAIRIE", "ADMIN"]}>
-                  //     <ResidencesPage />
-                  //   </ProtectedRoute>
-                  // }
+                  element={
+                    <ProtectedRoute roles={["SYNDIC", "BAILLEUR", "MAIRIE", "ADMIN"]}>
+                      <ResidencesPage />
+                    </ProtectedRoute>
+                  }
                 />
                 <Route
                   path="/syndic/notifications"
-                  // element={
-                  //   <ProtectedRoute roles={["SYNDIC", "BAILLEUR", "MAIRIE", "ADMIN"]}>
-                  //     <NotificationsPage />
-                  //   </ProtectedRoute>
-                  // }
+                  element={
+                    <ProtectedRoute roles={["SYNDIC", "BAILLEUR", "MAIRIE", "ADMIN"]}>
+                      <NotificationsPage />
+                    </ProtectedRoute>
+                  }
                 />
 
                 {/* ── Gardien ── */}
                 <Route
                   path="/gardien/home"
-                  // element={
-                  //   <ProtectedRoute roles={["GARDIEN", "ADMIN"]}>
-                  //     <GardienHomePage />
-                  //   </ProtectedRoute>
-                  // }
+                  element={
+                    <ProtectedRoute roles={["GARDIEN", "ADMIN"]}>
+                      <GardienHomePage />
+                    </ProtectedRoute>
+                  }
                 />
                 <Route
                   path="/gardien/alertes"
@@ -157,11 +162,11 @@ export default function App() {
                 {/* ── Chauffeur ── */}
                 <Route
                   path="/chauffeur/tournee"
-                  // element={
-                  //   <ProtectedRoute roles={["CHAUFFEUR", "ADMIN"]}>
-                  //     <ChauffeurTourneePage />
-                  //   </ProtectedRoute>
-                  // }
+                  element={
+                    <ProtectedRoute roles={["CHAUFFEUR", "ADMIN"]}>
+                      <ChauffeurTourneePage />
+                    </ProtectedRoute>
+                  }
                 />
                 <Route
                   path="/chauffeur/gps"
@@ -175,11 +180,11 @@ export default function App() {
                 {/* ── Habitant ── */}
                 <Route
                   path="/habitant/home"
-                  // element={
-                  //   <ProtectedRoute roles={["HABITANT", "ADMIN"]}>
-                  //     <HabitantHomePage />
-                  //   </ProtectedRoute>
-                  // }
+                  element={
+                    <ProtectedRoute roles={["HABITANT", "ADMIN"]}>
+                      <HabitantHomePage />
+                    </ProtectedRoute>
+                  }
                 />
 
                 {/* ── Admin ── */}

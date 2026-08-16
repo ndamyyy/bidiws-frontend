@@ -1,0 +1,179 @@
+/* ============================================================
+   BIDIWS — HabitantHomePage
+   Fichier : src/pages/habitant/HabitantHomePage/HabitantHomePage.css
+   ============================================================ */
+
+.habitant__header { margin-bottom: 24px; }
+
+.habitant__title {
+  font-family: "Syne", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #f0f4ff;
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.habitant__subtitle { font-size: 13px; color: #6b84a3; }
+
+/* ─── Prochaine collecte hero ─── */
+.habitant__next {
+  background: linear-gradient(135deg, rgba(27,58,107,0.3), rgba(27,58,107,0.1));
+  border: 1.5px solid rgba(27,58,107,0.5);
+  border-radius: 18px;
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 40px rgba(27,58,107,0.2);
+  animation: fadeUp 0.4s both cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.habitant__next-label {
+  font-size: 11px;
+  color: #6b84a3;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+
+.habitant__next-content {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.habitant__next-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(76, 175, 80, 0.15);
+  border: 1.5px solid rgba(76, 175, 80, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.habitant__next-type {
+  font-family: "Syne", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #f0f4ff;
+}
+
+.habitant__next-heure {
+  font-size: 32px;
+  font-weight: 800;
+  font-family: "Syne", sans-serif;
+  color: #4caf50;
+  margin-top: 4px;
+}
+
+.habitant__next-jour {
+  font-size: 13px;
+  color: #6b84a3;
+  margin-top: 2px;
+}
+
+/* ─── Grille collectes ─── */
+.habitant__schedule {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  animation: fadeUp 0.4s 0.1s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.habitant__schedule-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: "Syne", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f0f4ff;
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.18s;
+}
+
+.schedule-item:last-child { border-bottom: none; }
+.schedule-item:hover { background: rgba(255, 255, 255, 0.03); }
+
+.schedule-item__color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.schedule-item__type {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #f0f4ff;
+}
+
+.schedule-item__jour {
+  font-size: 12px;
+  color: #6b84a3;
+}
+
+.schedule-item__heure {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4caf50;
+}
+
+/* ─── Conseils ─── */
+.habitant__tips {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 22px;
+  animation: fadeUp 0.4s 0.15s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.habitant__tips-title {
+  font-family: "Syne", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f0f4ff;
+  margin-bottom: 14px;
+}
+
+.tip-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.tip-item:last-child { margin-bottom: 0; }
+
+.tip-item__emoji {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.tip-item__text {
+  font-size: 13px;
+  color: #6b84a3;
+  line-height: 1.5;
+}
+
+.tip-item__text strong { color: #f0f4ff; }

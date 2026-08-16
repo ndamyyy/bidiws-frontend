@@ -1,0 +1,195 @@
+/* ============================================================
+   BIDIWS — GardienHomePage
+   Fichier : src/pages/gardien/GardienHomePage/GardienHomePage.css
+   ============================================================ */
+
+.gardien__header { margin-bottom: 24px; }
+
+.gardien__title {
+  font-family: "Syne", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #f0f4ff;
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.gardien__subtitle {
+  font-size: 13px;
+  color: #6b84a3;
+}
+
+/* ─── Hero statut ─── */
+.gardien__hero {
+  border-radius: 18px;
+  padding: 28px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.4s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gardien__hero--confirmed {
+  background: linear-gradient(135deg, rgba(76,175,80,0.2), rgba(76,175,80,0.06));
+  border: 1.5px solid rgba(76,175,80,0.4);
+  box-shadow: 0 8px 40px rgba(76,175,80,0.15);
+}
+
+.gardien__hero--waiting {
+  background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.04));
+  border: 1.5px solid rgba(245,158,11,0.35);
+  box-shadow: 0 8px 40px rgba(245,158,11,0.12);
+}
+
+.gardien__hero--approaching {
+  background: linear-gradient(135deg, rgba(33,150,243,0.15), rgba(33,150,243,0.04));
+  border: 1.5px solid rgba(33,150,243,0.35);
+  box-shadow: 0 8px 40px rgba(33,150,243,0.12);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.gardien__hero-blob {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.gardien__hero-content {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.gardien__hero-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.gardien__hero-text {}
+
+.gardien__hero-title {
+  font-family: "Syne", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #f0f4ff;
+  margin-bottom: 6px;
+}
+
+.gardien__hero-desc {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ─── Grille infos ─── */
+.gardien__info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+  animation: fadeUp 0.4s 0.1s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.info-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.info-card__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: rgba(27, 58, 107, 0.2);
+  border: 1px solid rgba(27, 58, 107, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.info-card__label {
+  font-size: 10px;
+  color: #3d5166;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.info-card__value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f0f4ff;
+}
+
+/* ─── Historique alertes ─── */
+.gardien__alertes {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: fadeUp 0.4s 0.15s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gardien__alertes-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: "Syne", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f0f4ff;
+}
+
+.alerte-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.18s;
+}
+
+.alerte-item:last-child { border-bottom: none; }
+.alerte-item:hover { background: rgba(255, 255, 255, 0.03); }
+
+.alerte-item__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.alerte-item__msg {
+  flex: 1;
+  font-size: 13px;
+  color: #f0f4ff;
+  font-weight: 500;
+}
+
+.alerte-item__time {
+  font-size: 11px;
+  color: #3d5166;
+}
