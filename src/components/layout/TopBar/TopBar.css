@@ -42,6 +42,25 @@
   gap: 12px;
 }
 
+/* ─── Bouton thème ─── */
+.topbar__theme-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.topbar__theme-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
 /* ─── Bouton notification ─── */
 .topbar__notif-btn {
   position: relative;

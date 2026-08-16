@@ -591,13 +591,57 @@ h4, .h4 { font-family: var(--font-display); font-size: clamp(16px, 2vw, 20px); f
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   DARK MODE SUPPORT (prêt pour future extension)
+   THÈME CLAIR / SOMBRE
+   Ciblé via l'attribut [data-theme] posé par ThemeContext sur
+   <html> — pas par prefers-color-scheme directement, pour permettre
+   la bascule manuelle en plus du suivi automatique de l'OS.
    ═══════════════════════════════════════════════════════════════ */
 
-@media (prefers-color-scheme: light) {
-  :root {
-    /* À implémenter si nécessaire */
-  }
+[data-theme="light"] {
+  --bg-deep:        #F7F8FA;
+  --bg-surface:     #FFFFFF;
+  --bg-elevated:    #FFFFFF;
+  --bg-card:        #FFFFFF;
+  --bg-card-hover:  #EEF1F6;
+  --bg-input:       #F1F3F7;
+
+  /* Accent inchangés (identité de marque) — seules les variantes
+     "dim" sont éclaircies pour rester visibles sur fond clair. */
+  --signal-dim-05:  rgba(57, 255, 140, 0.08);
+  --signal-dim-10:  rgba(57, 255, 140, 0.14);
+  --signal-dim-20:  rgba(57, 255, 140, 0.24);
+  --signal-dim-40:  rgba(57, 255, 140, 0.45);
+  --data-dim-15:    rgba(91, 108, 255, 0.18);
+
+  --text-primary:   #101828;
+  --text-secondary: #55617A;
+  --text-muted:     #94A0B8;
+  /* --text-inverse volontairement inchangé : il sert uniquement de
+     couleur de texte sur fond --signal (boutons primaires), qui reste
+     un vert clair identique dans les deux thèmes — du texte clair
+     dessus serait illisible (contraste ~1.3:1). */
+
+  --border-subtle:  #E4E8F0;
+  --border-default: #D3D9E4;
+  --border-strong:  #B8C1D4;
+
+  --shadow-card:    0 8px 40px rgba(15, 23, 42, 0.08);
+  --shadow-elevated:0 20px 60px rgba(15, 23, 42, 0.12);
+}
+
+/* Même problème de contraste que --text-inverse : le texte des badges
+   success utilise --signal tel quel, illisible sur fond clair
+   (~1.3:1). On fonce uniquement le texte de ce badge en mode clair,
+   --signal lui-même ne change pas. */
+[data-theme="light"] .badge--success {
+  color: #1E9A54;
+}
+
+/* Le dark reste les valeurs de :root — bloc laissé vide pour que
+   [data-theme="dark"] existe explicitement sans dupliquer les valeurs,
+   et pour que le dark reste le défaut tant que ThemeProvider n'a pas
+   encore posé l'attribut (pas de flash avant hydratation). */
+[data-theme="dark"] {
 }
 
 /* ═══════════════════════════════════════════════════════════════
