@@ -6,6 +6,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthContext";
+import { WebSocketProvider } from "./context/WebSocketContext";
 import { NotificationProvider } from "./context/NotificationContext";
 // Role values are used as runtime strings here; import the type elsewhere if needed
 
@@ -78,6 +79,7 @@ export default function App() {
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <WebSocketProvider>
         <NotificationProvider>
           <Routes>
 
@@ -205,6 +207,7 @@ export default function App() {
 
                       </Routes>
         </NotificationProvider>
+        </WebSocketProvider>
       </AuthProvider>
     </QueryClientProvider>
   </BrowserRouter>

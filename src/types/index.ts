@@ -354,12 +354,3 @@ export interface PositionCamion {
   vitesse   : number;
   horodatage: string;
 }
-
-// Message WebSocket entrant
-export interface WsNotification {
-  type      : TypeNotification;
-  arretId   : number;
-  residenceId: number;
-  message   : string;
-  heure     : string;
-}

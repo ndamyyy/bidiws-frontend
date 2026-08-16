@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 // ============================================================
-// BIDIWS — Contexte Notifications (WebSocket STOMP)
+// BIDIWS — Contexte Notifications
 // Fichier : src/context/NotificationContext.tsx
 // ============================================================
 
@@ -9,25 +9,26 @@ import {
   useState,
   useEffect,
   useCallback,
-  useRef,
   type ReactNode,
 } from "react";
-import { Client } from "@stomp/stompjs";
-import SockJS from "sockjs-client";
 import { useAuth } from "../hooks/useAuth";
-import { getToken } from "../api/axios";
-import type { Notification, WsNotification } from "../types";
+import { useWebSocket } from "../hooks/useWebSocket";
+import {
+  getNotificationsByDestinataire,
+  marquerCommeLue,
+} from "../api/notifications.api";
+import type { Notification } from "../types";
 
 // ─────────────────────────────────────────
 // TYPE DU CONTEXTE
 // ─────────────────────────────────────────
 
 export interface NotificationContextType {
-  notifications    : Notification[];
-  nonLuesCount     : number;
-  wsConnected      : boolean;
-  marquerLue       : (id: number) => void;
-  marquerToutesLues: () => void;
+  notifications      : Notification[];
+  nonLuesCount       : number;
+  wsConnected        : boolean;
+  marquerLue         : (id: number) => Promise<void>;
+  marquerToutesLues  : () => Promise<void>;
   ajouterNotification: (notif: Notification) => void;
 }
 
@@ -47,105 +48,78 @@ interface NotificationProviderProps {
 
 export function NotificationProvider({ children }: NotificationProviderProps) {
   const { isAuthenticated, utilisateur } = useAuth();
+  const { connected: wsConnected, subscribe } = useWebSocket();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [wsConnected, setWsConnected]     = useState<boolean>(false);
-  const stompClientRef = useRef<Client | null>(null);
 
   // ── Compter les non lues ──
   const nonLuesCount = notifications.filter((n) => !n.lu).length;
 
-  // ── Ajouter une notification ──
+  // ── Ajouter une notification (reçue via WebSocket) ──
   const ajouterNotification = useCallback((notif: Notification): void => {
     setNotifications((prev) => [notif, ...prev]);
   }, []);
 
-  // ── Marquer une notification comme lue ──
-  const marquerLue = useCallback((id: number): void => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, lu: true } : n))
+  // ── Marquer une notification comme lue (persisté côté serveur) ──
+  const marquerLue = useCallback(
+    async (id: number): Promise<void> => {
+      if (!utilisateur) return;
+      await marquerCommeLue(id, utilisateur.id);
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, lu: true } : n))
+      );
+    },
+    [utilisateur]
+  );
+
+  // ── Marquer toutes comme lues (pas d'endpoint batch → une requête par notif) ──
+  const marquerToutesLues = useCallback(async (): Promise<void> => {
+    if (!utilisateur) return;
+    const nonLues = notifications.filter((n) => !n.lu);
+    if (nonLues.length === 0) return;
+
+    await Promise.all(
+      nonLues.map((n) => marquerCommeLue(n.id, utilisateur.id))
     );
-  }, []);
-
-  // ── Marquer toutes comme lues ──
-  const marquerToutesLues = useCallback((): void => {
     setNotifications((prev) => prev.map((n) => ({ ...n, lu: true })));
-  }, []);
+  }, [utilisateur, notifications]);
 
-  // ── Connexion WebSocket STOMP ──
+  // ── Charger l'historique au montage (ou repartir de zéro à la déconnexion) ──
+  useEffect(() => {
+    let cancelled = false;
+
+    const charger = async (): Promise<void> => {
+      if (!isAuthenticated || !utilisateur) {
+        setNotifications([]);
+        return;
+      }
+      try {
+        const historique = await getNotificationsByDestinataire(utilisateur.id);
+        if (!cancelled) setNotifications(historique);
+      } catch (e) {
+        console.error("BIDIWS — Erreur chargement historique notifications", e);
+      }
+    };
+
+    void charger();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated, utilisateur]);
+
+  // ── Abonnement aux notifications personnelles ──
+  // Chemin relatif "/user/queue/notifications" : rien n'y est inséré
+  // (ni id ni email), c'est le mécanisme user-destination de Spring qui
+  // route automatiquement vers la session authentifiée courante.
   useEffect(() => {
     if (!isAuthenticated || !utilisateur) return;
 
-    const token = getToken();
-    const wsUrl = (import.meta as { env?: { VITE_WS_URL?: string } }).env?.VITE_WS_URL ?? "http://localhost:8080/ws";
-
-    const client = new Client({
-      webSocketFactory: () => new SockJS(wsUrl),
-      connectHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-      reconnectDelay: 5000,
-
-      onConnect: () => {
-        setWsConnected(true);
-
-        // S'abonner aux notifications personnelles
-        client.subscribe(
-          `/user/${utilisateur.id}/queue/notifications`,
-          (message) => {
-            try {
-              const wsNotif: WsNotification = JSON.parse(message.body);
-              const newNotif: Notification = {
-                id             : Date.now(),
-                destinataireId : utilisateur.id,
-                arretId        : wsNotif.arretId,
-                residenceId    : wsNotif.residenceId,
-                type           : wsNotif.type,
-                titre          : wsNotif.type,
-                message        : wsNotif.message,
-                canal          : "PUSH" as const,
-                lu             : false,
-                envoye         : true,
-                heureEnvoi     : wsNotif.heure,
-                createdAt      : new Date().toISOString(),
-              };
-              ajouterNotification(newNotif);
-            } catch (e) {
-              console.error("BIDIWS WS — Erreur parsing notification", e);
-            }
-          }
-        );
-
-        // S'abonner aux notifications globales (broadcast)
-        client.subscribe("/topic/collecte", (message) => {
-          try {
-            const wsNotif: WsNotification = JSON.parse(message.body);
-            console.info("BIDIWS WS — Broadcast collecte :", wsNotif);
-          } catch (e) {
-            console.error("BIDIWS WS — Erreur parsing broadcast", e);
-          }
-        });
-      },
-
-      onDisconnect: () => {
-        setWsConnected(false);
-      },
-
-      onStompError: (frame) => {
-        console.error("BIDIWS WS — Erreur STOMP :", frame);
-        setWsConnected(false);
-      },
+    const unsubscribe = subscribe("/user/queue/notifications", (payload) => {
+      ajouterNotification(payload as Notification);
     });
 
-    client.activate();
-    stompClientRef.current = client;
-
-    // Nettoyage à la déconnexion
-    return () => {
-      client.deactivate();
-      stompClientRef.current = null;
-      setWsConnected(false);
-    };
-  }, [isAuthenticated, utilisateur, ajouterNotification]);
+    return unsubscribe;
+  }, [isAuthenticated, utilisateur, subscribe, ajouterNotification]);
 
   const value: NotificationContextType = {
     notifications,
@@ -162,4 +136,3 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
     </NotificationContext.Provider>
   );
 }
-
