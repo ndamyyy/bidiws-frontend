@@ -3,8 +3,8 @@
 // Fichier : src/pages/syndic/NotificationsPage/NotificationsPage.tsx
 // ============================================================
 
-import { JSX, useState }             from "react";
-import { MOCK_NOTIFICATIONS }   from "../../../mocks/data";
+import { JSX }                  from "react";
+import { useNotifications }     from "../../../hooks/useNotifications";
 import type { Notification }    from "../../../types";
 import "./NotificationsPage.css";
 
@@ -114,16 +114,14 @@ const NotifItem = ({
 // ─────────────────────────────────────────
 
 export default function NotificationsPage() {
-  const [notifs, setNotifs] = useState<Notification[]>(MOCK_NOTIFICATIONS);
-
-  const nonLues = notifs.filter(n => !n.lu).length;
+  const { notifications, nonLuesCount, marquerLue, marquerToutesLues } = useNotifications();
 
   const handleRead = (id: number): void => {
-    setNotifs(prev => prev.map(n => n.id === id ? { ...n, lu: true } : n));
+    marquerLue(id).catch(e => console.error("BIDIWS — Erreur marquerLue", e));
   };
 
   const handleToutLire = (): void => {
-    setNotifs(prev => prev.map(n => ({ ...n, lu: true })));
+    marquerToutesLues().catch(e => console.error("BIDIWS — Erreur marquerToutesLues", e));
   };
 
   return (
@@ -132,10 +130,10 @@ export default function NotificationsPage() {
         <div>
           <h1 className="notifs__title">Notifications</h1>
           <p className="notifs__subtitle">
-            {nonLues > 0 ? `${nonLues} non lue${nonLues > 1 ? "s" : ""}` : "Tout est lu"}
+            {nonLuesCount > 0 ? `${nonLuesCount} non lue${nonLuesCount > 1 ? "s" : ""}` : "Tout est lu"}
           </p>
         </div>
-        {nonLues > 0 && (
+        {nonLuesCount > 0 && (
           <button className="notifs__tout-lire" onClick={handleToutLire}>
             Tout marquer comme lu
           </button>
@@ -143,7 +141,7 @@ export default function NotificationsPage() {
       </div>
 
       <div className="notifs__list">
-        {notifs.map(n => (
+        {notifications.map(n => (
           <NotifItem key={n.id} notif={n} onRead={handleRead} />
         ))}
       </div>
