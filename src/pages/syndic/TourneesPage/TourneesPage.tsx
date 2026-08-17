@@ -114,8 +114,8 @@ const ArretItem = ({
 
       {/* Info résidence */}
       <div className="arret-item__info">
-        <div className="arret-item__name">{arret.residence.nom}</div>
-        <div className="arret-item__addr">{arret.residence.adresse}</div>
+        <div className="arret-item__name">{arret.residenceNom}</div>
+        <div className="arret-item__addr">{arret.residenceAdresse}</div>
         {arret.typesConteneurs && (
           <div className="arret-item__tags">
             {arret.typesConteneurs.split(",").map((c, i) => (

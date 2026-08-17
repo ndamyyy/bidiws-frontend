@@ -108,8 +108,8 @@ const ArretItem = ({
 
       {/* Infos */}
       <div className="c-arret-item__info">
-        <div className="c-arret-item__name">{arret.residence.nom}</div>
-        <div className="c-arret-item__addr">{arret.residence.adresse}</div>
+        <div className="c-arret-item__name">{arret.residenceNom}</div>
+        <div className="c-arret-item__addr">{arret.residenceAdresse}</div>
         {arret.heureCollecte && (
           <div className="c-arret-item__heure">
             ✓ Validé à {new Date(arret.heureCollecte).toLocaleTimeString("fr-FR", {

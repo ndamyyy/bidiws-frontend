@@ -179,10 +179,20 @@ export interface Tournee {
   arrets                 : Arret[];
 }
 
+// Forme plate confirmée contre le vrai backend (GET /arrets/residence/:id
+// testé en session) : residence dénormalisée en residenceId/residenceNom
+// (pas d'objet Residence imbriqué), et createdAt/updatedAt CONFIRMÉS
+// ABSENTS du DTO réel (c'est ce qui faisait planter le tri par createdAt
+// dans GardienHomePage — undefined.localeCompare(...)).
+// residenceAdresse : NON confirmé côté vrai DTO (absent de l'échantillon
+// testé) — gardé en optionnel uniquement pour ne pas casser l'affichage
+// adresse de TourneesPage/ChauffeurTourneePage, qui restent sur mocks.
 export interface Arret {
   id                   : number;
   tourneeId            : number;
-  residence            : Residence;
+  residenceId          : number;
+  residenceNom         : string;
+  residenceAdresse    ?: string;
   ordre                : number;
   statut               : StatutArret;
   heureEstimee        ?: string;
@@ -196,8 +206,6 @@ export interface Arret {
   incident             : boolean;
   descriptionIncident ?: string;
   photoIncidentUrl    ?: string;
-  createdAt            : string;
-  updatedAt            : string;
 }
 
 // Détail d'un bac/conteneur rattaché à un arrêt — forme exacte du

@@ -74,11 +74,12 @@ export default function GardienHomePage() {
   const residenceId   = residenceLien?.residenceId;
 
   // ── Arrêt "actuel" ──
-  // Pas d'endpoint filtré par date côté backend, et Arret n'a pas de
-  // date propre (elle vit sur la Tournee via tourneeId) : on prend le
-  // plus récent par createdAt comme dernier statut connu. Ce n'est pas
-  // une garantie que c'est l'arrêt "d'aujourd'hui", juste le plus
-  // raisonnable en attendant un vrai filtre côté backend.
+  // Pas d'endpoint filtré par date côté backend, et Arret n'a ni date
+  // propre ni createdAt (confirmé absent du vrai DTO — GET /arrets/
+  // residence/:id testé en session) : on prend l'id le plus élevé comme
+  // proxy du plus récent (auto-incrément, monotone, toujours présent).
+  // Ce n'est pas une garantie que c'est l'arrêt "d'aujourd'hui", juste
+  // le plus raisonnable en attendant un vrai filtre côté backend.
   const { data: arrets, isLoading: isLoadingArrets } = useQuery({
     queryKey: ["arrets", "residence", residenceId],
     queryFn: () => getArretsByResidence(residenceId as number),
@@ -86,7 +87,7 @@ export default function GardienHomePage() {
   });
 
   const arretActuel = arrets
-    ? [...arrets].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]
+    ? [...arrets].sort((a, b) => b.id - a.id)[0]
     : undefined;
 
   // ── Tournée de l'arrêt actuel (type de collecte, chauffeur, camion) ──

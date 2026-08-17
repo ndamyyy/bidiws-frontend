@@ -53,7 +53,7 @@ const Badge = ({ statut }: { statut: string }) => {
 // ─────────────────────────────────────────
 
 const ResidenceCard = ({ residence }: { residence: Residence }) => {
-  const arret    = MOCK_ARRETS.find(a => a.residence.id === residence.id);
+  const arret    = MOCK_ARRETS.find(a => a.residenceId === residence.id);
   const gardien  = residence.gardiens[0];
   const initiales = gardien
     ? `${gardien.prenom[0]}${gardien.nom[0]}`.toUpperCase()
