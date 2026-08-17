@@ -14,14 +14,14 @@
   font-family: "Syne", sans-serif;
   font-size: 28px;
   font-weight: 800;
-  color: #f0f4ff;
+  color: var(--text-primary);
   margin: 0 0 4px;
   letter-spacing: -0.5px;
 }
 
 .notifs__subtitle {
   font-size: 13px;
-  color: #6b84a3;
+  color: var(--text-secondary);
 }
 
 .notifs__tout-lire {
@@ -29,7 +29,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   padding: 9px 16px;
-  color: #6b84a3;
+  color: var(--text-secondary);
   font-family: "DM Sans", sans-serif;
   font-size: 13px;
   cursor: pointer;
@@ -38,7 +38,7 @@
 
 .notifs__tout-lire:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: #f0f4ff;
+  color: var(--text-primary);
 }
 
 /* ─── Liste ─── */
@@ -96,18 +96,18 @@
 .notif-item__titre {
   font-size: 14px;
   font-weight: 400;
-  color: #6b84a3;
+  color: var(--text-secondary);
   margin-bottom: 4px;
 }
 
 .notif-item__titre--unread {
   font-weight: 600;
-  color: #f0f4ff;
+  color: var(--text-primary);
 }
 
 .notif-item__message {
   font-size: 13px;
-  color: #6b84a3;
+  color: var(--text-secondary);
   line-height: 1.5;
   margin-bottom: 6px;
 }
@@ -120,14 +120,14 @@
 
 .notif-item__time {
   font-size: 11px;
-  color: #3d5166;
+  color: var(--text-muted);
 }
 
 .notif-item__canal {
   font-size: 10px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #6b84a3;
+  color: var(--text-secondary);
   border-radius: 6px;
   padding: 2px 7px;
   font-weight: 600;

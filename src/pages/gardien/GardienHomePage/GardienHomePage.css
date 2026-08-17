@@ -9,14 +9,14 @@
   font-family: "Syne", sans-serif;
   font-size: 28px;
   font-weight: 800;
-  color: #f0f4ff;
+  color: var(--text-primary);
   margin: 0 0 4px;
   letter-spacing: -0.5px;
 }
 
 .gardien__subtitle {
   font-size: 13px;
-  color: #6b84a3;
+  color: var(--text-secondary);
 }
 
 /* ─── Hero statut ─── */
@@ -87,7 +87,7 @@
   font-family: "Syne", sans-serif;
   font-size: 20px;
   font-weight: 700;
-  color: #f0f4ff;
+  color: var(--text-primary);
   margin-bottom: 6px;
 }
 
@@ -129,7 +129,7 @@
 
 .info-card__label {
   font-size: 10px;
-  color: #3d5166;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.07em;
   font-weight: 600;
@@ -139,7 +139,7 @@
 .info-card__value {
   font-size: 14px;
   font-weight: 600;
-  color: #f0f4ff;
+  color: var(--text-primary);
 }
 
 /* ─── Historique alertes ─── */
@@ -157,7 +157,7 @@
   font-family: "Syne", sans-serif;
   font-size: 15px;
   font-weight: 700;
-  color: #f0f4ff;
+  color: var(--text-primary);
 }
 
 .alerte-item {
@@ -185,11 +185,11 @@
 .alerte-item__msg {
   flex: 1;
   font-size: 13px;
-  color: #f0f4ff;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
 .alerte-item__time {
   font-size: 11px;
-  color: #3d5166;
+  color: var(--text-muted);
 }
