@@ -5,7 +5,7 @@
 // ============================================================
 
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -17,6 +17,7 @@ import { useAuth } from "./hooks/useAuth";
 // ─── Pages publiques ───────────────────────────────────────
 import LoginPage from "./pages/LoginPage/LoginPage";
 import SplashScreen from "./components/SplashScreen/SplashScreen";
+import PageTransition from "./components/ui/PageTransition/PageTransition";
 
 // ─── Layout ────────────────────────────────────────────────
 import Layout from "./components/layout/Layout/Layout";
@@ -104,6 +105,7 @@ export default function App() {
 
 function AppShell() {
   const { isInitializing } = useAuth();
+  const location = useLocation();
 
   if (isInitializing) {
     return <SplashScreen />;
@@ -115,7 +117,16 @@ function AppShell() {
         <Routes>
 
               {/* ── Route publique ── */}
-              <Route path="/login" element={<LoginPage />} />
+              <Route
+                path="/login"
+                element={
+                  <AnimatePresence mode="wait">
+                    <PageTransition key={location.pathname}>
+                      <LoginPage />
+                    </PageTransition>
+                  </AnimatePresence>
+                }
+              />
 
               {/* ── Redirect racine ── */}
               <Route path="/" element={<Navigate to="/login" replace />} />
