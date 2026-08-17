@@ -31,7 +31,7 @@ export default function Layout() {
 
         {/* ── Pages (Outlet = la page active) ── */}
         <main className="layout__content">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             <PageTransition key={location.pathname}>
               <Outlet />
             </PageTransition>

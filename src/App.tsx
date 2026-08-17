@@ -120,7 +120,7 @@ function AppShell() {
               <Route
                 path="/login"
                 element={
-                  <AnimatePresence mode="wait">
+                  <AnimatePresence mode="wait" initial={false}>
                     <PageTransition key={location.pathname}>
                       <LoginPage />
                     </PageTransition>
