@@ -10,6 +10,10 @@ import {
   getResidencesByGardien,
   type ResidenceGardien,
 } from "../api/residences.api";
+import {
+  getResidencesByHabitant,
+  type ResidenceHabitant,
+} from "../api/residence-habitants.api";
 import type { Residence } from "../types";
 
 // ─────────────────────────────────────────
@@ -46,5 +50,19 @@ export function useResidencesGardien(
     queryKey: ["residence-gardiens", "gardien", gardienId],
     queryFn: () => getResidencesByGardien(gardienId as number),
     enabled: gardienId !== undefined,
+  });
+}
+
+// ─────────────────────────────────────────
+// RÉSIDENCES D'UN HABITANT
+// ─────────────────────────────────────────
+
+export function useResidencesHabitant(
+  habitantId: number | undefined
+): UseQueryResult<ResidenceHabitant[]> {
+  return useQuery({
+    queryKey: ["residence-habitants", "habitant", habitantId],
+    queryFn: () => getResidencesByHabitant(habitantId as number),
+    enabled: habitantId !== undefined,
   });
 }

@@ -84,10 +84,9 @@ export const assignerGardien = async (
 // ─────────────────────────────────────────
 // RÉSIDENCES D'UN GARDIEN
 // GET /residence-gardiens/gardien/:gardienId
-// Forme du DTO NON vérifiée contre le backend réel (pas de compte de
-// test disponible pour cette session) — supposée dénormalisée avec le
-// nom de résidence par analogie avec les autres réponses de liens du
-// projet (ex: ArretConteneur). À confirmer/ajuster au premier test réel.
+// Forme confirmée en conditions réelles (compte gardien de test) : le
+// DTO renvoie aussi gardienNom/gardienPrenom, non utilisés ici donc pas
+// déclarés sur le type (extra champs ignorés sans risque par TS).
 // ─────────────────────────────────────────
 
 export interface ResidenceGardien {

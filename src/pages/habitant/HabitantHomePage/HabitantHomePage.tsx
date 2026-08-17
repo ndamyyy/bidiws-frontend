@@ -3,7 +3,10 @@
 // Fichier : src/pages/habitant/HabitantHomePage/HabitantHomePage.tsx
 // ============================================================
 
-import { MOCK_TYPES_COLLECTE } from "../../../mocks/data";
+import { useAuth } from "../../../hooks/useAuth";
+import { useResidencesHabitant } from "../../../hooks/useResidences";
+import { useCalendrierCollecte, useTypesCollecte } from "../../../hooks/useCalendrierCollecte";
+import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import "./HabitantHomePage.css";
 
 // ─────────────────────────────────────────
@@ -18,25 +21,59 @@ const IconTrash = ({ color }: { color: string }) => (
 );
 
 // ─────────────────────────────────────────
-// CALENDRIER MOCK
+// HELPERS
 // ─────────────────────────────────────────
 
-const JOURS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+// jourSemaine : 1=lundi...7=dimanche (ISO-8601) — NON vérifié contre une
+// vraie donnée peuplée, voir le commentaire sur CalendrierCollecte dans
+// types/index.ts. Si "prochaine collecte" tombe systématiquement sur le
+// mauvais jour une fois testé, c'est ici et dans le type qu'il faut
+// corriger la convention.
+const JOURS: Record<number, string> = {
+  1: "Lundi", 2: "Mardi", 3: "Mercredi", 4: "Jeudi",
+  5: "Vendredi", 6: "Samedi", 7: "Dimanche",
+};
 
-const CALENDRIER = [
-  { typeCode: "OM",  jour: 0, heure: "14h30" }, // Lundi
-  { typeCode: "TRI", jour: 1, heure: "14h30" }, // Mardi
-  { typeCode: "OM",  jour: 3, heure: "14h30" }, // Jeudi
-];
+const jsDayToJourSemaine = (jsDay: number): number => (jsDay === 0 ? 7 : jsDay);
+
+const formatHeure = (heure: string | undefined): string =>
+  heure ? heure.replace(":", "h") : "—";
 
 // ─────────────────────────────────────────
 // PAGE PRINCIPALE
 // ─────────────────────────────────────────
 
 export default function HabitantHomePage() {
-  // Prochaine collecte = aujourd'hui OM à 14h30
-  const prochaine = CALENDRIER[0];
-  const type      = MOCK_TYPES_COLLECTE.find(t => t.code === prochaine.typeCode);
+  const { utilisateur } = useAuth();
+
+  const habitantId = utilisateur?.id;
+  const { data: residencesHabitant, isLoading: isLoadingResidences } =
+    useResidencesHabitant(habitantId);
+
+  const residenceLien = residencesHabitant?.[0];
+  const residenceId   = residenceLien?.residenceId;
+
+  const { data: calendrier, isLoading: isLoadingCalendrier } =
+    useCalendrierCollecte(residenceId);
+  const { data: typesCollecte, isLoading: isLoadingTypes } = useTypesCollecte();
+
+  const isChargement = isLoadingResidences || isLoadingCalendrier || isLoadingTypes;
+
+  if (isChargement) {
+    return <LoadingSpinner />;
+  }
+
+  // ── Prochaine collecte : le jour actif le plus proche à partir
+  //    d'aujourd'hui (sans comparer l'heure — même simplification que
+  //    l'ancien mock, qui affichait toujours le premier jour du
+  //    calendrier comme "aujourd'hui") ──
+  const todayJourSemaine = jsDayToJourSemaine(new Date().getDay());
+  const calendrierActif = (calendrier ?? []).filter(c => c.actif);
+  const calendrierTrie = [...calendrierActif].sort(
+    (a, b) => (a.jourSemaine - todayJourSemaine + 7) % 7 - (b.jourSemaine - todayJourSemaine + 7) % 7
+  );
+  const prochaine = calendrierTrie[0];
+  const prochainType = typesCollecte?.find(t => t.id === prochaine?.typeCollecteId);
 
   const today = new Date().toLocaleDateString("fr-FR", {
     weekday: "long", day: "numeric", month: "long",
@@ -52,19 +89,28 @@ export default function HabitantHomePage() {
 
       {/* ── Hero prochaine collecte ── */}
       <div className="habitant__next">
-        <div className="habitant__next-label">Aujourd'hui</div>
-        <div className="habitant__next-content">
-          <div className="habitant__next-icon">
-            <IconTrash color={type?.couleur ?? "#4caf50"} />
-          </div>
-          <div>
-            <div className="habitant__next-type">{type?.libelle}</div>
-            <div className="habitant__next-heure">{prochaine.heure}</div>
-            <div className="habitant__next-jour">
-              Sortez vos bacs avant {prochaine.heure}
+        <div className="habitant__next-label">
+          {prochaine?.jourSemaine === todayJourSemaine ? "Aujourd'hui" : "Prochainement"}
+        </div>
+        {prochaine ? (
+          <div className="habitant__next-content">
+            <div className="habitant__next-icon">
+              <IconTrash color={prochainType?.couleur ?? "#4caf50"} />
+            </div>
+            <div>
+              <div className="habitant__next-type">{prochaine.typeCollecteLibelle}</div>
+              <div className="habitant__next-heure">{formatHeure(prochaine.heureEstimee)}</div>
+              <div className="habitant__next-jour">
+                {prochaine.jourSemaine === todayJourSemaine
+                  ? `Sortez vos bacs avant ${formatHeure(prochaine.heureEstimee)}`
+                  : `${JOURS[prochaine.jourSemaine]} — sortez vos bacs avant ${formatHeure(prochaine.heureEstimee)}`
+                }
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="habitant__next-jour">Aucune collecte programmée pour votre résidence.</div>
+        )}
       </div>
 
       {/* ── Calendrier de collecte ── */}
@@ -72,20 +118,27 @@ export default function HabitantHomePage() {
         <div className="habitant__schedule-header">
           Calendrier de collecte — cette semaine
         </div>
-        {CALENDRIER.map((c, i) => {
-          const tc = MOCK_TYPES_COLLECTE.find(t => t.code === c.typeCode);
-          return (
-            <div key={i} className="schedule-item">
-              <div
-                className="schedule-item__color"
-                style={{ background: tc?.couleur ?? "#4caf50" }}
-              />
-              <div className="schedule-item__type">{tc?.libelle}</div>
-              <div className="schedule-item__jour">{JOURS[c.jour]}</div>
-              <div className="schedule-item__heure">{c.heure}</div>
-            </div>
-          );
-        })}
+        {calendrierActif.length === 0 && (
+          <div style={{ padding: "16px 22px", color: "var(--text-secondary)", fontSize: 13 }}>
+            Aucun calendrier de collecte renseigné pour votre résidence.
+          </div>
+        )}
+        {[...calendrierActif]
+          .sort((a, b) => a.jourSemaine - b.jourSemaine)
+          .map((c) => {
+            const tc = typesCollecte?.find(t => t.id === c.typeCollecteId);
+            return (
+              <div key={c.id} className="schedule-item">
+                <div
+                  className="schedule-item__color"
+                  style={{ background: tc?.couleur ?? "#4caf50" }}
+                />
+                <div className="schedule-item__type">{c.typeCollecteLibelle}</div>
+                <div className="schedule-item__jour">{JOURS[c.jourSemaine]}</div>
+                <div className="schedule-item__heure">{formatHeure(c.heureEstimee)}</div>
+              </div>
+            );
+          })}
       </div>
 
       {/* ── Conseils ── */}

@@ -130,13 +130,23 @@ export interface TypeCollecte {
   icone  ?: string;
 }
 
+// Forme plate supposée par analogie avec Tournee/Arret/ResidenceGardien
+// (dénormalisation confirmée sur ces trois-là, jamais en défaut cette
+// session) — mais AUCUNE donnée peuplée disponible pour vérifier
+// celle-ci précisément (résidence de test sans calendrier renseigné,
+// GET /calendriers-collecte/residence/1 confirmé 200 mais []). La
+// convention de jourSemaine (1=lundi...7=dimanche, ISO-8601/
+// java.time.DayOfWeek) est un choix motivé par la stack Spring Boot du
+// projet, PAS une valeur vérifiée — à confirmer dès qu'une résidence
+// avec calendrier réel sera testable.
 export interface CalendrierCollecte {
-  id              : number;
-  residenceId     : number;
-  typeCollecte    : TypeCollecte;
-  jourSemaine     : number;       // 1=Lundi ... 7=Dimanche
-  heureEstimee   ?: string;       // "HH:mm"
-  actif           : boolean;
+  id                  : number;
+  residenceId         : number;
+  typeCollecteId      : number;
+  typeCollecteLibelle : string;
+  jourSemaine         : number;   // 1=lundi ... 7=dimanche (ISO-8601, NON vérifié)
+  heureEstimee       ?: string;   // "HH:mm"
+  actif               : boolean;
 }
 
 export interface Camion {
