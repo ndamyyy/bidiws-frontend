@@ -84,16 +84,17 @@ export const assignerGardien = async (
 // ─────────────────────────────────────────
 // RÉSIDENCES D'UN GARDIEN
 // GET /residence-gardiens/gardien/:gardienId
-// Forme confirmée en conditions réelles (compte gardien de test) : le
-// DTO renvoie aussi gardienNom/gardienPrenom, non utilisés ici donc pas
-// déclarés sur le type (extra champs ignorés sans risque par TS).
+// Forme confirmée en conditions réelles (compte gardien de test), y
+// compris gardienNom/gardienPrenom.
 // ─────────────────────────────────────────
 
 export interface ResidenceGardien {
-  residenceId : number;
-  residenceNom: string;
-  gardienId   : number;
-  principal   : boolean;
+  residenceId   : number;
+  residenceNom  : string;
+  gardienId     : number;
+  gardienNom   ?: string;
+  gardienPrenom?: string;
+  principal     : boolean;
 }
 
 export const getResidencesByGardien = async (
@@ -101,6 +102,22 @@ export const getResidencesByGardien = async (
 ): Promise<ResidenceGardien[]> => {
   const response = await apiClient.get<ResidenceGardien[]>(
     `/residence-gardiens/gardien/${gardienId}`
+  );
+  return response.data;
+};
+
+// ─────────────────────────────────────────
+// GARDIENS D'UNE RÉSIDENCE
+// GET /residence-gardiens/residence/:residenceId
+// Sens inverse de getResidencesByGardien, jamais testé dans ce sens —
+// même DTO ResidenceGardien supposé par analogie (même contrôleur).
+// ─────────────────────────────────────────
+
+export const getGardiensByResidence = async (
+  residenceId: number
+): Promise<ResidenceGardien[]> => {
+  const response = await apiClient.get<ResidenceGardien[]>(
+    `/residence-gardiens/residence/${residenceId}`
   );
   return response.data;
 };

@@ -129,47 +129,42 @@ export const MOCK_RESIDENCES: Residence[] = [
   {
     id: 1, nom: "Résidence Les Érables",
     adresse: "12 rue Pasteur", codePostal: "55400",
-    ville: MOCK_VILLES[0], zone: MOCK_ZONES[0],
+    villeId: MOCK_VILLES[0].id, villeNom: MOCK_VILLES[0].nom,
+    zoneId: MOCK_ZONES[0].id, zoneNom: MOCK_ZONES[0].nom,
     latitude: 49.2101, longitude: 5.6349,
     rayonDetection: 50, nbConteneurs: 3, actif: true,
-    createdAt: "2026-01-15T00:00:00",
-    gardiens: [MOCK_UTILISATEURS[1]],
   },
   {
     id: 2, nom: "Résidence du Parc",
     adresse: "4 allée des Tilleuls", codePostal: "55400",
-    ville: MOCK_VILLES[0], zone: MOCK_ZONES[0],
+    villeId: MOCK_VILLES[0].id, villeNom: MOCK_VILLES[0].nom,
+    zoneId: MOCK_ZONES[0].id, zoneNom: MOCK_ZONES[0].nom,
     latitude: 49.2115, longitude: 5.6372,
     rayonDetection: 40, nbConteneurs: 4, actif: true,
-    createdAt: "2026-01-15T00:00:00",
-    gardiens: [MOCK_UTILISATEURS[2]],
   },
   {
     id: 3, nom: "Résidence Voltaire",
     adresse: "27 rue Voltaire", codePostal: "55400",
-    ville: MOCK_VILLES[0], zone: MOCK_ZONES[1],
+    villeId: MOCK_VILLES[0].id, villeNom: MOCK_VILLES[0].nom,
+    zoneId: MOCK_ZONES[1].id, zoneNom: MOCK_ZONES[1].nom,
     latitude: 49.2089, longitude: 5.6401,
     rayonDetection: 50, nbConteneurs: 2, actif: true,
-    createdAt: "2026-01-20T00:00:00",
-    gardiens: [MOCK_UTILISATEURS[6]],
   },
   {
     id: 4, nom: "Les Jardins de Verdun",
     adresse: "8 bd de la Paix", codePostal: "55100",
-    ville: MOCK_VILLES[1], zone: MOCK_ZONES[2],
+    villeId: MOCK_VILLES[1].id, villeNom: MOCK_VILLES[1].nom,
+    zoneId: MOCK_ZONES[2].id, zoneNom: MOCK_ZONES[2].nom,
     latitude: 49.1620, longitude: 5.3880,
     rayonDetection: 60, nbConteneurs: 5, actif: true,
-    createdAt: "2026-02-01T00:00:00",
-    gardiens: [MOCK_UTILISATEURS[7]],
   },
   {
     id: 5, nom: "Résidence Bellevue",
     adresse: "3 rue du Moulin", codePostal: "55400",
-    ville: MOCK_VILLES[0], zone: MOCK_ZONES[0],
+    villeId: MOCK_VILLES[0].id, villeNom: MOCK_VILLES[0].nom,
+    zoneId: MOCK_ZONES[0].id, zoneNom: MOCK_ZONES[0].nom,
     latitude: 49.2130, longitude: 5.6310,
     rayonDetection: 45, nbConteneurs: 2, actif: true,
-    createdAt: "2026-02-10T00:00:00",
-    gardiens: [MOCK_UTILISATEURS[1]],
   },
 ];
 
@@ -373,12 +368,6 @@ export const getNotificationsByUserId = (userId: number): Notification[] =>
 // Récupérer une résidence par ID
 export const getResidenceById = (id: number): Residence | undefined =>
   MOCK_RESIDENCES.find((r) => r.id === id);
-
-// Récupérer les résidences d'un gardien
-export const getResidencesByGardienId = (gardienId: number): Residence[] =>
-  MOCK_RESIDENCES.filter((r) =>
-    r.gardiens.some((g) => g.id === gardienId)
-  );
 
 // Progression d'une tournée en %
 export const getTourneeProgress = (tournee: Tournee): number => {

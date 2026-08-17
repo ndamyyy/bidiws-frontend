@@ -105,21 +105,26 @@ export interface Zone {
   description?: string;
 }
 
+// Forme plate confirmée contre le vrai ResidenceResponseDto (testé en
+// Postman) : villeId/villeNom et zoneId/zoneNom dénormalisés (pas
+// d'objets Ville/Zone imbriqués, pas de champ "code" de zone). Ni
+// gardiens ni createdAt dans cette réponse — les gardiens sont une
+// relation séparée (GET /residence-gardiens/residence/:id).
 export interface Residence {
   id              : number;
   nom             : string;
   adresse         : string;
   complement     ?: string;
   codePostal      : string;
-  ville           : Ville;
-  zone           ?: Zone;
+  villeId         : number;
+  villeNom        : string;
+  zoneId         ?: number;
+  zoneNom        ?: string;
   latitude       ?: number;
   longitude      ?: number;
   rayonDetection  : number;
   nbConteneurs    : number;
   actif           : boolean;
-  createdAt       : string;
-  gardiens        : Utilisateur[];
 }
 
 export interface TypeCollecte {

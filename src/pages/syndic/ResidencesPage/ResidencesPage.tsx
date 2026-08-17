@@ -3,8 +3,12 @@
 // Fichier : src/pages/syndic/ResidencesPage/ResidencesPage.tsx
 // ============================================================
 
-import { MOCK_RESIDENCES, MOCK_ARRETS } from "../../../mocks/data";
-import type { Residence }               from "../../../types";
+import { useQueries }                       from "@tanstack/react-query";
+import { useResidences }                    from "../../../hooks/useResidences";
+import { getGardiensByResidence, type ResidenceGardien } from "../../../api/residences.api";
+import { getArretsByResidence }             from "../../../api/arrets.api";
+import { LoadingSpinner }                   from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import type { Residence, Arret }            from "../../../types";
 import "./ResidencesPage.css";
 
 // ─────────────────────────────────────────
@@ -52,11 +56,17 @@ const Badge = ({ statut }: { statut: string }) => {
 // CARTE RÉSIDENCE
 // ─────────────────────────────────────────
 
-const ResidenceCard = ({ residence }: { residence: Residence }) => {
-  const arret    = MOCK_ARRETS.find(a => a.residenceId === residence.id);
-  const gardien  = residence.gardiens[0];
-  const initiales = gardien
-    ? `${gardien.prenom[0]}${gardien.nom[0]}`.toUpperCase()
+const ResidenceCard = ({
+  residence,
+  gardien,
+  arret,
+}: {
+  residence: Residence;
+  gardien  : ResidenceGardien | undefined;
+  arret    : Arret | undefined;
+}) => {
+  const initiales = gardien?.gardienPrenom && gardien?.gardienNom
+    ? `${gardien.gardienPrenom[0]}${gardien.gardienNom[0]}`.toUpperCase()
     : "?";
 
   return (
@@ -66,16 +76,16 @@ const ResidenceCard = ({ residence }: { residence: Residence }) => {
           <IconHome color="#1b3a6b" />
         </div>
         <div className="residence-card__badges">
-          <span className="residence-card__secteur">
-            Sect. {residence.zone?.code ?? "—"}
-          </span>
+          {residence.zoneNom && (
+            <span className="residence-card__secteur">{residence.zoneNom}</span>
+          )}
           {arret && <Badge statut={arret.statut} />}
         </div>
       </div>
 
       <div className="residence-card__name">{residence.nom}</div>
       <div className="residence-card__addr">
-        {residence.adresse}, {residence.codePostal} {residence.ville.nom}
+        {residence.adresse}, {residence.codePostal} {residence.villeNom}
       </div>
 
       <hr className="residence-card__divider" />
@@ -85,9 +95,8 @@ const ResidenceCard = ({ residence }: { residence: Residence }) => {
           <div className="residence-card__avatar">{initiales}</div>
           <div>
             <div className="residence-card__gardien-name">
-              {gardien.prenom} {gardien.nom}
+              {gardien.gardienPrenom} {gardien.gardienNom}
             </div>
-            <div className="residence-card__gardien-tel">{gardien.telephone}</div>
           </div>
         </div>
       )}
@@ -107,21 +116,58 @@ const ResidenceCard = ({ residence }: { residence: Residence }) => {
 // ─────────────────────────────────────────
 
 export default function ResidencesPage() {
+  const { data: residences, isLoading: isLoadingResidences } = useResidences();
+  const residencesListe = residences ?? [];
+
+  // ── Gardien(s) et arrêt le plus récent de chaque résidence ──
+  const gardiensQueries = useQueries({
+    queries: residencesListe.map(r => ({
+      queryKey: ["residence-gardiens", "residence", r.id],
+      queryFn: () => getGardiensByResidence(r.id),
+      enabled: !!residences,
+    })),
+  });
+
+  const arretsQueries = useQueries({
+    queries: residencesListe.map(r => ({
+      queryKey: ["arrets", "residence", r.id],
+      queryFn: () => getArretsByResidence(r.id),
+      enabled: !!residences,
+    })),
+  });
+
+  if (isLoadingResidences) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <div>
       <div className="residences__header">
         <div>
           <h1 className="residences__title">Résidences</h1>
           <p className="residences__subtitle">
-            {MOCK_RESIDENCES.length} résidences enregistrées
+            {residencesListe.length} résidences enregistrées
           </p>
         </div>
       </div>
 
       <div className="residences__grid">
-        {MOCK_RESIDENCES.map(r => (
-          <ResidenceCard key={r.id} residence={r} />
-        ))}
+        {residencesListe.map((r, i) => {
+          const gardiensListe = gardiensQueries[i]?.data ?? [];
+          const gardien = gardiensListe.find(g => g.principal) ?? gardiensListe[0];
+
+          // Arrêt "actuel" : le plus récent par id décroissant — pas un
+          // vrai filtre par date, même logique pragmatique que
+          // GardienHomePage (pas d'endpoint filtré côté backend).
+          const arretsListe = arretsQueries[i]?.data ?? [];
+          const arretActuel = arretsListe.length > 0
+            ? [...arretsListe].sort((a, b) => b.id - a.id)[0]
+            : undefined;
+
+          return (
+            <ResidenceCard key={r.id} residence={r} gardien={gardien} arret={arretActuel} />
+          );
+        })}
       </div>
     </div>
   );
