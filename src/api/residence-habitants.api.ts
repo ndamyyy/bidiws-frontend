@@ -16,9 +16,11 @@ import apiClient from "./axios";
 // ─────────────────────────────────────────
 
 export interface ResidenceHabitant {
-  residenceId : number;
-  residenceNom: string;
-  habitantId  : number;
+  residenceId    : number;
+  residenceNom   : string;
+  habitantId     : number;
+  habitantNom    : string;
+  habitantPrenom : string;
 }
 
 export const getResidencesByHabitant = async (

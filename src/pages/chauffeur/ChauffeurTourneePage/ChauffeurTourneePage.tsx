@@ -4,8 +4,13 @@
 // ============================================================
 
 import { useState }                    from "react";
-import { MOCK_TOURNEES }               from "../../../mocks/data";
-import type { Tournee, Arret }         from "../../../types";
+import { useQueryClient }              from "@tanstack/react-query";
+import { useAuth }                     from "../../../hooks/useAuth";
+import { useMaTourneeAujourdhui }      from "../../../hooks/useTournees";
+import { useArretsByTournee }          from "../../../hooks/useArrets";
+import { validerArret }                from "../../../api/arrets.api";
+import { LoadingSpinner }              from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import type { Arret }                  from "../../../types";
 import "./ChauffeurTourneePage.css";
 
 // ─────────────────────────────────────────
@@ -153,31 +158,50 @@ const ArretItem = ({
 // ─────────────────────────────────────────
 
 export default function ChauffeurTourneePage() {
-  // Tournée du chauffeur connecté (mock : tournée 1)
-  const [tournee, setTournee] = useState<Tournee>(MOCK_TOURNEES[0]);
-  const [gpsOn,   setGpsOn]   = useState<boolean>(true);
+  const { utilisateur } = useAuth();
+  const queryClient = useQueryClient();
 
-  const done     = tournee.arrets.filter(a => a.statut === 'COLLECTE_CONFIRMEE').length;
-  const total    = tournee.arrets.length;
-  const progress = Math.round((done / total) * 100);
+  const [gpsOn, setGpsOn] = useState<boolean>(true);
 
-  const handleValider = (arretId: number): void => {
-    const now = new Date().toISOString();
-    setTournee(prev => ({
-      ...prev,
-      arrets: prev.arrets.map(a =>
-        a.id === arretId
-          ? {
-              ...a,
-              statut        : 'COLLECTE_CONFIRMEE' as const,
-              heureCollecte : now,
-              scoreConfiance: 100,
-              modeDetection : 'VALIDATION_CHAUFFEUR' as const,
-            }
-          : a
-      ),
-    }));
+  // ── Tournée du jour du chauffeur connecté ──
+  const chauffeurId = utilisateur?.id;
+  const { data: tournees, isLoading: isLoadingTournees } = useMaTourneeAujourdhui(chauffeurId);
+  const tournee = tournees?.[0];
+
+  // ── Arrêts de cette tournée ──
+  const { data: arrets, isLoading: isLoadingArrets } = useArretsByTournee(tournee?.id);
+  const arretsListe = arrets ?? [];
+
+  const isChargement = isLoadingTournees || isLoadingArrets;
+
+  const done     = arretsListe.filter(a => a.statut === 'COLLECTE_CONFIRMEE').length;
+  const total    = arretsListe.length;
+  const progress = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  // ── Valider un arrêt : appel serveur réel, puis refetch ──
+  const handleValider = async (arretId: number): Promise<void> => {
+    try {
+      await validerArret(arretId, 'COLLECTE_CONFIRMEE');
+      await queryClient.invalidateQueries({ queryKey: ["arrets", "tournee", tournee?.id] });
+    } catch (e) {
+      console.error("BIDIWS — Erreur validation arrêt", e);
+    }
   };
+
+  if (isChargement) {
+    return <LoadingSpinner />;
+  }
+
+  if (!tournee) {
+    return (
+      <div>
+        <div className="chauffeur__header">
+          <h1 className="chauffeur__title">Ma tournée</h1>
+          <p className="chauffeur__subtitle">Aucune tournée programmée aujourd'hui.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -242,7 +266,12 @@ export default function ChauffeurTourneePage() {
       {/* ── Liste des arrêts ── */}
       <div className="chauffeur__arrets">
         <div className="chauffeur__arrets-header">Arrêts</div>
-        {tournee.arrets.map((arret, idx) => (
+        {arretsListe.length === 0 && (
+          <div style={{ padding: "16px 22px", color: "var(--text-secondary)", fontSize: 13 }}>
+            Aucun arrêt sur cette tournée.
+          </div>
+        )}
+        {arretsListe.map((arret, idx) => (
           <ArretItem
             key={arret.id}
             arret={arret}
