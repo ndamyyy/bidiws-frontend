@@ -3,9 +3,11 @@
 // Fichier : src/pages/syndic/TourneesPage/TourneesPage.tsx
 // ============================================================
 
-import { useState }                          from "react";
-import { MOCK_TOURNEES }                     from "../../../mocks/data";
-import type { Tournee, Arret }               from "../../../types";
+import { useQueryClient, useQueries }        from "@tanstack/react-query";
+import { useTournees }                       from "../../../hooks/useTournees";
+import { getArretsByTournee, validerArret }  from "../../../api/arrets.api";
+import { LoadingSpinner }                    from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import type { Arret }                        from "../../../types";
 import "./TourneesPage.css";
 
 // ─────────────────────────────────────────
@@ -157,21 +159,40 @@ const ArretItem = ({
 // ─────────────────────────────────────────
 
 export default function TourneesPage() {
-  const [tournees, setTournees] = useState<Tournee[]>(MOCK_TOURNEES);
+  const queryClient = useQueryClient();
 
-  const handleValider = (arretId: number): void => {
-    const now = new Date().toISOString();
-    setTournees(prev =>
-      prev.map(t => ({
-        ...t,
-        arrets: t.arrets.map(a =>
-          a.id === arretId
-            ? { ...a, statut: 'COLLECTE_CONFIRMEE' as const, heureCollecte: now, scoreConfiance: 100, modeDetection: 'VALIDATION_CHAUFFEUR' as const }
-            : a
-        ),
-      }))
-    );
+  const now = new Date();
+  const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
+  const { data: tournees, isLoading: isLoadingTournees } = useTournees({ date });
+
+  // ── Arrêts de chaque tournée, une query par tournée (useQueries, pas
+  //    de hook dans une boucle .map()) ──
+  const arretsQueries = useQueries({
+    queries: (tournees ?? []).map(t => ({
+      queryKey: ["arrets", "tournee", t.id],
+      queryFn: () => getArretsByTournee(t.id),
+      enabled: !!tournees,
+    })),
+  });
+
+  // ── Valider un arrêt : appel serveur réel, puis invalide toutes les
+  //    queries d'arrêts (plus simple/sûr que de retrouver la tournée
+  //    précise contenant cet arrêt) ──
+  const handleValider = async (arretId: number): Promise<void> => {
+    try {
+      await validerArret(arretId, 'COLLECTE_CONFIRMEE');
+      await queryClient.invalidateQueries({ queryKey: ["arrets", "tournee"] });
+    } catch (e) {
+      console.error("BIDIWS — Erreur validation arrêt", e);
+    }
   };
+
+  if (isLoadingTournees) {
+    return <LoadingSpinner />;
+  }
+
+  const tourneesListe = tournees ?? [];
 
   return (
     <div>
@@ -180,15 +201,24 @@ export default function TourneesPage() {
         <div>
           <h1 className="tournees__title">Tournées du jour</h1>
           <p className="tournees__subtitle">
-            {tournees.length} tournée{tournees.length > 1 ? "s" : ""} planifiée{tournees.length > 1 ? "s" : ""}
+            {tourneesListe.length} tournée{tourneesListe.length > 1 ? "s" : ""} planifiée{tourneesListe.length > 1 ? "s" : ""}
           </p>
         </div>
       </div>
 
+      {tourneesListe.length === 0 && (
+        <div style={{ padding: "24px 0", color: "var(--text-secondary)", fontSize: 13 }}>
+          Aucune tournée programmée aujourd'hui.
+        </div>
+      )}
+
       {/* ── Tournées ── */}
-      {tournees.map(t => {
-        const done  = t.arrets.filter(a => a.statut === 'COLLECTE_CONFIRMEE').length;
-        const total = t.arrets.length;
+      {tourneesListe.map((t, i) => {
+        const arretsQuery    = arretsQueries[i];
+        const arretsListe    = arretsQuery?.data ?? [];
+        const isLoadingArret = arretsQuery?.isLoading ?? false;
+        const done  = arretsListe.filter(a => a.statut === 'COLLECTE_CONFIRMEE').length;
+        const total = arretsListe.length;
         return (
           <div key={t.id} className="tournee-card">
             {/* Header */}
@@ -203,7 +233,7 @@ export default function TourneesPage() {
                 </div>
               </div>
               <div className="tournee-card__head-right">
-                <span style={{ fontSize: 13, color: "#4caf50", fontWeight: 700 }}>
+                <span style={{ fontSize: 13, color: "var(--signal)", fontWeight: 700 }}>
                   {done}/{total} arrêts
                 </span>
                 <Badge statut={t.statut} />
@@ -211,14 +241,20 @@ export default function TourneesPage() {
             </div>
 
             {/* Arrêts */}
-            {t.arrets.map((arret, idx) => (
-              <ArretItem
-                key={arret.id}
-                arret={arret}
-                index={idx}
-                onValider={handleValider}
-              />
-            ))}
+            {isLoadingArret && arretsListe.length === 0 ? (
+              <div style={{ padding: "16px 22px", color: "var(--text-secondary)", fontSize: 13 }}>
+                Chargement des arrêts…
+              </div>
+            ) : (
+              arretsListe.map((arret, idx) => (
+                <ArretItem
+                  key={arret.id}
+                  arret={arret}
+                  index={idx}
+                  onValider={handleValider}
+                />
+              ))
+            )}
           </div>
         );
       })}
