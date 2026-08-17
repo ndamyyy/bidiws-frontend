@@ -8,6 +8,7 @@ import { useResidences }                    from "../../../hooks/useResidences";
 import { getGardiensByResidence, type ResidenceGardien } from "../../../api/residences.api";
 import { getArretsByResidence }             from "../../../api/arrets.api";
 import { LoadingSpinner }                   from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import { StaggerContainer, StaggerItem }    from "../../../components/ui/StaggerContainer/StaggerContainer";
 import type { Residence, Arret }            from "../../../types";
 import "./ResidencesPage.css";
 
@@ -151,7 +152,7 @@ export default function ResidencesPage() {
         </div>
       </div>
 
-      <div className="residences__grid">
+      <StaggerContainer className="residences__grid">
         {residencesListe.map((r, i) => {
           const gardiensListe = gardiensQueries[i]?.data ?? [];
           const gardien = gardiensListe.find(g => g.principal) ?? gardiensListe[0];
@@ -165,10 +166,12 @@ export default function ResidencesPage() {
             : undefined;
 
           return (
-            <ResidenceCard key={r.id} residence={r} gardien={gardien} arret={arretActuel} />
+            <StaggerItem key={r.id}>
+              <ResidenceCard residence={r} gardien={gardien} arret={arretActuel} />
+            </StaggerItem>
           );
         })}
-      </div>
+      </StaggerContainer>
     </div>
   );
 }
