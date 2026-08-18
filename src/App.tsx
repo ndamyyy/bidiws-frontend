@@ -42,7 +42,7 @@ import ChauffeurTourneePage from "./pages/chauffeur/ChauffeurTourneePage/Chauffe
 import HabitantHomePage from "./pages/habitant/HabitantHomePage/HabitantHomePage";
 
 // ─── Pages Admin ───────────────────────────────────────────
-// import AdminDashboardPage from "./pages/admin/AdminDashboardPage/AdminDashboardPage";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage/AdminDashboardPage";
 // import AdminUsersPage from "./pages/admin/AdminUsersPage/AdminUsersPage";
 
 
@@ -227,11 +227,11 @@ function AppShell() {
                 {/* ── Admin ── */}
                 <Route
                   path="/admin/dashboard"
-                  // element={
-                  //   <ProtectedRoute roles={["ADMIN"]}>
-                  //     <AdminDashboardPage />
-                  //   </ProtectedRoute>
-                  // }
+                  element={
+                    <ProtectedRoute roles={["ADMIN"]}>
+                      <AdminDashboardPage />
+                    </ProtectedRoute>
+                  }
                 />
                 <Route
                   path="/admin/users"
