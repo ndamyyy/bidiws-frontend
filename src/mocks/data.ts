@@ -320,8 +320,9 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
 
 export const MOCK_SIGNALEMENTS: Signalement[] = [
   {
-    id: 1, auteur: MOCK_UTILISATEURS[1],
-    residence: MOCK_RESIDENCES[0], arretId: 1,
+    id: 1,
+    auteurId: MOCK_UTILISATEURS[1].id, auteurNom: MOCK_UTILISATEURS[1].nom, auteurPrenom: MOCK_UTILISATEURS[1].prenom,
+    residenceId: MOCK_RESIDENCES[0].id, residenceNom: MOCK_RESIDENCES[0].nom, arretId: 1,
     type:        'BAC_PLEIN',
     description: "Le bac OM n°2 déborde, non vidé lors du dernier passage.",
     latitude: 49.2101, longitude: 5.6349,
@@ -329,8 +330,9 @@ export const MOCK_SIGNALEMENTS: Signalement[] = [
     createdAt: "2026-06-20T14:30:00",
   },
   {
-    id: 2, auteur: MOCK_UTILISATEURS[6],
-    residence: MOCK_RESIDENCES[2],
+    id: 2,
+    auteurId: MOCK_UTILISATEURS[6].id, auteurNom: MOCK_UTILISATEURS[6].nom, auteurPrenom: MOCK_UTILISATEURS[6].prenom,
+    residenceId: MOCK_RESIDENCES[2].id, residenceNom: MOCK_RESIDENCES[2].nom,
     type:        'DEPOT_SAUVAGE',
     description: "Dépôt sauvage de sacs noirs devant le portail.",
     latitude: 49.2089, longitude: 5.6401,

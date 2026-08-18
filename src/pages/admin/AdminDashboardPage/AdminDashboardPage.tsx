@@ -338,10 +338,10 @@ export default function AdminDashboardPage() {
             <div className="admin-signalement-item__content">
               <div className="admin-signalement-item__msg">
                 {TYPE_SIGNALEMENT_LABEL[s.type] ?? s.type}
-                {s.residence?.nom && ` — ${s.residence.nom}`}
+                {s.residenceNom && ` — ${s.residenceNom}`}
               </div>
               <div className="admin-signalement-item__meta">
-                {s.auteur?.prenom} {s.auteur?.nom}
+                {s.auteurPrenom} {s.auteurNom}
               </div>
             </div>
             <Badge statut={s.statut} />

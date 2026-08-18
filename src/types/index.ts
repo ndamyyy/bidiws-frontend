@@ -265,19 +265,28 @@ export interface Notification {
   createdAt       : string;
 }
 
+// Forme plate NON confirmée en conditions réelles — GET /signalements
+// renvoie 500 avec les comptes GARDIEN et CHAUFFEUR disponibles cette
+// session (cause à investiguer séparément côté backend, sans rapport
+// avec le typage). Alignée par cohérence sur la convention systématique
+// du reste du projet (Tournee/Arret/Residence/ResidenceGardien, tous
+// confirmés dénormalisés) — à ajuster dès qu'un vrai test sera possible.
 export interface Signalement {
-  id           : number;
-  auteur       : Utilisateur;
-  residence   ?: Residence;
-  arretId     ?: number;
-  type         : TypeSignalement;
-  description ?: string;
-  photoUrl    ?: string;
-  latitude    ?: number;
-  longitude   ?: number;
-  statut       : StatutSignalement;
-  createdAt    : string;
-  resoluAt    ?: string;
+  id             : number;
+  auteurId       : number;
+  auteurNom     ?: string;
+  auteurPrenom  ?: string;
+  residenceId   ?: number;
+  residenceNom  ?: string;
+  arretId       ?: number;
+  type           : TypeSignalement;
+  description   ?: string;
+  photoUrl      ?: string;
+  latitude      ?: number;
+  longitude     ?: number;
+  statut         : StatutSignalement;
+  createdAt      : string;
+  resoluAt      ?: string;
 }
 
 // ─────────────────────────────────────────
