@@ -4,6 +4,7 @@
 // ============================================================
 
 import { JSX, useRef, useState } from "react";
+import { useNavigate }     from "react-router-dom";
 import axios                from "axios";
 import { useAuth }         from "../../hooks/useAuth";
 import type { Role, ApiError } from "../../types";
@@ -152,6 +153,7 @@ const ROLE_OPTIONS: RoleOption[] = [
 
 export default function LoginPage() {
   const { login, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   const [selectedRole,    setSelectedRole]    = useState<Role>('SYNDIC');
   const [email,           setEmail]           = useState<string>("");
@@ -164,14 +166,6 @@ export default function LoginPage() {
   const handleRoleSelect = (role: Role): void => {
     setSelectedRole(role);
     setError("");
-  };
-
-  // ── Lien admin : pas de rôle dédié, juste le même formulaire ──
-  const handleAdminClick = (): void => {
-    setEmail("");
-    setMotDePasse("");
-    setError("");
-    emailInputRef.current?.focus();
   };
 
   // ── Soumission ──
@@ -368,7 +362,7 @@ export default function LoginPage() {
           <button
             type="button"
             className="login__admin-link"
-            onClick={handleAdminClick}
+            onClick={() => navigate("/admin/login")}
           >
             Connexion administrateur
           </button>

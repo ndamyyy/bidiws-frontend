@@ -16,6 +16,7 @@ import { useAuth } from "./hooks/useAuth";
 
 // ─── Pages publiques ───────────────────────────────────────
 import LoginPage from "./pages/LoginPage/LoginPage";
+import AdminLoginPage from "./pages/admin/AdminLoginPage/AdminLoginPage";
 import SplashScreen from "./components/SplashScreen/SplashScreen";
 import PageTransition from "./components/ui/PageTransition/PageTransition";
 
@@ -123,6 +124,18 @@ function AppShell() {
                   <AnimatePresence mode="wait" initial={false}>
                     <PageTransition key={location.pathname}>
                       <LoginPage />
+                    </PageTransition>
+                  </AnimatePresence>
+                }
+              />
+
+              {/* ── Connexion administrateur (page dédiée) ── */}
+              <Route
+                path="/admin/login"
+                element={
+                  <AnimatePresence mode="wait" initial={false}>
+                    <PageTransition key={location.pathname}>
+                      <AdminLoginPage />
                     </PageTransition>
                   </AnimatePresence>
                 }
