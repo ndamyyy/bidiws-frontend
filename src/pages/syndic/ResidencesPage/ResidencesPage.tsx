@@ -3,13 +3,17 @@
 // Fichier : src/pages/syndic/ResidencesPage/ResidencesPage.tsx
 // ============================================================
 
-import { useQueries }                       from "@tanstack/react-query";
+import { useState, type FormEvent }         from "react";
+import { useQueries, useQueryClient }       from "@tanstack/react-query";
+import axios                                from "axios";
 import { useResidences }                    from "../../../hooks/useResidences";
-import { getGardiensByResidence, type ResidenceGardien } from "../../../api/residences.api";
+import { useVilles }                        from "../../../hooks/useVilles";
+import { useZones }                         from "../../../hooks/useZones";
+import { getGardiensByResidence, createResidence, type ResidenceGardien } from "../../../api/residences.api";
 import { getArretsByResidence }             from "../../../api/arrets.api";
 import { LoadingSpinner }                   from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { StaggerContainer, StaggerItem }    from "../../../components/ui/StaggerContainer/StaggerContainer";
-import type { Residence, Arret }            from "../../../types";
+import type { Residence, Arret, ApiError }  from "../../../types";
 import "./ResidencesPage.css";
 
 // ─────────────────────────────────────────
@@ -113,12 +117,199 @@ const ResidenceCard = ({
 };
 
 // ─────────────────────────────────────────
+// MODALE — AJOUTER UNE RÉSIDENCE
+// ─────────────────────────────────────────
+
+const AjouterResidenceModal = ({ onClose }: { onClose: () => void }) => {
+  const queryClient = useQueryClient();
+  const { data: villes, isLoading: isLoadingVilles } = useVilles();
+  const { data: zones,  isLoading: isLoadingZones }  = useZones();
+
+  const [nom,            setNom]            = useState<string>("");
+  const [adresse,        setAdresse]        = useState<string>("");
+  const [complement,     setComplement]     = useState<string>("");
+  const [codePostal,     setCodePostal]     = useState<string>("");
+  const [villeId,        setVilleId]        = useState<string>("");
+  const [zoneId,         setZoneId]         = useState<string>("");
+  const [latitude,       setLatitude]       = useState<string>("");
+  const [longitude,      setLongitude]      = useState<string>("");
+  const [rayonDetection, setRayonDetection] = useState<string>("");
+
+  const [error,        setError]        = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
+    e.preventDefault();
+    setError("");
+
+    if (!nom || !adresse || !codePostal || !villeId) {
+      setError("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await createResidence({
+        nom,
+        adresse,
+        complement: complement || undefined,
+        codePostal,
+        villeId: Number(villeId),
+        zoneId: zoneId ? Number(zoneId) : undefined,
+        latitude: latitude ? Number(latitude) : undefined,
+        longitude: longitude ? Number(longitude) : undefined,
+        rayonDetection: rayonDetection ? Number(rayonDetection) : 50,
+      });
+      await queryClient.invalidateQueries({ queryKey: ["residences"] });
+      onClose();
+    } catch (err) {
+      const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
+      setError(backendMessage ?? "Erreur lors de la création de la résidence.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="residence-modal__backdrop" onClick={onClose}>
+      <div className="residence-modal__card" onClick={(e) => e.stopPropagation()}>
+        <div className="residence-modal__header">
+          <h2 className="residence-modal__title">Ajouter une résidence</h2>
+          <button className="residence-modal__close" onClick={onClose} title="Fermer">×</button>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          {error && <div className="residence-modal__error">{error}</div>}
+
+          <div className="residence-modal__grid">
+            <div className="residence-modal__field residence-modal__field--full">
+              <label className="residence-modal__label">Nom</label>
+              <input
+                className="residence-modal__input"
+                type="text"
+                value={nom}
+                onChange={(e) => setNom(e.target.value)}
+              />
+            </div>
+
+            <div className="residence-modal__field residence-modal__field--full">
+              <label className="residence-modal__label">Adresse</label>
+              <input
+                className="residence-modal__input"
+                type="text"
+                value={adresse}
+                onChange={(e) => setAdresse(e.target.value)}
+              />
+            </div>
+
+            <div className="residence-modal__field residence-modal__field--full">
+              <label className="residence-modal__label">Complément (optionnel)</label>
+              <input
+                className="residence-modal__input"
+                type="text"
+                value={complement}
+                onChange={(e) => setComplement(e.target.value)}
+              />
+            </div>
+
+            <div className="residence-modal__field">
+              <label className="residence-modal__label">Code postal</label>
+              <input
+                className="residence-modal__input"
+                type="text"
+                value={codePostal}
+                onChange={(e) => setCodePostal(e.target.value)}
+              />
+            </div>
+
+            <div className="residence-modal__field">
+              <label className="residence-modal__label">Ville</label>
+              <select
+                className="residence-modal__select"
+                value={villeId}
+                onChange={(e) => setVilleId(e.target.value)}
+                disabled={isLoadingVilles}
+              >
+                <option value="">Sélectionner...</option>
+                {villes?.map(v => (
+                  <option key={v.id} value={v.id}>{v.nom}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="residence-modal__field">
+              <label className="residence-modal__label">Zone (optionnel)</label>
+              <select
+                className="residence-modal__select"
+                value={zoneId}
+                onChange={(e) => setZoneId(e.target.value)}
+                disabled={isLoadingZones}
+              >
+                <option value="">Aucune</option>
+                {zones?.map(z => (
+                  <option key={z.id} value={z.id}>
+                    {z.nom}{z.villeNom ? ` (${z.villeNom})` : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="residence-modal__field">
+              <label className="residence-modal__label">Rayon détection (m)</label>
+              <input
+                className="residence-modal__input"
+                type="number"
+                placeholder="50"
+                value={rayonDetection}
+                onChange={(e) => setRayonDetection(e.target.value)}
+              />
+            </div>
+
+            <div className="residence-modal__field">
+              <label className="residence-modal__label">Latitude (optionnel)</label>
+              <input
+                className="residence-modal__input"
+                type="number"
+                step="any"
+                value={latitude}
+                onChange={(e) => setLatitude(e.target.value)}
+              />
+            </div>
+
+            <div className="residence-modal__field">
+              <label className="residence-modal__label">Longitude (optionnel)</label>
+              <input
+                className="residence-modal__input"
+                type="number"
+                step="any"
+                value={longitude}
+                onChange={(e) => setLongitude(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="residence-modal__actions">
+            <button type="button" className="residence-modal__cancel" onClick={onClose}>
+              Annuler
+            </button>
+            <button type="submit" className="residence-modal__submit" disabled={isSubmitting}>
+              {isSubmitting ? "Création..." : "Créer la résidence"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────
 // PAGE PRINCIPALE
 // ─────────────────────────────────────────
 
 export default function ResidencesPage() {
   const { data: residences, isLoading: isLoadingResidences } = useResidences();
   const residencesListe = residences ?? [];
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
 
   // ── Gardien(s) et arrêt le plus récent de chaque résidence ──
   const gardiensQueries = useQueries({
@@ -150,7 +341,12 @@ export default function ResidencesPage() {
             {residencesListe.length} résidences enregistrées
           </p>
         </div>
+        <button className="residences__add" onClick={() => setModalOpen(true)}>
+          Ajouter une résidence
+        </button>
       </div>
+
+      {modalOpen && <AjouterResidenceModal onClose={() => setModalOpen(false)} />}
 
       <StaggerContainer className="residences__grid">
         {residencesListe.map((r, i) => {

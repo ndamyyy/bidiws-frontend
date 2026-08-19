@@ -7,7 +7,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/useAuth";
 import { useNotifications } from "../../../hooks/useNotifications";
 import { Role } from "../../../types";
-import "./Sidebar.css";
+import "./SideBar.css";
 import { JSX } from "react/jsx-runtime";
 
 // ─────────────────────────────────────────
@@ -103,7 +103,13 @@ const NavIcon = ({ name, active }: { name: string; active: boolean }) => {
 // COMPOSANT
 // ─────────────────────────────────────────
 
-export default function Sidebar() {
+export default function Sidebar({
+  isOpen,
+  onClose,
+}: {
+  isOpen : boolean;
+  onClose: () => void;
+}) {
   const navigate                        = useNavigate();
   const location                        = useLocation();
   const { utilisateur, logout }         = useAuth();
@@ -118,7 +124,9 @@ export default function Sidebar() {
   const avatarClass = `sidebar__user-avatar sidebar__user-avatar--${utilisateur.role.toLowerCase()}`;
 
   return (
-    <aside className="sidebar">
+    <>
+    {isOpen && <div className="sidebar__backdrop" onClick={onClose} />}
+    <aside className={`sidebar ${isOpen ? "sidebar--open" : ""}`}>
 
       {/* ── Logo ── */}
       <div className="sidebar__logo">
@@ -157,7 +165,7 @@ export default function Sidebar() {
             <button
               key={item.path}
               className={`sidebar__nav-item ${isActive ? "sidebar__nav-item--active" : ""}`}
-              onClick={() => navigate(item.path)}
+              onClick={() => { navigate(item.path); onClose(); }}
             >
               <NavIcon name={item.icon} active={isActive} />
               <span>{item.label}</span>
@@ -184,5 +192,6 @@ export default function Sidebar() {
       </div>
 
     </aside>
+    </>
   );
 }
