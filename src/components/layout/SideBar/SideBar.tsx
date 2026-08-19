@@ -165,7 +165,13 @@ export default function Sidebar({
             <button
               key={item.path}
               className={`sidebar__nav-item ${isActive ? "sidebar__nav-item--active" : ""}`}
-              onClick={() => { navigate(item.path); onClose(); }}
+              onClick={() => {
+                navigate(item.path);
+                // Referme le tiroir mobile après sélection, mais pas la
+                // sidebar desktop (repli explicite de l'utilisateur,
+                // pas un overlay à escamoter après navigation).
+                if (window.innerWidth <= 768) onClose();
+              }}
             >
               <NavIcon name={item.icon} active={isActive} />
               <span>{item.label}</span>

@@ -12,37 +12,44 @@ import PageTransition from "../../ui/PageTransition/PageTransition";
 import { ErrorBoundary } from "../../ErrorBoundary/ErrorBoundary";
 import "./Layout.css";
 
+const MOBILE_BREAKPOINT = 768;
+
 // ─────────────────────────────────────────
 // COMPOSANT
-// Sidebar toujours visible en desktop ; en dessous de 768px, elle
-// devient un tiroir masqué par défaut, ouvert via le bouton menu de
-// la TopBar et refermé au clic sur le fond ou au changement de page.
+// Sidebar ouverte par défaut en desktop (repliable via le bouton menu
+// de la TopBar, redimensionne le contenu) ; fermée par défaut en
+// dessous de 768px, où elle devient un tiroir en overlay ouvert via le
+// même bouton et refermé au clic sur le fond ou au choix d'une page.
 // ─────────────────────────────────────────
 
 export default function Layout() {
   const location = useLocation();
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > MOBILE_BREAKPOINT);
 
-  // Referme le tiroir mobile au changement de page — ajustement d'état
-  // pendant le rendu plutôt qu'un effet, pour éviter un rendu en
-  // cascade (pattern recommandé React quand l'état dépend d'une prop).
+  // Referme le tiroir au changement de page, mobile uniquement — sur
+  // desktop la sidebar est un choix persistant de l'utilisateur, pas
+  // un overlay à escamoter. Ajustement d'état pendant le rendu plutôt
+  // qu'un effet, pour éviter un rendu en cascade (pattern recommandé
+  // React quand l'état dépend d'une prop).
   const [prevPathname, setPrevPathname] = useState(location.pathname);
   if (location.pathname !== prevPathname) {
     setPrevPathname(location.pathname);
-    setMobileNavOpen(false);
+    if (window.innerWidth <= MOBILE_BREAKPOINT) {
+      setSidebarOpen(false);
+    }
   }
 
   return (
-    <div className="layout">
+    <div className={`layout ${!sidebarOpen ? "layout--sidebar-closed" : ""}`}>
 
-      {/* ── Sidebar fixe à gauche (tiroir en mobile) ── */}
-      <Sidebar isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
+      {/* ── Sidebar fixe à gauche (tiroir en mobile, repliable en desktop) ── */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* ── Contenu principal ── */}
       <div className="layout__main">
 
         {/* ── TopBar fixe en haut ── */}
-        <TopBar onMenuClick={() => setMobileNavOpen(o => !o)} />
+        <TopBar onMenuClick={() => setSidebarOpen(o => !o)} isSidebarOpen={sidebarOpen} />
 
         {/* ── Pages (Outlet = la page active) ── */}
         <main className="layout__content">

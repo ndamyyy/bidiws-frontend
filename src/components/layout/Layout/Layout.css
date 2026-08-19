@@ -11,7 +11,7 @@
   display: flex;
   width: 100%;
   min-height: 100vh;
-  background-color: var(--bg-base);
+  background-color: var(--bg-deep);
   overflow: hidden;
 }
 
@@ -21,9 +21,17 @@
   display: flex;
   flex-direction: column;
   min-width: 0; /* évite overflow horizontal */
-  background-color: var(--bg-base);
+  background-color: var(--bg-deep);
   margin-left: var(--sidebar-width);
-  transition: margin-left var(--transition-base);
+  transition: margin-left 0.3s var(--ease-smooth);
+}
+
+/* Sidebar repliée en desktop (classe posée par Layout.tsx) : le
+   contenu reprend toute la largeur. Sans effet en mobile, où le
+   media query plus bas force déjà margin-left:0 en permanence
+   (la sidebar y est un overlay, elle ne pousse jamais le contenu). */
+.layout--sidebar-closed .layout__main {
+  margin-left: 0;
 }
 
 .layout__content {

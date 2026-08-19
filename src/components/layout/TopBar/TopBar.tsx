@@ -95,7 +95,13 @@ const notifRouteByRole: Partial<Record<Role, string>> = {
 // COMPOSANT
 // ─────────────────────────────────────────
 
-export default function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
+export default function TopBar({
+  onMenuClick,
+  isSidebarOpen,
+}: {
+  onMenuClick  : () => void;
+  isSidebarOpen: boolean;
+}) {
   const location                      = useLocation();
   const navigate                      = useNavigate();
   const { nonLuesCount, wsConnected }  = useNotifications();
@@ -121,8 +127,12 @@ export default function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
   return (
     <header className="topbar">
 
-      {/* ── Bouton menu (mobile uniquement) ── */}
-      <button className="topbar__menu-btn" onClick={onMenuClick} title="Menu">
+      {/* ── Bouton menu : ouvre/ferme la sidebar ── */}
+      <button
+        className="topbar__menu-btn"
+        onClick={onMenuClick}
+        title={isSidebarOpen ? "Fermer le menu" : "Ouvrir le menu"}
+      >
         <IconMenu />
       </button>
 
