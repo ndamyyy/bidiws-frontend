@@ -59,43 +59,36 @@ export const MOCK_UTILISATEURS: Utilisateur[] = [
     id: 1, nom: "Admin",   prenom: "BIDIWS",
     email: "admin@bidiws.com", telephone: "06 00 00 00 00",
     role: 'ADMIN', actif: true,
-    createdAt: "2026-01-01T00:00:00", updatedAt: "2026-01-01T00:00:00",
   },
   {
     id: 2, nom: "Dupont",  prenom: "Marcel",
     email: "gardien1@bidiws.com", telephone: "06 12 34 56 78",
     role: 'GARDIEN', actif: true,
-    createdAt: "2026-01-15T00:00:00", updatedAt: "2026-01-15T00:00:00",
   },
   {
     id: 4, nom: "Ba",      prenom: "Karim",
     email: "chauffeur1@bidiws.com", telephone: "06 55 44 33 22",
     role: 'CHAUFFEUR', actif: true,
-    createdAt: "2026-02-01T00:00:00", updatedAt: "2026-02-01T00:00:00",
   },
   {
     id: 5, nom: "Martin",  prenom: "Claire",
     email: "syndic@bidiws.com", telephone: "06 11 22 33 44",
     role: 'SYNDIC', actif: true,
-    createdAt: "2026-01-10T00:00:00", updatedAt: "2026-01-10T00:00:00",
   },
   {
     id: 6, nom: "Chen",    prenom: "Li",
     email: "gardien3@bidiws.com", telephone: "06 33 44 55 66",
     role: 'GARDIEN', actif: true,
-    createdAt: "2026-01-20T00:00:00", updatedAt: "2026-01-20T00:00:00",
   },
   {
     id: 7, nom: "Sissoko", prenom: "Amadou",
     email: "gardien4@bidiws.com", telephone: "06 44 55 66 77",
     role: 'GARDIEN', actif: true,
-    createdAt: "2026-01-20T00:00:00", updatedAt: "2026-01-20T00:00:00",
   },
   {
     id: 8, nom: "Habitant", prenom: "Jean",
     email: "habitant@bidiws.com", telephone: "06 55 66 77 88",
     role: 'HABITANT', actif: true,
-    createdAt: "2026-02-10T00:00:00", updatedAt: "2026-02-10T00:00:00",
   },
 ];
 

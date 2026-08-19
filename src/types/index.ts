@@ -77,6 +77,11 @@ export type Plateforme =
 // ENTITÉS PRINCIPALES
 // ─────────────────────────────────────────
 
+// Forme confirmée directement depuis le DTO Java (UtilisateurResponseDto,
+// lu en construisant GET /utilisateurs/moi cette session) : (Long id,
+// String email, String nom, String prenom, String telephone, Role role,
+// Boolean actif, Long villeId) — exactement ces 8 champs, ni createdAt
+// ni updatedAt.
 export interface Utilisateur {
   id          : number;
   nom         : string;
@@ -85,8 +90,7 @@ export interface Utilisateur {
   telephone  ?: string;
   role        : Role;
   actif       : boolean;
-  createdAt   : string;
-  updatedAt   : string;
+  villeId    ?: number;
 }
 
 export interface Ville {
