@@ -9,12 +9,34 @@ import axios                                from "axios";
 import { useResidences }                    from "../../../hooks/useResidences";
 import { useVilles }                        from "../../../hooks/useVilles";
 import { useZones }                         from "../../../hooks/useZones";
+import { useCalendrierCollecte, useTypesCollecte } from "../../../hooks/useCalendrierCollecte";
 import { getGardiensByResidence, createResidence, type ResidenceGardien } from "../../../api/residences.api";
 import { getArretsByResidence }             from "../../../api/arrets.api";
+import { createCalendrier, desactiverCalendrier } from "../../../api/calendrier-collecte.api";
 import { LoadingSpinner }                   from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { StaggerContainer, StaggerItem }    from "../../../components/ui/StaggerContainer/StaggerContainer";
 import type { Residence, Arret, ApiError }  from "../../../types";
 import "./ResidencesPage.css";
+
+// ─────────────────────────────────────────
+// JOURS DE LA SEMAINE (1=lundi...7=dimanche, ISO-8601 — voir la note
+// sur CalendrierRequest dans calendrier-collecte.api.ts : convention
+// jamais confirmée en conditions réelles à ce jour)
+// ─────────────────────────────────────────
+
+const JOURS_SEMAINE: { value: number; label: string }[] = [
+  { value: 1, label: "Lundi" },
+  { value: 2, label: "Mardi" },
+  { value: 3, label: "Mercredi" },
+  { value: 4, label: "Jeudi" },
+  { value: 5, label: "Vendredi" },
+  { value: 6, label: "Samedi" },
+  { value: 7, label: "Dimanche" },
+];
+
+const JOUR_LABEL: Record<number, string> = Object.fromEntries(
+  JOURS_SEMAINE.map(j => [j.value, j.label])
+);
 
 // ─────────────────────────────────────────
 // ICÔNES
@@ -30,6 +52,12 @@ const IconHome = ({ color }: { color: string }) => (
 const IconCheck = ({ color }: { color: string }) => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+
+const IconChevron = ({ color }: { color: string }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="6 9 12 15 18 9"/>
   </svg>
 );
 
@@ -54,6 +82,163 @@ const Badge = ({ statut }: { statut: string }) => {
     }}>
       {s.label}
     </span>
+  );
+};
+
+// ─────────────────────────────────────────
+// SECTION DÉPLIABLE — CALENDRIER DE COLLECTE
+// ─────────────────────────────────────────
+
+const CalendrierSection = ({ residenceId }: { residenceId: number }) => {
+  const queryClient = useQueryClient();
+  const [expanded, setExpanded] = useState<boolean>(false);
+
+  // Chargé uniquement une fois la section dépliée — residenceId
+  // devient undefined tant que expanded est false, ce qui désactive
+  // la query (même mécanisme "enabled" que le hook utilise déjà).
+  const { data: calendrier, isLoading: isLoadingCalendrier } =
+    useCalendrierCollecte(expanded ? residenceId : undefined);
+  const { data: typesCollecte, isLoading: isLoadingTypes } = useTypesCollecte();
+
+  const [typeCollecteId, setTypeCollecteId] = useState<string>("");
+  const [jourSemaine,    setJourSemaine]    = useState<string>("");
+  const [heureEstimee,   setHeureEstimee]   = useState<string>("");
+  const [error,          setError]          = useState<string>("");
+  const [isSubmitting,   setIsSubmitting]   = useState<boolean>(false);
+  const [pendingIds,     setPendingIds]     = useState<Set<number>>(new Set());
+
+  const invalidate = () => queryClient.invalidateQueries({
+    queryKey: ["calendriers-collecte", "residence", residenceId],
+  });
+
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
+    e.preventDefault();
+    setError("");
+
+    if (!typeCollecteId || !jourSemaine) {
+      setError("Veuillez choisir un type de collecte et un jour.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await createCalendrier({
+        residenceId,
+        typeCollecteId: Number(typeCollecteId),
+        jourSemaine: Number(jourSemaine),
+        heureEstimee: heureEstimee || undefined,
+      });
+      await invalidate();
+      setTypeCollecteId("");
+      setJourSemaine("");
+      setHeureEstimee("");
+    } catch (err) {
+      const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
+      setError(backendMessage ?? "Erreur lors de l'ajout au calendrier.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDesactiver = async (id: number): Promise<void> => {
+    setPendingIds(prev => new Set(prev).add(id));
+    try {
+      await desactiverCalendrier(id);
+      await invalidate();
+    } catch (err) {
+      const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
+      console.error("BIDIWS — Erreur désactivation calendrier", backendMessage ?? err);
+    } finally {
+      setPendingIds(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
+  };
+
+  const entreesActives = (calendrier ?? []).filter(c => c.actif);
+
+  return (
+    <div className="residence-calendar" onClick={(e) => e.stopPropagation()}>
+      <button
+        className="residence-calendar__toggle"
+        onClick={() => setExpanded(o => !o)}
+      >
+        Calendrier de collecte
+        <span className={`residence-calendar__chevron ${expanded ? "residence-calendar__chevron--open" : ""}`}>
+          <IconChevron color="var(--text-secondary)" />
+        </span>
+      </button>
+
+      {expanded && (
+        <div className="residence-calendar__body">
+          {isLoadingCalendrier && (
+            <div className="residence-calendar__empty">Chargement…</div>
+          )}
+          {!isLoadingCalendrier && entreesActives.length === 0 && (
+            <div className="residence-calendar__empty">Aucun passage programmé.</div>
+          )}
+          {entreesActives.map(c => (
+            <div key={c.id} className="residence-calendar__entry">
+              <span className="residence-calendar__entry-jour">
+                {JOUR_LABEL[c.jourSemaine] ?? `Jour ${c.jourSemaine}`}
+              </span>
+              <span className="residence-calendar__entry-type">{c.typeCollecteLibelle}</span>
+              {c.heureEstimee && (
+                <span className="residence-calendar__entry-heure">{c.heureEstimee}</span>
+              )}
+              <button
+                className="residence-calendar__entry-remove"
+                onClick={() => handleDesactiver(c.id)}
+                disabled={pendingIds.has(c.id)}
+                title="Désactiver ce passage"
+              >
+                {pendingIds.has(c.id) ? "…" : "Désactiver"}
+              </button>
+            </div>
+          ))}
+
+          <form className="residence-calendar__form" onSubmit={handleSubmit}>
+            {error && <div className="residence-calendar__error">{error}</div>}
+
+            <select
+              className="residence-calendar__select"
+              value={typeCollecteId}
+              onChange={(e) => setTypeCollecteId(e.target.value)}
+              disabled={isLoadingTypes}
+            >
+              <option value="">Type de collecte...</option>
+              {typesCollecte?.map(t => (
+                <option key={t.id} value={t.id}>{t.libelle}</option>
+              ))}
+            </select>
+
+            <select
+              className="residence-calendar__select"
+              value={jourSemaine}
+              onChange={(e) => setJourSemaine(e.target.value)}
+            >
+              <option value="">Jour...</option>
+              {JOURS_SEMAINE.map(j => (
+                <option key={j.value} value={j.value}>{j.label}</option>
+              ))}
+            </select>
+
+            <input
+              className="residence-calendar__input"
+              type="time"
+              value={heureEstimee}
+              onChange={(e) => setHeureEstimee(e.target.value)}
+            />
+
+            <button className="residence-calendar__submit" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Ajout..." : "Ajouter"}
+            </button>
+          </form>
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -112,6 +297,8 @@ const ResidenceCard = ({
           Collecté à {new Date(arret.heureCollecte).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
         </div>
       )}
+
+      <CalendrierSection residenceId={residence.id} />
     </div>
   );
 };
