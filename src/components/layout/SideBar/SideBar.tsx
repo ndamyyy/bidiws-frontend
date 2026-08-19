@@ -55,8 +55,8 @@ const getNavItems = (role: Role, nonLuesCount: number): NavItem[] => {
       return [
         { label: "Dashboard",     path: "/admin/dashboard",     icon: "grid"  },
         { label: "Utilisateurs",  path: "/admin/users",         icon: "users" },
-        { label: "Tournées",      path: "/syndic/tournees",     icon: "truck" },
-        { label: "Créer une tournée", path: "/admin/tournees/creer", icon: "plus" },
+        { label: "Tournées",      path: "/admin/tournees",      icon: "plus"  },
+        { label: "Suivi tournées", path: "/syndic/tournees",    icon: "truck" },
         { label: "Résidences",    path: "/syndic/residences",   icon: "home"  },
       ];
     default:

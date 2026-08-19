@@ -322,6 +322,14 @@ export interface TourneeRequest {
   zoneId         ?: number;
 }
 
+export interface ArretRequest {
+  tourneeId       : number;
+  residenceId     : number;
+  ordre           : number;
+  nbConteneurs    : number;
+  typesConteneurs?: string;
+}
+
 export interface ArretValiderRequest {
   modeDetection   : ModeDetection;
   typesConteneurs?: string;

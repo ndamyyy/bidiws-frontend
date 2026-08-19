@@ -8,6 +8,7 @@ import { AnimatePresence } from "framer-motion";
 import Sidebar from "../SideBar/SideBar";
 import TopBar from "../TopBar/TopBar";
 import PageTransition from "../../ui/PageTransition/PageTransition";
+import { ErrorBoundary } from "../../ErrorBoundary/ErrorBoundary";
 import "./Layout.css";
 
 // ─────────────────────────────────────────
@@ -31,11 +32,13 @@ export default function Layout() {
 
         {/* ── Pages (Outlet = la page active) ── */}
         <main className="layout__content">
-          <AnimatePresence mode="wait" initial={false}>
-            <PageTransition key={location.pathname}>
-              <Outlet />
-            </PageTransition>
-          </AnimatePresence>
+          <ErrorBoundary>
+            <AnimatePresence mode="wait" initial={false}>
+              <PageTransition key={location.pathname}>
+                <Outlet />
+              </PageTransition>
+            </AnimatePresence>
+          </ErrorBoundary>
         </main>
 
       </div>

@@ -45,7 +45,7 @@ import HabitantHomePage from "./pages/habitant/HabitantHomePage/HabitantHomePage
 // ─── Pages Admin ───────────────────────────────────────────
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage/AdminDashboardPage";
 import AdminUsersPage from "./pages/admin/AdminUsersPage/AdminUsersPage";
-import AdminCreerTourneePage from "./pages/admin/AdminCreerTourneePage/AdminCreerTourneePage";
+import AdminTourneesPage from "./pages/admin/AdminTourneesPage/AdminTourneesPage";
 
 
 
@@ -256,10 +256,10 @@ function AppShell() {
                   }
                 />
                 <Route
-                  path="/admin/tournees/creer"
+                  path="/admin/tournees"
                   element={
                     <ProtectedRoute roles={["ADMIN"]}>
-                      <AdminCreerTourneePage />
+                      <AdminTourneesPage />
                     </ProtectedRoute>
                   }
                 />

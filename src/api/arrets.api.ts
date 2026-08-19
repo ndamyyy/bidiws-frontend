@@ -4,7 +4,7 @@
 // ============================================================
 
 import apiClient from "./axios";
-import type { Arret, ArretConteneur, StatutArret, SignalGpsRequest } from "../types";
+import type { Arret, ArretConteneur, ArretRequest, StatutArret, SignalGpsRequest } from "../types";
 
 // ─────────────────────────────────────────
 // ARRÊTS D'UNE TOURNÉE
@@ -39,6 +39,16 @@ export const getArretsByResidence = async (
   const response = await apiClient.get<Arret[]>(
     `/arrets/residence/${residenceId}`
   );
+  return response.data;
+};
+
+// ─────────────────────────────────────────
+// CRÉER UN ARRÊT
+// POST /arrets
+// ─────────────────────────────────────────
+
+export const createArret = async (data: ArretRequest): Promise<Arret> => {
+  const response = await apiClient.post<Arret>("/arrets", data);
   return response.data;
 };
 
