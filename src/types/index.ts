@@ -101,9 +101,12 @@ export interface Ville {
   actif       : boolean;
 }
 
+// villeNom confirmé en conditions réelles (GET /zones), absent
+// jusqu'ici — ajouté en plus des champs déjà là.
 export interface Zone {
   id          : number;
   villeId     : number;
+  villeNom   ?: string;
   nom         : string;
   code        : string;
   description?: string;

@@ -1,0 +1,114 @@
+/* ============================================================
+   BIDIWS — AdminCreerTourneePage
+   Fichier : src/pages/admin/AdminCreerTourneePage/AdminCreerTourneePage.css
+   Classes préfixées admin-creer-tournee- (pas de style partagé avec
+   les autres pages admin — même décision explicite que le reste).
+   ============================================================ */
+
+.admin-creer-tournee__header {
+  margin-bottom: 20px;
+}
+
+.admin-creer-tournee__title {
+  font-family: "Syne", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.admin-creer-tournee__subtitle {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.admin-creer-tournee__card {
+  max-width: 520px;
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.admin-creer-tournee__field {
+  margin-bottom: 16px;
+}
+
+.admin-creer-tournee__label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.admin-creer-tournee__input,
+.admin-creer-tournee__select {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: all var(--t-fast) var(--ease-smooth);
+}
+.admin-creer-tournee__input:focus,
+.admin-creer-tournee__select:focus {
+  border-color: var(--signal);
+  box-shadow: 0 0 0 4px var(--signal-dim-05);
+}
+
+.admin-creer-tournee__error {
+  background: rgba(255, 79, 100, 0.08);
+  border: 1px solid rgba(255, 79, 100, 0.2);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--critical);
+  margin-bottom: 16px;
+}
+
+.admin-creer-tournee__success {
+  background: var(--signal-dim-10);
+  border: 1px solid var(--signal-dim-20);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--signal);
+  margin-bottom: 16px;
+}
+
+.admin-creer-tournee__submit {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--signal), #2ECC71);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-inverse);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease-smooth);
+  box-shadow: 0 4px 24px rgba(57, 255, 140, 0.2);
+}
+.admin-creer-tournee__submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(57, 255, 140, 0.3);
+}
+.admin-creer-tournee__submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.admin-creer-tournee__empty {
+  padding: 22px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+  max-width: 520px;
+}
