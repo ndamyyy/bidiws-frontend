@@ -4,8 +4,9 @@
 // ============================================================
 
 import { JSX, useRef, useState } from "react";
+import axios                from "axios";
 import { useAuth }         from "../../hooks/useAuth";
-import type { Role }       from "../../types";
+import type { Role, ApiError } from "../../types";
 import "./LoginPage.css";
 
 // ─────────────────────────────────────────
@@ -188,8 +189,13 @@ export default function LoginPage() {
 
     try {
       await login({ email: email.trim(), motDePasse });
-    } catch {
-      setError("Email ou mot de passe incorrect. Vérifiez vos identifiants.");
+    } catch (err) {
+      // Le backend distingue plusieurs cas (401 mauvais identifiants,
+      // 423 compte verrouillé, etc.) avec un message précis à chaque
+      // fois — on l'affiche tel quel plutôt qu'un message générique
+      // qui ferait croire à un mauvais mot de passe dans tous les cas.
+      const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
+      setError(backendMessage ?? "Email ou mot de passe incorrect. Vérifiez vos identifiants.");
     }
   };
 
