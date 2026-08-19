@@ -84,8 +84,8 @@
 
 /* ─── Grille collectes ─── */
 .habitant__schedule {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
   border-radius: 16px;
   overflow: hidden;
   margin-bottom: 20px;
@@ -94,7 +94,7 @@
 
 .habitant__schedule-header {
   padding: 16px 22px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--overlay-6);
   font-family: "Syne", sans-serif;
   font-size: 15px;
   font-weight: 700;
@@ -106,12 +106,12 @@
   align-items: center;
   gap: 16px;
   padding: 14px 22px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--overlay-4);
   transition: background 0.18s;
 }
 
 .schedule-item:last-child { border-bottom: none; }
-.schedule-item:hover { background: rgba(255, 255, 255, 0.03); }
+.schedule-item:hover { background: var(--overlay-3); }
 
 .schedule-item__color {
   width: 12px;
@@ -140,8 +140,8 @@
 
 /* ─── Conseils ─── */
 .habitant__tips {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
   border-radius: 16px;
   padding: 22px;
   animation: fadeUp 0.4s 0.15s both cubic-bezier(0.22, 1, 0.36, 1);

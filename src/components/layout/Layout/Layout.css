@@ -573,7 +573,7 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 .table tr:last-child td { border-bottom: none; }
-.table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+.table tr:hover td { background: var(--overlay-2); }
 
 /* Input */
 .input {

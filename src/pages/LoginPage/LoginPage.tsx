@@ -278,8 +278,8 @@ export default function LoginPage() {
                     style={{
                       background: isActive
                         ? `${option.color}22`
-                        : "rgba(255,255,255,0.04)",
-                      border: `1px solid ${isActive ? option.color + "55" : "rgba(255,255,255,0.08)"}`,
+                        : "var(--overlay-4)",
+                      border: `1px solid ${isActive ? option.color + "55" : "var(--overlay-8)"}`,
                     }}
                   >
                     {option.icon}

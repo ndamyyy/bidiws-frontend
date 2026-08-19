@@ -15,6 +15,21 @@
   --bg-input:       #1A2440;
   --bg-card-glass:  rgba(18, 26, 46, 0.7);
 
+  /* ── Voiles translucides (effet carte/relief) ──
+     Mêmes valeurs numériques qu'avant leur passage en variable,
+     zéro régression en mode sombre. Redéfinies en noir dans
+     [data-theme="light"] plus bas. */
+  --overlay-2:      rgba(255, 255, 255, 0.02);
+  --overlay-3:      rgba(255, 255, 255, 0.03);
+  --overlay-4:      rgba(255, 255, 255, 0.04);
+  --overlay-5:      rgba(255, 255, 255, 0.05);
+  --overlay-6:      rgba(255, 255, 255, 0.06);
+  --overlay-7:      rgba(255, 255, 255, 0.07);
+  --overlay-8:      rgba(255, 255, 255, 0.08);
+  --overlay-10:     rgba(255, 255, 255, 0.1);
+  --overlay-14:     rgba(255, 255, 255, 0.14);
+  --overlay-20:     rgba(255, 255, 255, 0.2);
+
   /* ── Accent : Signal ── */
   --signal:         #39FF8C;
   --signal-dim-05:  rgba(57, 255, 140, 0.05);
@@ -606,6 +621,23 @@ h4, .h4 { font-family: var(--font-display); font-size: clamp(16px, 2vw, 20px); f
   --bg-card-hover:  #EEF1F6;
   --bg-input:       #F1F3F7;
   --bg-card-glass:  rgba(255, 255, 255, 0.75);
+
+  /* Voiles translucides : rgba(0,0,0,X) sur fond clair (#F7F8FA).
+     Un simple rgba(255,255,255,X) devient invisible sur fond déjà
+     clair — repassées en noir avec une opacité relevée (le fond
+     clair a beaucoup moins de "marge" perceptuelle qu'un fond sombre,
+     donc les valeurs les plus faibles sont celles qu'il faut le plus
+     relever pour rester visibles). */
+  --overlay-2:      rgba(0, 0, 0, 0.04);
+  --overlay-3:      rgba(0, 0, 0, 0.05);
+  --overlay-4:      rgba(0, 0, 0, 0.06);
+  --overlay-5:      rgba(0, 0, 0, 0.07);
+  --overlay-6:      rgba(0, 0, 0, 0.08);
+  --overlay-7:      rgba(0, 0, 0, 0.09);
+  --overlay-8:      rgba(0, 0, 0, 0.1);
+  --overlay-10:     rgba(0, 0, 0, 0.12);
+  --overlay-14:     rgba(0, 0, 0, 0.16);
+  --overlay-20:     rgba(0, 0, 0, 0.22);
 
   /* Accent inchangés (identité de marque) — seules les variantes
      "dim" sont éclaircies pour rester visibles sur fond clair. */

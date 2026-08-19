@@ -48,7 +48,7 @@ const ProgressBar = ({ progress }: { progress: number }) => (
     {/* Track */}
     <div style={{
       position: "absolute", top: 20, left: "2%", right: "2%",
-      height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 4,
+      height: 4, background: "var(--overlay-6)", borderRadius: 4,
     }}>
       <div style={{
         height: "100%", width: `${progress}%`, borderRadius: 4,
@@ -220,8 +220,8 @@ export default function ChauffeurTourneePage() {
           <div
             className="chauffeur__gps-icon"
             style={{
-              background: gpsOn ? "rgba(76,175,80,0.2)"  : "rgba(255,255,255,0.05)",
-              border    : `1.5px solid ${gpsOn ? "rgba(76,175,80,0.4)" : "rgba(255,255,255,0.08)"}`,
+              background: gpsOn ? "rgba(76,175,80,0.2)"  : "var(--overlay-5)",
+              border    : `1.5px solid ${gpsOn ? "rgba(76,175,80,0.4)" : "var(--overlay-8)"}`,
               boxShadow : gpsOn ? "0 0 20px rgba(76,175,80,0.2)" : "none",
             }}
           >
@@ -244,7 +244,7 @@ export default function ChauffeurTourneePage() {
         {/* Toggle switch */}
         <button
           className="toggle-switch"
-          style={{ background: gpsOn ? "#4caf50" : "rgba(255,255,255,0.1)" }}
+          style={{ background: gpsOn ? "#4caf50" : "var(--overlay-10)" }}
           onClick={() => setGpsOn(prev => !prev)}
         >
           <div
