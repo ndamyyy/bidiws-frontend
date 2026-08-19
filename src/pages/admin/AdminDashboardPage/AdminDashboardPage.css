@@ -288,8 +288,27 @@
 }
 
 .admin-dashboard__signalements-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
   padding: 18px 22px;
   border-bottom: 1px solid var(--overlay-6);
+}
+
+.admin-dashboard__see-all {
+  background: none;
+  border: none;
+  color: var(--signal);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+.admin-dashboard__see-all:hover {
+  text-decoration: underline;
 }
 
 .admin-signalement-item {

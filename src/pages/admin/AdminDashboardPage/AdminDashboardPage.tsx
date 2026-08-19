@@ -4,6 +4,7 @@
 // ============================================================
 
 import { useState, useEffect, JSX } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import { useVilles } from "../../../hooks/useVilles";
 import { useCamions } from "../../../hooks/useCamions";
@@ -184,6 +185,7 @@ const StatCard = ({
 // ─────────────────────────────────────────
 
 export default function AdminDashboardPage() {
+  const navigate = useNavigate();
   const now  = new Date();
   const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
@@ -191,7 +193,7 @@ export default function AdminDashboardPage() {
   const { data: camions,    isLoading: isLoadingCamions }    = useCamions();
   const { data: residences, isLoading: isLoadingResidences } = useResidences();
   const { data: tournees,   isLoading: isLoadingTournees }   = useTournees({ date });
-  const { data: signalements, isLoading: isLoadingSignalements } = useSignalements();
+  const { data: signalements, isLoading: isLoadingSignalements, isError: isErrorSignalements } = useSignalements();
 
   const tourneesListe = tournees ?? [];
 
@@ -310,6 +312,12 @@ export default function AdminDashboardPage() {
       <div className="admin-dashboard__signalements">
         <div className="admin-dashboard__signalements-header">
           <h2 className="admin-dashboard__section-title">Signalements récents</h2>
+          <button
+            className="admin-dashboard__see-all"
+            onClick={() => navigate("/admin/signalements")}
+          >
+            Voir tout →
+          </button>
         </div>
 
         {isLoadingSignalements && (
@@ -318,14 +326,25 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {!isLoadingSignalements && signalementsRecents.length === 0 && (
+        {isErrorSignalements && (
+          <div className="admin-dashboard__empty" style={{ padding: "14px 22px" }}>
+            Erreur lors du chargement des signalements.
+          </div>
+        )}
+
+        {!isLoadingSignalements && !isErrorSignalements && signalementsRecents.length === 0 && (
           <div className="admin-dashboard__empty" style={{ padding: "14px 22px" }}>
             Aucun signalement pour le moment.
           </div>
         )}
 
         {signalementsRecents.map((s) => (
-          <div key={s.id} className="admin-signalement-item">
+          <div
+            key={s.id}
+            className="admin-signalement-item"
+            onClick={() => navigate("/admin/signalements")}
+            style={{ cursor: "pointer" }}
+          >
             <div
               className="admin-signalement-item__icon"
               style={{
