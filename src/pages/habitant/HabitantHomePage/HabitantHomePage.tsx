@@ -21,6 +21,42 @@ const IconTrash = ({ color }: { color: string }) => (
 );
 
 // ─────────────────────────────────────────
+// ICÔNES CONSEILS
+// ─────────────────────────────────────────
+
+const IconClock = ({ color }: { color: string }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <polyline points="12 6 12 12 16 14"/>
+  </svg>
+);
+
+const IconBell = ({ color }: { color: string }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+  </svg>
+);
+
+const IconRecycle = ({ color }: { color: string }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/>
+    <path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/>
+    <path d="m14 16-3 3 3 3"/>
+    <path d="M8.293 13.596 4.5 9.5l1.5-1.5"/>
+    <path d="m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 11.985 3a1.784 1.784 0 0 1 1.546.888l3.943 6.843"/>
+    <path d="m13.378 9.633 4.096 1.098 1.097-4.096"/>
+  </svg>
+);
+
+const IconBan = ({ color }: { color: string }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+  </svg>
+);
+
+// ─────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────
 
@@ -145,13 +181,13 @@ export default function HabitantHomePage() {
       <div className="habitant__tips">
         <div className="habitant__tips-title">Conseils pratiques</div>
         {[
-          { emoji: "🕐", text: <><strong>Sortez vos bacs</strong> la veille au soir ou le matin avant 7h.</> },
-          { emoji: "📲", text: <><strong>Activez les notifications</strong> pour être prévenu du passage du camion.</> },
-          { emoji: "♻️", text: <><strong>Respectez le tri</strong> — verre, plastique, papier dans les bons bacs.</> },
-          { emoji: "🚫", text: <><strong>Ne laissez pas les bacs</strong> trop longtemps sur la voie publique après la collecte.</> },
+          { icon: <IconClock color="#6b84a3" />, text: <><strong>Sortez vos bacs</strong> la veille au soir ou le matin avant 7h.</> },
+          { icon: <IconBell color="#6b84a3" />, text: <><strong>Activez les notifications</strong> pour être prévenu du passage du camion.</> },
+          { icon: <IconRecycle color="#4caf50" />, text: <><strong>Respectez le tri</strong> — verre, plastique, papier dans les bons bacs.</> },
+          { icon: <IconBan color="#ef4444" />, text: <><strong>Ne laissez pas les bacs</strong> trop longtemps sur la voie publique après la collecte.</> },
         ].map((tip, i) => (
           <div key={i} className="tip-item">
-            <span className="tip-item__emoji">{tip.emoji}</span>
+            <span className="tip-item__icon">{tip.icon}</span>
             <span className="tip-item__text">{tip.text}</span>
           </div>
         ))}

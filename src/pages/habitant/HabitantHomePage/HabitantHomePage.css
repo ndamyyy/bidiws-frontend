@@ -164,10 +164,10 @@
 
 .tip-item:last-child { margin-bottom: 0; }
 
-.tip-item__emoji {
-  font-size: 18px;
+.tip-item__icon {
   flex-shrink: 0;
   margin-top: 1px;
+  display: flex;
 }
 
 .tip-item__text {
