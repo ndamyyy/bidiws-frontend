@@ -37,7 +37,7 @@ import GardienHomePage from "./pages/gardien/GardienHomePage/GardienHomePage";
 
 // ─── Pages Chauffeur ───────────────────────────────────────
 import ChauffeurTourneePage from "./pages/chauffeur/ChauffeurTourneePage/ChauffeurTourneePage";
-// import ChauffeurGpsPage from "./pages/chauffeur/ChauffeurGpsPage/ChauffeurGpsPage";
+import ChauffeurGpsPage from "./pages/chauffeur/ChauffeurGpsPage/ChauffeurGpsPage";
 
 // ─── Pages Habitant ────────────────────────────────────────
 import HabitantHomePage from "./pages/habitant/HabitantHomePage/HabitantHomePage";
@@ -220,11 +220,11 @@ function AppShell() {
                 />
                 <Route
                   path="/chauffeur/gps"
-                  // element={
-                  //   <ProtectedRoute roles={["CHAUFFEUR", "ADMIN"]}>
-                  //     <ChauffeurGpsPage />
-                  //   </ProtectedRoute>
-                  // }
+                  element={
+                    <ProtectedRoute roles={["CHAUFFEUR", "ADMIN"]}>
+                      <ChauffeurGpsPage />
+                    </ProtectedRoute>
+                  }
                 />
 
                 {/* ── Habitant ── */}
