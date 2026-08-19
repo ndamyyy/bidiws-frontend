@@ -32,8 +32,8 @@ import NotificationsPage from "./pages/syndic/NotificationsPages/NotificationsPa
 
 // ─── Pages Gardien ─────────────────────────────────────────
 import GardienHomePage from "./pages/gardien/GardienHomePage/GardienHomePage";
-// import GardienAlertsPage from "./pages/gardien/GardienAlertsPage/GardienAlertsPage";
-// import GardienHistoPage from "./pages/gardien/GardienHistoPage/GardienHistoPage";
+import GardienAlertsPage from "./pages/gardien/GardienAlertsPage/GardienAlertsPage";
+import GardienHistoPage from "./pages/gardien/GardienHistoPage/GardienHistoPage";
 
 // ─── Pages Chauffeur ───────────────────────────────────────
 import ChauffeurTourneePage from "./pages/chauffeur/ChauffeurTourneePage/ChauffeurTourneePage";
@@ -195,19 +195,19 @@ function AppShell() {
                 />
                 <Route
                   path="/gardien/alertes"
-                    // element={
-                    //   <ProtectedRoute roles={["GARDIEN", "ADMIN"]}>
-                    //     <GardienAlertsPage />
-                    //   </ProtectedRoute>
-                    // }
+                  element={
+                    <ProtectedRoute roles={["GARDIEN", "ADMIN"]}>
+                      <GardienAlertsPage />
+                    </ProtectedRoute>
+                  }
                 />
                 <Route
                   path="/gardien/historique"
-                  // element={
-                  //   <ProtectedRoute roles={["GARDIEN", "ADMIN"]}>
-                  //     <GardienHistoPage />
-                  //   </ProtectedRoute>
-                  // }
+                  element={
+                    <ProtectedRoute roles={["GARDIEN", "ADMIN"]}>
+                      <GardienHistoPage />
+                    </ProtectedRoute>
+                  }
                 />
 
                 {/* ── Chauffeur ── */}
