@@ -81,10 +81,19 @@ apiClient.interceptors.response.use(
     const status = error.response?.status;
 
     if (status === 401) {
-      // Token expiré ou invalide → on nettoie et redirige
-      removeToken();
-      localStorage.removeItem("bidiws_user");
-      window.location.href = "/login";
+      // Un 401 sur /auth/login ou /auth/register est un échec de
+      // connexion normal (mauvais mot de passe) — géré localement par
+      // LoginPage, pas une session expirée. Ne pas y appliquer le
+      // nettoyage/redirection global, sinon un mauvais mot de passe
+      // déclenche un rechargement complet de la page.
+      const url = error.config?.url ?? "";
+      const isAuthEndpoint = url.includes("/auth/login") || url.includes("/auth/register");
+      if (!isAuthEndpoint) {
+        // Token expiré ou invalide → on nettoie et redirige
+        removeToken();
+        localStorage.removeItem("bidiws_user");
+        window.location.href = "/login";
+      }
     }
 
     if (status === 403) {
