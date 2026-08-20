@@ -171,7 +171,7 @@ export default function TourneesPage() {
   const now = new Date();
   const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
-  const { data: tournees, isLoading: isLoadingTournees } = useTournees({ date });
+  const { data: tournees, isLoading: isLoadingTournees, isError: isErrorTournees } = useTournees({ date });
 
   // ── Arrêts de chaque tournée, une query par tournée (useQueries, pas
   //    de hook dans une boucle .map()) ──
@@ -197,6 +197,23 @@ export default function TourneesPage() {
 
   if (isLoadingTournees) {
     return <LoadingSpinner />;
+  }
+
+  // Sans ce garde, une requête en erreur (data: undefined) retombait
+  // silencieusement sur "Aucune tournée programmée" — indiscernable
+  // d'une vraie journée sans tournée, sans log console (pas un throw,
+  // ErrorBoundary ne le voit jamais) et sans message explicite.
+  if (isErrorTournees) {
+    return (
+      <div>
+        <div className="tournees__header">
+          <h1 className="tournees__title">Tournées du jour</h1>
+        </div>
+        <div style={{ padding: "24px 0", color: "var(--critical)", fontSize: 13 }}>
+          Erreur lors du chargement des tournées.
+        </div>
+      </div>
+    );
   }
 
   const tourneesListe = tournees ?? [];

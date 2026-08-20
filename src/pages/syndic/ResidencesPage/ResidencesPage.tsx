@@ -494,7 +494,7 @@ const AjouterResidenceModal = ({ onClose }: { onClose: () => void }) => {
 // ─────────────────────────────────────────
 
 export default function ResidencesPage() {
-  const { data: residences, isLoading: isLoadingResidences } = useResidences();
+  const { data: residences, isLoading: isLoadingResidences, isError: isErrorResidences } = useResidences();
   const residencesListe = residences ?? [];
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
@@ -517,6 +517,23 @@ export default function ResidencesPage() {
 
   if (isLoadingResidences) {
     return <LoadingSpinner />;
+  }
+
+  // Sans ce garde, une requête en erreur (data: undefined) retombait
+  // silencieusement sur "0 résidences enregistrées" — indiscernable
+  // d'un vrai compte sans résidence, sans log console (pas un throw,
+  // ErrorBoundary ne le voit jamais) et sans message explicite.
+  if (isErrorResidences) {
+    return (
+      <div>
+        <div className="residences__header">
+          <h1 className="residences__title">Résidences</h1>
+        </div>
+        <div style={{ padding: "24px 0", color: "var(--critical)", fontSize: 13 }}>
+          Erreur lors du chargement des résidences.
+        </div>
+      </div>
+    );
   }
 
   return (
