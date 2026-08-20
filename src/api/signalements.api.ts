@@ -36,12 +36,23 @@ export const getSignalementsByAuteur = async (
 };
 
 // ─────────────────────────────────────────
-// TOUS LES SIGNALEMENTS (syndic / admin)
-// GET /signalements (SANS pagination)
+// SIGNALEMENTS PAR STATUT (syndic / admin)
+// GET /signalements?statut=X
+// "statut" est un @RequestParam obligatoire côté backend — confirmé
+// sur le vrai code, aucune route "tous statuts confondus" n'existe.
+// L'appeler sans paramètre renvoie un 400 (masqué en "Erreur interne
+// du serveur" par le GlobalExceptionHandler, qui étiquette tout
+// pareil) — ce n'était pas un vrai problème serveur, juste un
+// paramètre manquant. Confirmé en conditions réelles : 200 avec
+// ?statut=OUVERT sur un compte ADMIN.
 // ─────────────────────────────────────────
 
-export const getAllSignalements = async (): Promise<Signalement[]> => {
-  const response = await apiClient.get<Signalement[]>("/signalements");
+export const getSignalementsByStatut = async (
+  statut: StatutSignalement
+): Promise<Signalement[]> => {
+  const response = await apiClient.get<Signalement[]>("/signalements", {
+    params: { statut },
+  });
   return response.data;
 };
 

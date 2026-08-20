@@ -9,7 +9,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useSignalements } from "../../../hooks/useSignalements";
+import { useSignalementsByStatut } from "../../../hooks/useSignalements";
 import { updateStatutSignalement } from "../../../api/signalements.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import type { ApiError, Signalement, StatutSignalement } from "../../../types";
@@ -130,33 +130,18 @@ const SignalementCard = ({
 
 export default function AdminSignalementsPage() {
   const queryClient = useQueryClient();
-  const { data: signalements, isLoading, isError, error } = useSignalements();
 
-  const [filtreStatut, setFiltreStatut] = useState<StatutSignalement | "TOUS">("TOUS");
+  // Un statut doit toujours être sélectionné — le backend n'a pas de
+  // route "tous statuts confondus" (voir signalements.api.ts). OUVERT
+  // par défaut : le statut le plus actionnable au chargement.
+  const [filtreStatut, setFiltreStatut] = useState<StatutSignalement>("OUVERT");
   const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
+
+  const { data: signalements, isLoading, isError, error } = useSignalementsByStatut(filtreStatut);
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
-
-  if (isError) {
-    const backendMessage = axios.isAxiosError<ApiError>(error) ? error.response?.data?.message : undefined;
-    return (
-      <div>
-        <div className="admin-signalements__header">
-          <h1 className="admin-signalements__title">Signalements</h1>
-        </div>
-        <div className="admin-signalements__empty">
-          {backendMessage ?? "Erreur lors du chargement des signalements."}
-        </div>
-      </div>
-    );
-  }
-
-  const signalementsListe = [...(signalements ?? [])].sort((a, b) => b.id - a.id);
-  const signalementsFiltres = filtreStatut === "TOUS"
-    ? signalementsListe
-    : signalementsListe.filter(s => s.statut === filtreStatut);
 
   const handleChangeStatut = async (id: number, statut: StatutSignalement): Promise<void> => {
     setPendingIds(prev => new Set(prev).add(id));
@@ -175,22 +160,19 @@ export default function AdminSignalementsPage() {
     }
   };
 
+  const signalementsListe = [...(signalements ?? [])].sort((a, b) => b.id - a.id);
+  const backendMessage = isError && axios.isAxiosError<ApiError>(error) ? error.response?.data?.message : undefined;
+
   return (
     <div>
       <div className="admin-signalements__header">
         <h1 className="admin-signalements__title">Signalements</h1>
         <p className="admin-signalements__subtitle">
-          {signalementsListe.length} signalement{signalementsListe.length > 1 ? "s" : ""} enregistré{signalementsListe.length > 1 ? "s" : ""}
+          {signalementsListe.length} signalement{signalementsListe.length > 1 ? "s" : ""} « {STATUT_LABEL[filtreStatut]} »
         </p>
       </div>
 
       <div className="admin-signalements__filters">
-        <button
-          className={`admin-signalements__filter-pill ${filtreStatut === "TOUS" ? "admin-signalements__filter-pill--active" : ""}`}
-          onClick={() => setFiltreStatut("TOUS")}
-        >
-          Tous
-        </button>
         {STATUTS.map(s => (
           <button
             key={s}
@@ -202,13 +184,17 @@ export default function AdminSignalementsPage() {
         ))}
       </div>
 
-      {signalementsFiltres.length === 0 ? (
+      {isError ? (
         <div className="admin-signalements__empty">
-          {filtreStatut === "TOUS" ? "Aucun signalement." : `Aucun signalement avec le statut « ${STATUT_LABEL[filtreStatut]} ».`}
+          {backendMessage ?? "Erreur lors du chargement des signalements."}
+        </div>
+      ) : signalementsListe.length === 0 ? (
+        <div className="admin-signalements__empty">
+          {`Aucun signalement avec le statut « ${STATUT_LABEL[filtreStatut]} ».`}
         </div>
       ) : (
         <div className="admin-signalements__list">
-          {signalementsFiltres.map(s => (
+          {signalementsListe.map(s => (
             <SignalementCard
               key={s.id}
               signalement={s}

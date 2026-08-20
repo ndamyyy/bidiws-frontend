@@ -10,10 +10,16 @@ import { useVilles } from "../../../hooks/useVilles";
 import { useCamions } from "../../../hooks/useCamions";
 import { useResidences } from "../../../hooks/useResidences";
 import { useTournees } from "../../../hooks/useTournees";
-import { useSignalements } from "../../../hooks/useSignalements";
 import { getArretsByTournee } from "../../../api/arrets.api";
+import { getSignalementsByStatut } from "../../../api/signalements.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import type { StatutSignalement } from "../../../types";
 import "./AdminDashboardPage.css";
+
+// Pas de route "tous statuts confondus" côté backend (statut est un
+// paramètre obligatoire, voir signalements.api.ts) — on interroge les
+// 4 statuts séparément et on fusionne côté client.
+const TOUS_STATUTS_SIGNALEMENT: StatutSignalement[] = ["OUVERT", "EN_TRAITEMENT", "RESOLU", "CLOS"];
 
 // ─────────────────────────────────────────
 // ICÔNES
@@ -193,7 +199,6 @@ export default function AdminDashboardPage() {
   const { data: camions,    isLoading: isLoadingCamions }    = useCamions();
   const { data: residences, isLoading: isLoadingResidences } = useResidences();
   const { data: tournees,   isLoading: isLoadingTournees }   = useTournees({ date });
-  const { data: signalements, isLoading: isLoadingSignalements, isError: isErrorSignalements } = useSignalements();
 
   const tourneesListe = tournees ?? [];
 
@@ -205,6 +210,19 @@ export default function AdminDashboardPage() {
       enabled: !!tournees,
     })),
   });
+
+  // ── Signalements récents : pas de route "tous statuts confondus"
+  // côté backend (statut obligatoire) — une query par statut, fusion
+  // côté client, tri par id décroissant (plus récent en premier). ──
+  const signalementsQueries = useQueries({
+    queries: TOUS_STATUTS_SIGNALEMENT.map(statut => ({
+      queryKey: ["signalements", statut],
+      queryFn: () => getSignalementsByStatut(statut),
+    })),
+  });
+
+  const isLoadingSignalements = signalementsQueries.some(q => q.isLoading);
+  const isErrorSignalements   = signalementsQueries.some(q => q.isError);
 
   const isChargementEssentiel =
     isLoadingVilles || isLoadingCamions || isLoadingResidences || isLoadingTournees;
@@ -219,7 +237,8 @@ export default function AdminDashboardPage() {
     weekday: "long", day: "numeric", month: "long", year: "numeric",
   });
 
-  const signalementsRecents = [...(signalements ?? [])]
+  const signalementsRecents = signalementsQueries
+    .flatMap(q => q.data ?? [])
     .sort((a, b) => b.id - a.id)
     .slice(0, 5);
 

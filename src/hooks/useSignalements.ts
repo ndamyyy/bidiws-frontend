@@ -4,12 +4,17 @@
 // ============================================================
 
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { getAllSignalements } from "../api/signalements.api";
-import type { Signalement } from "../types";
+import { getSignalementsByStatut } from "../api/signalements.api";
+import type { Signalement, StatutSignalement } from "../types";
 
-export function useSignalements(): UseQueryResult<Signalement[]> {
+// "statut" est un paramètre obligatoire côté backend (voir le
+// commentaire dans signalements.api.ts) — pas de variante "tous
+// statuts confondus".
+export function useSignalementsByStatut(
+  statut: StatutSignalement
+): UseQueryResult<Signalement[]> {
   return useQuery({
-    queryKey: ["signalements"],
-    queryFn: getAllSignalements,
+    queryKey: ["signalements", statut],
+    queryFn: () => getSignalementsByStatut(statut),
   });
 }
