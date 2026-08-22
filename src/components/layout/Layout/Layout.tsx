@@ -3,13 +3,14 @@
 // Fichier : src/components/layout/Layout/Layout.tsx
 // ============================================================
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import Sidebar from "../SideBar/SideBar";
 import TopBar from "../TopBar/TopBar";
 import PageTransition from "../../ui/PageTransition/PageTransition";
 import { ErrorBoundary } from "../../ErrorBoundary/ErrorBoundary";
+import { LoadingSpinner } from "../../ui/LoadingSpinner/LoadingSpinner";
 import "./Layout.css";
 
 const MOBILE_BREAKPOINT = 768;
@@ -56,7 +57,9 @@ export default function Layout() {
           <ErrorBoundary>
             <AnimatePresence mode="wait" initial={false}>
               <PageTransition key={location.pathname}>
-                <Outlet />
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Outlet />
+                </Suspense>
               </PageTransition>
             </AnimatePresence>
           </ErrorBoundary>

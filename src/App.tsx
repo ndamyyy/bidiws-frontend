@@ -4,6 +4,7 @@
 // Fichier : src/App.tsx
 // ============================================================
 
+import { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -15,38 +16,38 @@ import { useAuth } from "./hooks/useAuth";
 // Role values are used as runtime strings here;
 
 // ─── Pages publiques ───────────────────────────────────────
+// LoginPage reste en import direct : première page vue par tout le
+// monde, aucun gain à la rendre paresseuse.
 import LoginPage from "./pages/LoginPage/LoginPage";
-import AdminLoginPage from "./pages/admin/AdminLoginPage/AdminLoginPage";
+import { LoadingSpinner } from "./components/ui/LoadingSpinner/LoadingSpinner";
 import SplashScreen from "./components/SplashScreen/SplashScreen";
 import PageTransition from "./components/ui/PageTransition/PageTransition";
 
 // ─── Layout ────────────────────────────────────────────────
 import Layout from "./components/layout/Layout/Layout";
-
-// ─── Pages Syndic ──────────────────────────────────────────
-import DashboardPage from "./pages/syndic/DashboardPage/DashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
-import TourneesPage from "./pages/syndic/TourneesPage/TourneesPage";
-import ResidencesPage from "./pages/syndic/ResidencesPage/ResidencesPage";
-import NotificationsPage from "./pages/syndic/NotificationsPages/NotificationsPage";
 
-// ─── Pages Gardien ─────────────────────────────────────────
-import GardienHomePage from "./pages/gardien/GardienHomePage/GardienHomePage";
-import GardienAlertsPage from "./pages/gardien/GardienAlertsPage/GardienAlertsPage";
-import GardienHistoPage from "./pages/gardien/GardienHistoPage/GardienHistoPage";
+// ─── Pages chargées à la demande (une par route) ────────────
+const AdminLoginPage       = lazy(() => import("./pages/admin/AdminLoginPage/AdminLoginPage"));
 
-// ─── Pages Chauffeur ───────────────────────────────────────
-import ChauffeurTourneePage from "./pages/chauffeur/ChauffeurTourneePage/ChauffeurTourneePage";
-import ChauffeurGpsPage from "./pages/chauffeur/ChauffeurGpsPage/ChauffeurGpsPage";
+const DashboardPage        = lazy(() => import("./pages/syndic/DashboardPage/DashboardPage"));
+const TourneesPage         = lazy(() => import("./pages/syndic/TourneesPage/TourneesPage"));
+const ResidencesPage       = lazy(() => import("./pages/syndic/ResidencesPage/ResidencesPage"));
+const NotificationsPage    = lazy(() => import("./pages/syndic/NotificationsPages/NotificationsPage"));
 
-// ─── Pages Habitant ────────────────────────────────────────
-import HabitantHomePage from "./pages/habitant/HabitantHomePage/HabitantHomePage";
+const GardienHomePage      = lazy(() => import("./pages/gardien/GardienHomePage/GardienHomePage"));
+const GardienAlertsPage    = lazy(() => import("./pages/gardien/GardienAlertsPage/GardienAlertsPage"));
+const GardienHistoPage     = lazy(() => import("./pages/gardien/GardienHistoPage/GardienHistoPage"));
 
-// ─── Pages Admin ───────────────────────────────────────────
-import AdminDashboardPage from "./pages/admin/AdminDashboardPage/AdminDashboardPage";
-import AdminUsersPage from "./pages/admin/AdminUsersPage/AdminUsersPage";
-import AdminTourneesPage from "./pages/admin/AdminTourneesPage/AdminTourneesPage";
-import AdminSignalementsPage from "./pages/admin/AdminSignalementsPage/AdminSignalementsPage";
+const ChauffeurTourneePage = lazy(() => import("./pages/chauffeur/ChauffeurTourneePage/ChauffeurTourneePage"));
+const ChauffeurGpsPage     = lazy(() => import("./pages/chauffeur/ChauffeurGpsPage/ChauffeurGpsPage"));
+
+const HabitantHomePage     = lazy(() => import("./pages/habitant/HabitantHomePage/HabitantHomePage"));
+
+const AdminDashboardPage    = lazy(() => import("./pages/admin/AdminDashboardPage/AdminDashboardPage"));
+const AdminUsersPage        = lazy(() => import("./pages/admin/AdminUsersPage/AdminUsersPage"));
+const AdminTourneesPage     = lazy(() => import("./pages/admin/AdminTourneesPage/AdminTourneesPage"));
+const AdminSignalementsPage = lazy(() => import("./pages/admin/AdminSignalementsPage/AdminSignalementsPage"));
 
 
 
@@ -137,7 +138,9 @@ function AppShell() {
                 element={
                   <AnimatePresence mode="wait" initial={false}>
                     <PageTransition key={location.pathname}>
-                      <AdminLoginPage />
+                      <Suspense fallback={<LoadingSpinner />}>
+                        <AdminLoginPage />
+                      </Suspense>
                     </PageTransition>
                   </AnimatePresence>
                 }
