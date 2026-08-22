@@ -1,35 +1,15 @@
-/* eslint-disable react-refresh/only-export-components */
 // ============================================================
 // BIDIWS — Contexte Thème (light / dark / system)
 // Fichier : src/context/ThemeContext.tsx
 // ============================================================
 
 import {
-  createContext,
   useState,
   useEffect,
   useCallback,
   type ReactNode,
 } from "react";
-
-// ─────────────────────────────────────────
-// TYPES
-// ─────────────────────────────────────────
-
-export type Theme = "light" | "dark" | "system";
-export type ThemeResolu = "light" | "dark";
-
-export interface ThemeContextType {
-  theme       : Theme;
-  themeResolu : ThemeResolu;
-  setTheme    : (theme: Theme) => void;
-}
-
-// ─────────────────────────────────────────
-// CRÉATION DU CONTEXTE
-// ─────────────────────────────────────────
-
-export const ThemeContext = createContext<ThemeContextType | null>(null);
+import { ThemeContext, type Theme, type ThemeResolu, type ThemeContextType } from "./ThemeContextValue";
 
 // ─────────────────────────────────────────
 // HELPERS

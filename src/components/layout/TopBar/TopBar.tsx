@@ -7,7 +7,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/useAuth";
 import { useNotifications } from "../../../hooks/useNotifications";
 import { useTheme } from "../../../hooks/useTheme";
-import type { Theme } from "../../../context/ThemeContext";
+import type { Theme } from "../../../context/ThemeContextValue";
 import { Role } from "../../../types";
 
 import  "./TopBar.css";
