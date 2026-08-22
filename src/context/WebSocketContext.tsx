@@ -1,11 +1,9 @@
-/* eslint-disable react-refresh/only-export-components */
 // ============================================================
 // BIDIWS — Contexte WebSocket (client STOMP partagé)
 // Fichier : src/context/WebSocketContext.tsx
 // ============================================================
 
 import {
-  createContext,
   useEffect,
   useRef,
   useState,
@@ -16,24 +14,7 @@ import { Client, type IMessage, type StompSubscription } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { useAuth } from "../hooks/useAuth";
 import { getToken } from "../api/axios";
-
-// ─────────────────────────────────────────
-// TYPE DU CONTEXTE
-// ─────────────────────────────────────────
-
-export interface WebSocketContextType {
-  connected: boolean;
-  subscribe: (
-    destination: string,
-    callback: (payload: unknown) => void
-  ) => () => void;
-}
-
-// ─────────────────────────────────────────
-// CRÉATION DU CONTEXTE
-// ─────────────────────────────────────────
-
-export const WebSocketContext = createContext<WebSocketContextType | null>(null);
+import { WebSocketContext, type WebSocketContextType } from "./WebSocketContextValue";
 
 // ─────────────────────────────────────────
 // ABONNEMENT EN ATTENTE
