@@ -172,6 +172,57 @@ export interface Camion {
   actif           : boolean;
 }
 
+// Forme confirmée contre ConteneurResponseDto (backend) : residenceId/
+// residenceNom dénormalisés, pas de GET liste à plat (uniquement
+// /conteneurs/residence/:residenceId et /conteneurs/:id).
+export interface Conteneur {
+  id           : number;
+  code         : string;
+  residenceId  : number;
+  residenceNom : string;
+  rfidTag     ?: string;
+  actif        : boolean;
+}
+
+// ─────────────────────────────────────────
+// APPAREILS IOT (capteurs de benne / lecteurs RFID)
+// ─────────────────────────────────────────
+
+export type TypeAppareilIot = "CAPTEUR_BENNE" | "LECTEUR_RFID";
+
+// Forme confirmée contre AppareilIotResponseDto (backend) : ni cleApi
+// ni cleApiHash — la clé n'est jamais renvoyée après la création.
+export interface AppareilIot {
+  id                    : number;
+  identifiantMateriel   : string;
+  typeAppareil          : TypeAppareilIot;
+  conteneurId          ?: number;
+  conteneurCode        ?: string;
+  camionId             ?: number;
+  camionImmatriculation?: string;
+  actif                 : boolean;
+  createdAt             : string;
+}
+
+// Forme confirmée contre AppareilIotRequestDto : conteneurId/camionId
+// tous deux optionnels, au plus un des deux (contrainte appliquée côté
+// service, aucun des deux n'est requis).
+export interface AppareilIotRequest {
+  identifiantMateriel: string;
+  typeAppareil       : TypeAppareilIot;
+  conteneurId       ?: number;
+  camionId          ?: number;
+}
+
+// Forme confirmée contre AppareilIotCreeResponseDto : uniquement ces 3
+// champs, cleApi en clair — renvoyée UNE SEULE FOIS (création ou
+// régénération), jamais récupérable ensuite.
+export interface AppareilIotCreeResponse {
+  id                 : number;
+  identifiantMateriel: string;
+  cleApi             : string;
+}
+
 // Forme plate confirmée contre le vrai TourneeResponseDto (testé en
 // Postman) — le backend dénormalise typeCollecte/camion/chauffeur/zone
 // au lieu de les imbriquer. `createdAt` n'a pas pu être confirmé

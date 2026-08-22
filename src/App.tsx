@@ -47,6 +47,7 @@ const AdminDashboardPage    = lazy(() => import("./pages/admin/AdminDashboardPag
 const AdminUsersPage        = lazy(() => import("./pages/admin/AdminUsersPage/AdminUsersPage"));
 const AdminTourneesPage     = lazy(() => import("./pages/admin/AdminTourneesPage/AdminTourneesPage"));
 const AdminSignalementsPage = lazy(() => import("./pages/admin/AdminSignalementsPage/AdminSignalementsPage"));
+const AdminAppareilsIotPage = lazy(() => import("./pages/admin/AdminAppareilsIotPage/AdminAppareilsIotPage"));
 
 
 
@@ -253,6 +254,14 @@ function AppShell() {
                   element={
                     <ProtectedRoute roles={["ADMIN"]}>
                       <AdminSignalementsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/appareils-iot"
+                  element={
+                    <ProtectedRoute roles={["ADMIN"]}>
+                      <AdminAppareilsIotPage />
                     </ProtectedRoute>
                   }
                 />
