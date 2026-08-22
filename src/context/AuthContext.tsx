@@ -1,11 +1,9 @@
-/* eslint-disable react-refresh/only-export-components */
 // ============================================================
 // BIDIWS — Contexte Authentification
 // Fichier : src/context/AuthContext.tsx
 // ============================================================
 
 import {
-  createContext,
   useState,
   useEffect,
   useCallback,
@@ -15,26 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { login as apiLogin, logout as apiLogout, getMe } from "../api/auth.api";
 import { getToken, removeToken } from "../api/axios";
 import type { AuthUser, LoginRequest, Utilisateur } from "../types";
-
-// ─────────────────────────────────────────
-// TYPE DU CONTEXTE
-// ─────────────────────────────────────────
-
-export interface AuthContextType {
-  authUser       : AuthUser | null;
-  utilisateur    : Utilisateur | null;
-  isAuthenticated: boolean;
-  isLoading      : boolean;
-  isInitializing : boolean;
-  login          : (data: LoginRequest) => Promise<void>;
-  logout         : () => void;
-}
-
-// ─────────────────────────────────────────
-// CRÉATION DU CONTEXTE
-// ─────────────────────────────────────────
-
-export const AuthContext = createContext<AuthContextType | null>(null);
+import { AuthContext, type AuthContextType } from "./AuthContextValue";
 
 // ─────────────────────────────────────────
 // REDIRECT PAR RÔLE
