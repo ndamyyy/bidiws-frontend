@@ -16,14 +16,22 @@
 
 .habitant__subtitle { font-size: 13px; color: var(--text-secondary); }
 
-/* ─── Prochaine collecte hero ─── */
+/* ─── Prochaine collecte hero ───
+   rgba(27,58,107,X) fixe auparavant (bleu nuit) — invisible en mode
+   sombre où il se fond dans le fond, mais lavis bleu-gris lourd et
+   incohérent en mode clair, contrairement aux cartes voisines de ce
+   même fichier (.habitant__schedule/.habitant__tips) qui utilisent
+   déjà var(--overlay-4)/var(--overlay-7). Repris en teinte signal
+   (accent invariant du projet) plutôt qu'aplati en overlay neutre,
+   pour garder cette carte visuellement mise en avant — cohérent avec
+   .habitant__next-heure juste en dessous, déjà en var(--signal). */
 .habitant__next {
-  background: linear-gradient(135deg, rgba(27,58,107,0.3), rgba(27,58,107,0.1));
-  border: 1.5px solid rgba(27,58,107,0.5);
+  background: var(--signal-dim-05);
+  border: 1.5px solid var(--signal-dim-20);
   border-radius: 18px;
   padding: 28px;
   margin-bottom: 20px;
-  box-shadow: 0 8px 40px rgba(27,58,107,0.2);
+  box-shadow: var(--shadow-card);
   animation: fadeUp 0.4s both cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
   overflow: hidden;
