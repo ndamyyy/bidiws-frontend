@@ -1,11 +1,9 @@
-/* eslint-disable react-refresh/only-export-components */
 // ============================================================
 // BIDIWS — Contexte Notifications
 // Fichier : src/context/NotificationContext.tsx
 // ============================================================
 
 import {
-  createContext,
   useState,
   useEffect,
   useCallback,
@@ -18,25 +16,7 @@ import {
   marquerCommeLue,
 } from "../api/notifications.api";
 import type { Notification } from "../types";
-
-// ─────────────────────────────────────────
-// TYPE DU CONTEXTE
-// ─────────────────────────────────────────
-
-export interface NotificationContextType {
-  notifications      : Notification[];
-  nonLuesCount       : number;
-  wsConnected        : boolean;
-  marquerLue         : (id: number) => Promise<void>;
-  marquerToutesLues  : () => Promise<void>;
-  ajouterNotification: (notif: Notification) => void;
-}
-
-// ─────────────────────────────────────────
-// CRÉATION DU CONTEXTE
-// ─────────────────────────────────────────
-
-export const NotificationContext = createContext<NotificationContextType | null>(null);
+import { NotificationContext, type NotificationContextType } from "./NotificationContextValue";
 
 // ─────────────────────────────────────────
 // PROVIDER
