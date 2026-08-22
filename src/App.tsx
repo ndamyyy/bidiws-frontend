@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 // ============================================================
 // BIDIWS — App.tsx + Routes
 // Fichier : src/App.tsx
@@ -64,24 +63,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-// ─────────────────────────────────────────
-// REDIRECT PAR RÔLE
-// Redirige vers la bonne page d'accueil
-// selon le rôle de l'utilisateur connecté
-// ─────────────────────────────────────────
-
-const redirectByRole: Record<string, string> = {
-  SYNDIC:    "/syndic/dashboard",
-  BAILLEUR:  "/syndic/dashboard",
-  MAIRIE:    "/syndic/dashboard",
-  GARDIEN:   "/gardien/home",
-  CHAUFFEUR: "/chauffeur/tournee",
-  HABITANT:  "/habitant/home",
-  ADMIN:     "/admin/dashboard",
-};
-
-export { redirectByRole };
 
 // ─────────────────────────────────────────
 // APP
