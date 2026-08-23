@@ -70,7 +70,7 @@ export default function GardienHomePage() {
 
   // ── Résidence(s) du gardien connecté ──
   const gardienId = utilisateur?.id;
-  const { data: residencesGardien, isLoading: isLoadingResidences } =
+  const { data: residencesGardien, isLoading: isLoadingResidences, isError: isErrorResidences } =
     useResidencesGardien(gardienId);
 
   const residenceLien = residencesGardien?.find(r => r.principal) ?? residencesGardien?.[0];
@@ -83,7 +83,7 @@ export default function GardienHomePage() {
   // proxy du plus récent (auto-incrément, monotone, toujours présent).
   // Ce n'est pas une garantie que c'est l'arrêt "d'aujourd'hui", juste
   // le plus raisonnable en attendant un vrai filtre côté backend.
-  const { data: arrets, isLoading: isLoadingArrets } = useQuery({
+  const { data: arrets, isLoading: isLoadingArrets, isError: isErrorArrets } = useQuery({
     queryKey: ["arrets", "residence", residenceId],
     queryFn: () => getArretsByResidence(residenceId as number),
     enabled: residenceId !== undefined,
@@ -94,7 +94,7 @@ export default function GardienHomePage() {
     : undefined;
 
   // ── Tournée de l'arrêt actuel (type de collecte, chauffeur, camion) ──
-  const { data: tournee, isLoading: isLoadingTournee } = useTournee(arretActuel?.tourneeId);
+  const { data: tournee, isLoading: isLoadingTournee, isError: isErrorTournee } = useTournee(arretActuel?.tourneeId);
 
   // ── Notifications du gardien, scopées à cette résidence ──
   const mesNotifs = notifications.filter(n => n.residenceId === residenceId);
@@ -104,6 +104,7 @@ export default function GardienHomePage() {
   const isApproching = arretActuel?.statut === 'EN_APPROCHE';
 
   const isChargement = isLoadingResidences || isLoadingArrets || isLoadingTournee;
+  const isErreur = isErrorResidences || isErrorArrets || isErrorTournee;
 
   const heroClass = isConfirmed
     ? "gardien__hero--confirmed"
@@ -120,6 +121,23 @@ export default function GardienHomePage() {
 
   if (isChargement) {
     return <LoadingSpinner />;
+  }
+
+  // Sans ce garde, une requête en erreur (data: undefined) retombait
+  // silencieusement sur "Résidence non assignée" / "En attente du
+  // camion" — indiscernable d'un vrai état inactif, sans message
+  // explicite.
+  if (isErreur) {
+    return (
+      <div>
+        <div className="gardien__header">
+          <h1 className="gardien__title">Ma résidence</h1>
+        </div>
+        <div style={{ padding: "24px 0", color: "var(--critical)", fontSize: 13 }}>
+          Erreur lors du chargement de votre résidence.
+        </div>
+      </div>
+    );
   }
 
   return (

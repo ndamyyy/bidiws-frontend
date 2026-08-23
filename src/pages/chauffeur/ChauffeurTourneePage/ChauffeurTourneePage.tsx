@@ -181,16 +181,17 @@ export default function ChauffeurTourneePage() {
 
   // ── Tournée du jour du chauffeur connecté ──
   const chauffeurId = utilisateur?.id;
-  const { data: tournees, isLoading: isLoadingTournees } = useMaTourneeAujourdhui(chauffeurId);
+  const { data: tournees, isLoading: isLoadingTournees, isError: isErrorTournees } = useMaTourneeAujourdhui(chauffeurId);
   const tournee = tournees?.[0];
   const { data: typesCollecte } = useTypesCollecte();
   const typeCode = typesCollecte?.find(tc => tc.id === tournee?.typeCollecteId)?.code;
 
   // ── Arrêts de cette tournée ──
-  const { data: arrets, isLoading: isLoadingArrets } = useArretsByTournee(tournee?.id);
+  const { data: arrets, isLoading: isLoadingArrets, isError: isErrorArrets } = useArretsByTournee(tournee?.id);
   const arretsListe = arrets ?? [];
 
   const isChargement = isLoadingTournees || isLoadingArrets;
+  const isErreur = isErrorTournees || isErrorArrets;
 
   const done     = arretsListe.filter(a => a.statut === 'COLLECTE_CONFIRMEE').length;
   const total    = arretsListe.length;
@@ -228,6 +229,23 @@ export default function ChauffeurTourneePage() {
 
   if (isChargement) {
     return <LoadingSpinner />;
+  }
+
+  // Sans ce garde, une requête en erreur (data: undefined) retombait
+  // silencieusement sur "Aucune tournée programmée aujourd'hui" —
+  // indiscernable d'une vraie journée sans tournée, sans message
+  // explicite.
+  if (isErreur) {
+    return (
+      <div>
+        <div className="chauffeur__header">
+          <h1 className="chauffeur__title">Ma tournée</h1>
+          <p className="chauffeur__subtitle" style={{ color: "var(--critical)" }}>
+            Erreur lors du chargement de la tournée.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   if (!tournee) {

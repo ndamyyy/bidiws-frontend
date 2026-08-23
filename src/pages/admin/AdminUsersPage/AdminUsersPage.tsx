@@ -298,7 +298,7 @@ const UserRow = ({
 
 export default function AdminUsersPage() {
   const queryClient = useQueryClient();
-  const { data: utilisateurs, isLoading } = useAdminUtilisateurs();
+  const { data: utilisateurs, isLoading, isError } = useAdminUtilisateurs();
   const { data: villes, isLoading: isLoadingVilles } = useVilles();
 
   const [filtreRole, setFiltreRole] = useState<Role | "TOUS">("TOUS");
@@ -318,6 +318,22 @@ export default function AdminUsersPage() {
 
   if (isLoading) {
     return <LoadingSpinner />;
+  }
+
+  // Sans ce garde, une requête en erreur (data: undefined) retombait
+  // silencieusement sur "0 utilisateur enregistré" — indiscernable
+  // d'un vrai compte admin sans utilisateurs, sans message explicite.
+  if (isError) {
+    return (
+      <div>
+        <div className="admin-users__header">
+          <h1 className="admin-users__title">Utilisateurs</h1>
+        </div>
+        <div style={{ padding: "24px 0", color: "var(--critical)", fontSize: 13 }}>
+          Erreur lors du chargement des utilisateurs.
+        </div>
+      </div>
+    );
   }
 
   const utilisateursListe = utilisateurs ?? [];

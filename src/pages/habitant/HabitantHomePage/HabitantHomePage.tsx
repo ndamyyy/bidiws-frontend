@@ -76,20 +76,37 @@ export default function HabitantHomePage() {
   const [signalementOpen, setSignalementOpen] = useState<boolean>(false);
 
   const habitantId = utilisateur?.id;
-  const { data: residencesHabitant, isLoading: isLoadingResidences } =
+  const { data: residencesHabitant, isLoading: isLoadingResidences, isError: isErrorResidences } =
     useResidencesHabitant(habitantId);
 
   const residenceLien = residencesHabitant?.[0];
   const residenceId   = residenceLien?.residenceId;
 
-  const { data: calendrier, isLoading: isLoadingCalendrier } =
+  const { data: calendrier, isLoading: isLoadingCalendrier, isError: isErrorCalendrier } =
     useCalendrierCollecte(residenceId);
   const { data: typesCollecte, isLoading: isLoadingTypes } = useTypesCollecte();
 
   const isChargement = isLoadingResidences || isLoadingCalendrier || isLoadingTypes;
+  const isErreur = isErrorResidences || isErrorCalendrier;
 
   if (isChargement) {
     return <LoadingSpinner />;
+  }
+
+  // Sans ce garde, une requête en erreur (data: undefined) retombait
+  // silencieusement sur "Aucune collecte programmée" — indiscernable
+  // d'un vrai calendrier vide, sans message explicite.
+  if (isErreur) {
+    return (
+      <div>
+        <div className="habitant__header">
+          <h1 className="habitant__title">Prochaine collecte</h1>
+        </div>
+        <div style={{ padding: "24px 0", color: "var(--critical)", fontSize: 13 }}>
+          Erreur lors du chargement de votre calendrier de collecte.
+        </div>
+      </div>
+    );
   }
 
   // ── Prochaine collecte : le jour actif le plus proche à partir

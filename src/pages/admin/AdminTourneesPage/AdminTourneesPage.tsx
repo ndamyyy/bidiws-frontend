@@ -262,7 +262,7 @@ export default function AdminTourneesPage() {
   const queryClient = useQueryClient();
 
   const [selectedDate, setSelectedDate] = useState<string>(TODAY_ISO);
-  const { data: tournees, isLoading: isLoadingTournees } = useTournees({ date: selectedDate });
+  const { data: tournees, isLoading: isLoadingTournees, isError: isErrorTournees } = useTournees({ date: selectedDate });
 
   const { data: typesCollecte, isLoading: isLoadingTypes }  = useTypesCollecte();
   const { data: camions,       isLoading: isLoadingCamions } = useCamions();
@@ -340,6 +340,22 @@ export default function AdminTourneesPage() {
 
   if (isLoadingTournees) {
     return <LoadingSpinner />;
+  }
+
+  // Sans ce garde, une requête en erreur (data: undefined) retombait
+  // silencieusement sur "0 tournée le ..." — indiscernable d'une vraie
+  // journée sans tournée, sans message explicite.
+  if (isErrorTournees) {
+    return (
+      <div>
+        <div className="admin-tournees__header">
+          <h1 className="admin-tournees__title">Tournées</h1>
+        </div>
+        <div style={{ padding: "24px 0", color: "var(--critical)", fontSize: 13 }}>
+          Erreur lors du chargement des tournées.
+        </div>
+      </div>
+    );
   }
 
   const tourneesListe = tournees ?? [];
