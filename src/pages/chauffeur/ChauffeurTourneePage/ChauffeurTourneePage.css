@@ -237,3 +237,33 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 22px rgba(76, 175, 80, 0.45);
 }
+
+/* ─── Terminer la tournée ─── */
+.chauffeur__terminer {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.btn-terminer-chauffeur {
+  background: linear-gradient(135deg, #1b3a6b, #2196f3);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  color: var(--text-inverse);
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
+  box-shadow: 0 4px 16px rgba(33, 150, 243, 0.35);
+}
+
+.btn-terminer-chauffeur:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(33, 150, 243, 0.45);
+}
+
+.btn-terminer-chauffeur:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
