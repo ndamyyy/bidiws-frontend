@@ -49,6 +49,10 @@ const AdminUsersPage        = lazy(() => import("./pages/admin/AdminUsersPage/Ad
 const AdminTourneesPage     = lazy(() => import("./pages/admin/AdminTourneesPage/AdminTourneesPage"));
 const AdminSignalementsPage = lazy(() => import("./pages/admin/AdminSignalementsPage/AdminSignalementsPage"));
 const AdminAppareilsIotPage = lazy(() => import("./pages/admin/AdminAppareilsIotPage/AdminAppareilsIotPage"));
+const AdminCamionsPage      = lazy(() => import("./pages/admin/AdminCamionsPage/AdminCamionsPage"));
+const AdminAffectationsPage = lazy(() => import("./pages/admin/AdminAffectationsPage/AdminAffectationsPage"));
+
+const ProfilPage            = lazy(() => import("./pages/ProfilPage/ProfilPage"));
 
 
 
@@ -277,6 +281,32 @@ function AppShell() {
                   element={
                     <ProtectedRoute roles={["ADMIN"]}>
                       <AdminAppareilsIotPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/camions"
+                  element={
+                    <ProtectedRoute roles={["ADMIN"]}>
+                      <AdminCamionsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/affectations"
+                  element={
+                    <ProtectedRoute roles={["ADMIN"]}>
+                      <AdminAffectationsPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* ── Profil (tout rôle connecté) ── */}
+                <Route
+                  path="/profil"
+                  element={
+                    <ProtectedRoute roles={["SYNDIC", "BAILLEUR", "MAIRIE", "GARDIEN", "CHAUFFEUR", "HABITANT", "ADMIN"]}>
+                      <ProfilPage />
                     </ProtectedRoute>
                   }
                 />

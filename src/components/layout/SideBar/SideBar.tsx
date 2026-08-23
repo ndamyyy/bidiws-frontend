@@ -60,6 +60,8 @@ const getNavItems = (role: Role, nonLuesCount: number): NavItem[] => {
         { label: "Résidences",    path: "/syndic/residences",   icon: "home"  },
         { label: "Signalements",  path: "/admin/signalements",  icon: "alert" },
         { label: "Appareils IoT", path: "/admin/appareils-iot", icon: "cpu"   },
+        { label: "Camions",       path: "/admin/camions",       icon: "truck" },
+        { label: "Affectations",  path: "/admin/affectations",  icon: "link"  },
       ];
     default:
       return [];
@@ -99,6 +101,7 @@ const NavIcon = ({ name, active }: { name: string; active: boolean }) => {
     plus:  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
     alert: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
     cpu:   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>,
+    link:  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>,
   };
   return icons[name] ?? null;
 };
@@ -148,7 +151,14 @@ export default function Sidebar({
       </div>
 
       {/* ── Profil ── */}
-      <div className="sidebar__user">
+      <button
+        className="sidebar__user"
+        onClick={() => {
+          navigate("/profil");
+          if (window.innerWidth <= 768) onClose();
+        }}
+        title="Mon profil"
+      >
         <div className={avatarClass}>{initiales}</div>
         <div className="sidebar__user-info">
           <div className="sidebar__user-name">
@@ -158,7 +168,7 @@ export default function Sidebar({
             {roleLabel[utilisateur.role]}
           </div>
         </div>
-      </div>
+      </button>
 
       {/* ── Navigation ── */}
       <nav className="sidebar__nav">
