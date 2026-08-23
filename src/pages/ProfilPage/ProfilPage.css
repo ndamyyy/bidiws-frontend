@@ -1,0 +1,127 @@
+/* ============================================================
+   BIDIWS — ProfilPage
+   Fichier : src/pages/ProfilPage/ProfilPage.css
+   Classes préfixées profil- : pas de style partagé avec les autres
+   pages.
+   ============================================================ */
+
+.profil__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.profil__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--signal-dim-20), var(--data-dim-15));
+  border: 1.5px solid var(--signal-dim-20);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.profil__title {
+  font-family: "Syne", sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 2px;
+  letter-spacing: -0.3px;
+}
+
+.profil__subtitle {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.profil__card {
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.profil__card-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 16px;
+}
+
+.profil__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.profil__field { display: flex; flex-direction: column; gap: 6px; }
+.profil__field--full { grid-column: 1 / -1; }
+
+.profil__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.profil__input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.18s;
+}
+.profil__input:focus {
+  border-color: var(--signal);
+  box-shadow: 0 0 0 4px var(--signal-dim-05);
+}
+
+.profil__error {
+  background: rgba(255, 79, 100, 0.08);
+  border: 1px solid rgba(255, 79, 100, 0.2);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--critical);
+  margin-bottom: 14px;
+}
+
+.profil__succes {
+  background: var(--signal-dim-10);
+  border: 1px solid var(--signal-dim-20);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--signal);
+  margin-bottom: 14px;
+}
+
+.profil__submit {
+  padding: 10px 22px;
+  background: linear-gradient(135deg, var(--signal), #2ECC71);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-inverse);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.profil__submit:hover:not(:disabled) { transform: translateY(-2px); }
+.profil__submit:disabled { opacity: 0.5; cursor: not-allowed; }

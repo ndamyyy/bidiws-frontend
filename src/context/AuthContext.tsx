@@ -109,6 +109,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     navigate("/login");
   }, [navigate]);
 
+  // ── Rafraîchir l'utilisateur courant (après modification du profil) ──
+  const refreshUtilisateur = useCallback(async (): Promise<void> => {
+    const token = getToken();
+    if (!token) return;
+    const utilisateur = await getMe();
+    localStorage.setItem("bidiws_user", JSON.stringify(utilisateur));
+    setAuthUser({ token, utilisateur });
+  }, []);
+
   const value: AuthContextType = {
     authUser,
     utilisateur    : authUser?.utilisateur ?? null,
@@ -117,6 +126,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isInitializing,
     login,
     logout,
+    refreshUtilisateur,
   };
 
   return (
