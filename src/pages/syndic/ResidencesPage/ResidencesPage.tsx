@@ -10,9 +10,11 @@ import { useResidences }                    from "../../../hooks/useResidences";
 import { useVilles }                        from "../../../hooks/useVilles";
 import { useZones }                         from "../../../hooks/useZones";
 import { useCalendrierCollecte, useTypesCollecte } from "../../../hooks/useCalendrierCollecte";
+import { useConteneursByResidence }         from "../../../hooks/useConteneurs";
 import { getGardiensByResidence, createResidence, type ResidenceGardien } from "../../../api/residences.api";
 import { getArretsByResidence }             from "../../../api/arrets.api";
 import { createCalendrier, desactiverCalendrier } from "../../../api/calendrier-collecte.api";
+import { createConteneur, desactiverConteneur } from "../../../api/conteneurs.api";
 import { LoadingSpinner }                   from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { StaggerContainer, StaggerItem }    from "../../../components/ui/StaggerContainer/StaggerContainer";
 import type { Residence, Arret, ApiError }  from "../../../types";
@@ -243,6 +245,139 @@ const CalendrierSection = ({ residenceId }: { residenceId: number }) => {
 };
 
 // ─────────────────────────────────────────
+// SECTION DÉPLIABLE — CONTENEURS
+// ─────────────────────────────────────────
+
+const ConteneursSection = ({ residenceId }: { residenceId: number }) => {
+  const queryClient = useQueryClient();
+  const [expanded, setExpanded] = useState<boolean>(false);
+
+  const { data: conteneurs, isLoading: isLoadingConteneurs } =
+    useConteneursByResidence(expanded ? residenceId : undefined);
+
+  const [code,          setCode]          = useState<string>("");
+  const [rfidTag,       setRfidTag]       = useState<string>("");
+  const [error,         setError]         = useState<string>("");
+  const [isSubmitting,  setIsSubmitting]  = useState<boolean>(false);
+  const [pendingIds,    setPendingIds]    = useState<Set<number>>(new Set());
+
+  const invalidate = () => queryClient.invalidateQueries({
+    queryKey: ["conteneurs", "residence", residenceId],
+  });
+
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
+    e.preventDefault();
+    setError("");
+
+    if (!code.trim()) {
+      setError("Veuillez saisir un code.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await createConteneur({
+        code: code.trim(),
+        residenceId,
+        rfidTag: rfidTag.trim() || undefined,
+      });
+      await invalidate();
+      setCode("");
+      setRfidTag("");
+    } catch (err) {
+      const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
+      setError(backendMessage ?? "Erreur lors de l'ajout du conteneur.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDesactiver = async (id: number): Promise<void> => {
+    setPendingIds(prev => new Set(prev).add(id));
+    try {
+      await desactiverConteneur(id);
+      await invalidate();
+    } catch (err) {
+      const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
+      console.error("BIDIWS — Erreur désactivation conteneur", backendMessage ?? err);
+    } finally {
+      setPendingIds(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
+  };
+
+  const conteneursActifs = (conteneurs ?? []).filter(c => c.actif);
+
+  return (
+    <div className="residence-conteneurs" onClick={(e) => e.stopPropagation()}>
+      <button
+        className="residence-conteneurs__toggle"
+        onClick={() => setExpanded(o => !o)}
+      >
+        Conteneurs
+        <span className={`residence-conteneurs__chevron ${expanded ? "residence-conteneurs__chevron--open" : ""}`}>
+          <IconChevron color="var(--text-secondary)" />
+        </span>
+      </button>
+
+      {expanded && (
+        <div className="residence-conteneurs__body">
+          {isLoadingConteneurs && (
+            <div className="residence-conteneurs__empty">Chargement…</div>
+          )}
+          {!isLoadingConteneurs && conteneursActifs.length === 0 && (
+            <div className="residence-conteneurs__empty">Aucun conteneur enregistré.</div>
+          )}
+          {conteneursActifs.map(c => (
+            <div key={c.id} className="residence-conteneurs__entry">
+              <span className="residence-conteneurs__entry-code">{c.code}</span>
+              {c.rfidTag && (
+                <span className="residence-conteneurs__entry-rfid">{c.rfidTag}</span>
+              )}
+              <button
+                className="residence-conteneurs__entry-remove"
+                onClick={() => handleDesactiver(c.id)}
+                disabled={pendingIds.has(c.id)}
+                title="Désactiver ce conteneur"
+              >
+                {pendingIds.has(c.id) ? "…" : "Désactiver"}
+              </button>
+            </div>
+          ))}
+
+          <form className="residence-conteneurs__form" onSubmit={handleSubmit}>
+            {error && <div className="residence-conteneurs__error">{error}</div>}
+
+            <input
+              className="residence-conteneurs__input"
+              type="text"
+              placeholder="Code du conteneur"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+
+            <input
+              className="residence-conteneurs__input"
+              type="text"
+              placeholder="Tag RFID (optionnel)"
+              value={rfidTag}
+              onChange={(e) => setRfidTag(e.target.value)}
+            />
+
+            <button className="residence-conteneurs__submit" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Ajout..." : "Ajouter"}
+            </button>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────
 // CARTE RÉSIDENCE
 // ─────────────────────────────────────────
 
@@ -299,6 +434,7 @@ const ResidenceCard = ({
       )}
 
       <CalendrierSection residenceId={residence.id} />
+      <ConteneursSection residenceId={residence.id} />
     </div>
   );
 };

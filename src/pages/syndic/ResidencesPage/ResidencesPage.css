@@ -457,3 +457,137 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ─── Section dépliable — Conteneurs ─── */
+.residence-conteneurs {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--overlay-6);
+}
+
+.residence-conteneurs__toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.residence-conteneurs__toggle:hover {
+  color: var(--text-primary);
+}
+
+.residence-conteneurs__chevron {
+  display: flex;
+  transition: transform 0.2s;
+}
+.residence-conteneurs__chevron--open {
+  transform: rotate(180deg);
+}
+
+.residence-conteneurs__body {
+  margin-top: 12px;
+}
+
+.residence-conteneurs__empty {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 4px 0 10px;
+}
+
+.residence-conteneurs__entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--overlay-4);
+  font-size: 12px;
+}
+.residence-conteneurs__entry:last-of-type {
+  border-bottom: none;
+}
+
+.residence-conteneurs__entry-code {
+  font-weight: 700;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.residence-conteneurs__entry-rfid {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: "Fira Code", "Consolas", monospace;
+  font-size: 11px;
+}
+
+.residence-conteneurs__entry-remove {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--critical);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 3px 6px;
+}
+.residence-conteneurs__entry-remove:hover:not(:disabled) {
+  text-decoration: underline;
+}
+.residence-conteneurs__entry-remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.residence-conteneurs__form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.residence-conteneurs__error {
+  font-size: 11px;
+  color: var(--critical);
+}
+
+.residence-conteneurs__input {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 12px;
+  outline: none;
+}
+.residence-conteneurs__input:focus {
+  border-color: var(--signal);
+  box-shadow: 0 0 0 3px var(--signal-dim-05);
+}
+
+.residence-conteneurs__submit {
+  padding: 8px 14px;
+  background: var(--signal-dim-10);
+  border: 1px solid var(--signal-dim-20);
+  border-radius: var(--radius-md);
+  color: var(--signal);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.residence-conteneurs__submit:hover:not(:disabled) {
+  background: var(--signal-dim-20);
+}
+.residence-conteneurs__submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
