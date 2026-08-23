@@ -12,22 +12,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { login as apiLogin, logout as apiLogout, getMe } from "../api/auth.api";
 import { getToken, removeToken } from "../api/axios";
-import type { AuthUser, LoginRequest, Utilisateur } from "../types";
+import { redirectByRole } from "../utils/redirectByRole";
+import type { AuthUser, LoginRequest } from "../types";
 import { AuthContext, type AuthContextType } from "./AuthContextValue";
-
-// ─────────────────────────────────────────
-// REDIRECT PAR RÔLE
-// ─────────────────────────────────────────
-
-const redirectByRole: Record<Utilisateur["role"], string> = {
-  SYNDIC   : "/syndic/dashboard",
-  BAILLEUR : "/syndic/dashboard",
-  MAIRIE   : "/syndic/dashboard",
-  GARDIEN  : "/gardien/home",
-  CHAUFFEUR: "/chauffeur/tournee",
-  HABITANT : "/habitant/home",
-  ADMIN    : "/admin/dashboard",
-};
 
 // ─────────────────────────────────────────
 // DURÉE MINIMALE DU SPLASH
