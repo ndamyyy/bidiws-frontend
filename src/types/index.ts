@@ -161,6 +161,8 @@ export interface CalendrierCollecte {
   actif               : boolean;
 }
 
+// Forme confirmée contre CamionResponseDto (backend) : villeId/villeNom
+// dénormalisés (Camion.villeId, migration V4) — absents jusqu'ici.
 export interface Camion {
   id              : number;
   immatriculation : string;
@@ -170,6 +172,21 @@ export interface Camion {
   gpsActif        : boolean;
   capteurBenne    : boolean;
   actif           : boolean;
+  villeId        ?: number;
+  villeNom       ?: string;
+}
+
+// Forme confirmée contre ChauffeurCamionResponseDto (backend) : pas de
+// PK propre exposée (identifiée par la paire chauffeurId/camionId côté
+// API — "terminer" prend les deux en paramètres, pas un id unique).
+export interface ChauffeurCamion {
+  chauffeurId           : number;
+  chauffeurNom          : string;
+  chauffeurPrenom       : string;
+  camionId              : number;
+  camionImmatriculation : string;
+  dateDebut              : string; // "YYYY-MM-DD"
+  dateFin               ?: string; // "YYYY-MM-DD" — absent = affectation active
 }
 
 // Forme confirmée contre ConteneurResponseDto (backend) : residenceId/
