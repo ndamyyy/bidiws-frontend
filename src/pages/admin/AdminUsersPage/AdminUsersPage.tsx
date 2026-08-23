@@ -13,6 +13,8 @@ import {
   desactiverUtilisateur,
   createUtilisateurAdmin,
   changerVilleUtilisateur,
+  changerRoleUtilisateur,
+  resetMotDePasseUtilisateur,
 } from "../../../api/admin-utilisateurs.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import type { ApiError, Role, Utilisateur } from "../../../types";
@@ -56,44 +58,236 @@ const StatutBadge = ({ actif }: { actif: boolean }) => (
 );
 
 // ─────────────────────────────────────────
+// PANNEAU D'ÉDITION — RÔLE / VILLE / MOT DE PASSE
+// ─────────────────────────────────────────
+
+const EditUserPanel = ({
+  utilisateur,
+  villes,
+  isLoadingVilles,
+  onDone,
+}: {
+  utilisateur    : Utilisateur;
+  villes         : { id: number; nom: string }[] | undefined;
+  isLoadingVilles: boolean;
+  onDone         : () => Promise<void>;
+}) => {
+  const [editRole, setEditRole] = useState<Role>(utilisateur.role);
+  const [editVilleId, setEditVilleId] = useState<string>(
+    utilisateur.villeId !== undefined ? String(utilisateur.villeId) : ""
+  );
+  const [roleError, setRoleError] = useState<string>("");
+  const [isSubmittingRole, setIsSubmittingRole] = useState<boolean>(false);
+
+  const [nouveauMotDePasse, setNouveauMotDePasse] = useState<string>("");
+  const [confirmation, setConfirmation] = useState<string>("");
+  const [passwordError, setPasswordError] = useState<string>("");
+  const [isSubmittingPassword, setIsSubmittingPassword] = useState<boolean>(false);
+  const [motDePasseReinitialise, setMotDePasseReinitialise] = useState<string>("");
+
+  const handleRoleSubmit = async (e: FormEvent): Promise<void> => {
+    e.preventDefault();
+    setRoleError("");
+
+    if (editRole === "MAIRIE" && !editVilleId) {
+      setRoleError("Une ville est obligatoire pour un compte Mairie.");
+      return;
+    }
+
+    setIsSubmittingRole(true);
+    try {
+      if (editRole !== utilisateur.role) {
+        await changerRoleUtilisateur(utilisateur.id, editRole);
+      }
+      if (editRole === "MAIRIE") {
+        await changerVilleUtilisateur(utilisateur.id, Number(editVilleId));
+      }
+      await onDone();
+    } catch (err) {
+      const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
+      setRoleError(backendMessage ?? "Erreur lors de la modification.");
+    } finally {
+      setIsSubmittingRole(false);
+    }
+  };
+
+  const handlePasswordSubmit = async (e: FormEvent): Promise<void> => {
+    e.preventDefault();
+    setPasswordError("");
+    setMotDePasseReinitialise("");
+
+    if (nouveauMotDePasse.length < 8) {
+      setPasswordError("Le mot de passe doit contenir au moins 8 caractères.");
+      return;
+    }
+    if (nouveauMotDePasse !== confirmation) {
+      setPasswordError("La confirmation ne correspond pas.");
+      return;
+    }
+
+    setIsSubmittingPassword(true);
+    try {
+      await resetMotDePasseUtilisateur(utilisateur.id, nouveauMotDePasse);
+      setMotDePasseReinitialise(nouveauMotDePasse);
+      setNouveauMotDePasse("");
+      setConfirmation("");
+    } catch (err) {
+      const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
+      setPasswordError(backendMessage ?? "Erreur lors de la réinitialisation.");
+    } finally {
+      setIsSubmittingPassword(false);
+    }
+  };
+
+  return (
+    <div className="admin-user-edit">
+      {/* ── Rôle / Ville ── */}
+      <form className="admin-user-edit__form" onSubmit={handleRoleSubmit}>
+        {roleError && <div className="admin-users__error">{roleError}</div>}
+        <div className="admin-user-edit__row">
+          <div className="admin-users__field">
+            <label className="admin-users__label">Rôle</label>
+            <select
+              className="admin-users__select"
+              value={editRole}
+              onChange={(e) => setEditRole(e.target.value as Role)}
+            >
+              {ALL_ROLES.map(r => (
+                <option key={r} value={r}>{ROLE_LABEL[r]}</option>
+              ))}
+            </select>
+          </div>
+
+          {editRole === "MAIRIE" && (
+            <div className="admin-users__field">
+              <label className="admin-users__label">Ville</label>
+              <select
+                className="admin-users__select"
+                value={editVilleId}
+                onChange={(e) => setEditVilleId(e.target.value)}
+                disabled={isLoadingVilles}
+              >
+                <option value="">Sélectionner...</option>
+                {villes?.map(v => (
+                  <option key={v.id} value={v.id}>{v.nom}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <button className="admin-users__submit" type="submit" disabled={isSubmittingRole}>
+            {isSubmittingRole ? "Enregistrement..." : "Enregistrer"}
+          </button>
+        </div>
+      </form>
+
+      {/* ── Réinitialiser le mot de passe ── */}
+      <form className="admin-user-edit__form admin-user-edit__form--password" onSubmit={handlePasswordSubmit}>
+        <div className="admin-user-edit__password-title">Réinitialiser le mot de passe</div>
+        {passwordError && <div className="admin-users__error">{passwordError}</div>}
+
+        {motDePasseReinitialise ? (
+          <div className="admin-user-edit__reveal">
+            <div className="admin-user-edit__reveal-warning">
+              Mot de passe réinitialisé — communiquez-le à l'utilisateur maintenant,
+              il ne sera plus affiché après avoir fermé ce panneau.
+            </div>
+            <div className="admin-user-edit__reveal-value">{motDePasseReinitialise}</div>
+          </div>
+        ) : (
+          <div className="admin-user-edit__row">
+            <div className="admin-users__field">
+              <label className="admin-users__label">Nouveau mot de passe</label>
+              <input
+                className="admin-users__input"
+                type="password"
+                placeholder="8 caractères minimum"
+                value={nouveauMotDePasse}
+                onChange={(e) => setNouveauMotDePasse(e.target.value)}
+              />
+            </div>
+            <div className="admin-users__field">
+              <label className="admin-users__label">Confirmation</label>
+              <input
+                className="admin-users__input"
+                type="password"
+                value={confirmation}
+                onChange={(e) => setConfirmation(e.target.value)}
+              />
+            </div>
+            <button className="admin-users__submit" type="submit" disabled={isSubmittingPassword}>
+              {isSubmittingPassword ? "Réinitialisation..." : "Réinitialiser"}
+            </button>
+          </div>
+        )}
+      </form>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────
 // LIGNE UTILISATEUR
 // ─────────────────────────────────────────
 
 const UserRow = ({
   utilisateur,
   isPending,
+  isEditing,
+  villes,
+  isLoadingVilles,
   onToggle,
+  onToggleEdit,
+  onEditDone,
 }: {
-  utilisateur: Utilisateur;
-  isPending  : boolean;
-  onToggle   : (u: Utilisateur) => void;
+  utilisateur    : Utilisateur;
+  isPending      : boolean;
+  isEditing      : boolean;
+  villes         : { id: number; nom: string }[] | undefined;
+  isLoadingVilles: boolean;
+  onToggle       : (u: Utilisateur) => void;
+  onToggleEdit   : () => void;
+  onEditDone     : () => Promise<void>;
 }) => {
   const initiales = `${utilisateur.prenom[0] ?? ""}${utilisateur.nom[0] ?? ""}`.toUpperCase();
 
   return (
-    <div className="admin-user-row">
-      <div className="admin-user-row__avatar">{initiales}</div>
+    <div className="admin-user-row-wrap">
+      <div className="admin-user-row">
+        <div className="admin-user-row__avatar">{initiales}</div>
 
-      <div className="admin-user-row__info">
-        <div className="admin-user-row__name">
-          {utilisateur.prenom} {utilisateur.nom}
+        <div className="admin-user-row__info">
+          <div className="admin-user-row__name">
+            {utilisateur.prenom} {utilisateur.nom}
+          </div>
+          <div className="admin-user-row__email">{utilisateur.email}</div>
         </div>
-        <div className="admin-user-row__email">{utilisateur.email}</div>
+
+        <div className="admin-user-row__right">
+          <StatutBadge actif={utilisateur.actif} />
+          <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+            {ROLE_LABEL[utilisateur.role] ?? utilisateur.role}
+          </span>
+          <button className="admin-user-row__action" onClick={onToggleEdit}>
+            {isEditing ? "Fermer" : "Modifier"}
+          </button>
+          <button
+            className={`admin-user-row__action ${utilisateur.actif ? "admin-user-row__action--desactiver" : "admin-user-row__action--activer"}`}
+            onClick={() => onToggle(utilisateur)}
+            disabled={isPending}
+          >
+            {isPending ? "…" : utilisateur.actif ? "Désactiver" : "Activer"}
+          </button>
+        </div>
       </div>
 
-      <div className="admin-user-row__right">
-        <StatutBadge actif={utilisateur.actif} />
-        <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-          {ROLE_LABEL[utilisateur.role] ?? utilisateur.role}
-        </span>
-        <button
-          className={`admin-user-row__action ${utilisateur.actif ? "admin-user-row__action--desactiver" : "admin-user-row__action--activer"}`}
-          onClick={() => onToggle(utilisateur)}
-          disabled={isPending}
-        >
-          {isPending ? "…" : utilisateur.actif ? "Désactiver" : "Activer"}
-        </button>
-      </div>
+      {isEditing && (
+        <EditUserPanel
+          utilisateur={utilisateur}
+          villes={villes}
+          isLoadingVilles={isLoadingVilles}
+          onDone={onEditDone}
+        />
+      )}
     </div>
   );
 };
@@ -109,6 +303,7 @@ export default function AdminUsersPage() {
 
   const [filtreRole, setFiltreRole] = useState<Role | "TOUS">("TOUS");
   const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const [createOpen, setCreateOpen] = useState<boolean>(false);
   const [nom, setNom] = useState<string>("");
@@ -150,6 +345,11 @@ export default function AdminUsersPage() {
         return next;
       });
     }
+  };
+
+  const handleEditDone = async (): Promise<void> => {
+    setEditingId(null);
+    await queryClient.invalidateQueries({ queryKey: ["admin-utilisateurs"] });
   };
 
   const resetCreateForm = (): void => {
@@ -351,7 +551,12 @@ export default function AdminUsersPage() {
             key={u.id}
             utilisateur={u}
             isPending={pendingIds.has(u.id)}
+            isEditing={editingId === u.id}
+            villes={villes}
+            isLoadingVilles={isLoadingVilles}
             onToggle={handleToggle}
+            onToggleEdit={() => setEditingId(id => (id === u.id ? null : u.id))}
+            onEditDone={handleEditDone}
           />
         ))}
       </div>

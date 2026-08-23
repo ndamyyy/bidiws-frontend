@@ -59,6 +59,41 @@ export const changerVilleUtilisateur = async (
 };
 
 // ─────────────────────────────────────────
+// CHANGER LE RÔLE D'UN UTILISATEUR
+// PATCH /admin/utilisateurs/:id/role?role=X (ROLE_ADMIN)
+// Rejeté (409) si on retire le rôle CHAUFFEUR à quelqu'un qui a une
+// affectation camion active ou une tournée en cours — même prudence
+// que CamionService.desactiver côté backend.
+// ─────────────────────────────────────────
+
+export const changerRoleUtilisateur = async (
+  id: number,
+  role: Role
+): Promise<Utilisateur> => {
+  const response = await apiClient.patch<Utilisateur>(
+    `/admin/utilisateurs/${id}/role`,
+    null,
+    { params: { role } }
+  );
+  return response.data;
+};
+
+// ─────────────────────────────────────────
+// RÉINITIALISER LE MOT DE PASSE D'UN UTILISATEUR
+// PATCH /admin/utilisateurs/:id/mot-de-passe (ROLE_ADMIN)
+// L'admin choisit lui-même le nouveau mot de passe (ResetPasswordRequestDto
+// n'a qu'un champ nouveauMotDePasse) — le serveur n'en génère aucun,
+// contrairement à l'hypothèse de départ.
+// ─────────────────────────────────────────
+
+export const resetMotDePasseUtilisateur = async (
+  id: number,
+  nouveauMotDePasse: string
+): Promise<void> => {
+  await apiClient.patch(`/admin/utilisateurs/${id}/mot-de-passe`, { nouveauMotDePasse });
+};
+
+// ─────────────────────────────────────────
 // DÉSACTIVER UN UTILISATEUR
 // PATCH /admin/utilisateurs/:id/desactiver (ROLE_ADMIN)
 // Confirmé en conditions réelles : 204 No Content, pas de corps —
