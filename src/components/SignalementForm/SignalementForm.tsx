@@ -4,11 +4,16 @@
 // Formulaire modal réutilisable (gardien + habitant) pour signaler un
 // problème sur une résidence. residenceId est fourni par la page
 // appelante (résidence du gardien/habitant connecté), pas de sélecteur.
+// Photo : upload réel vers POST /uploads, envoyé avant la soumission du
+// signalement — plus de champ URL en texte libre. Un seul input file
+// (accept="image/*", sans capture) : laisse le choix natif caméra/
+// galerie/fichier plutôt que deux boutons séparés.
 // ============================================================
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import axios from "axios";
 import { createSignalement } from "../../api/signalements.api";
+import { uploadPhoto } from "../../api/uploads.api";
 import type { ApiError, TypeSignalement } from "../../types";
 import "./SignalementForm.css";
 
@@ -31,10 +36,60 @@ export default function SignalementForm({
 }) {
   const [type, setType] = useState<TypeSignalement | "">("");
   const [description, setDescription] = useState<string>("");
-  const [photoUrl, setPhotoUrl] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [succes, setSucces] = useState<boolean>(false);
+
+  // ── Photo : aperçu local + upload réel avant soumission ──
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
+  const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string | null>(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState<boolean>(false);
+  const [photoError, setPhotoError] = useState<string>("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const photoInputRef = useRef<HTMLInputElement>(null);
+
+  // Révoque l'URL d'objet locale quand elle change ou au démontage —
+  // sinon elle reste en mémoire tant que la page vit.
+  useEffect(() => {
+    return () => {
+      if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+    };
+  }, [photoPreviewUrl]);
+
+  const lancerUpload = async (file: File): Promise<void> => {
+    setPhotoError("");
+    setIsUploadingPhoto(true);
+    try {
+      const url = await uploadPhoto(file);
+      setUploadedPhotoUrl(url);
+    } catch (err) {
+      const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
+      setPhotoError(backendMessage ?? "Erreur lors de l'envoi de la photo.");
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // permet de resélectionner le même fichier après un retrait
+    if (!file) return;
+
+    if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+    setSelectedFile(file);
+    setPhotoPreviewUrl(URL.createObjectURL(file));
+    setUploadedPhotoUrl(null);
+    void lancerUpload(file);
+  };
+
+  const handleRetirerPhoto = (): void => {
+    if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+    setSelectedFile(null);
+    setPhotoPreviewUrl(null);
+    setUploadedPhotoUrl(null);
+    setPhotoError("");
+  };
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
@@ -44,6 +99,14 @@ export default function SignalementForm({
       setError("Veuillez sélectionner un type de problème.");
       return;
     }
+    if (selectedFile && isUploadingPhoto) {
+      setError("Veuillez attendre la fin de l'envoi de la photo.");
+      return;
+    }
+    if (selectedFile && !uploadedPhotoUrl) {
+      setError("L'envoi de la photo a échoué — réessayez ou retirez-la avant d'envoyer le signalement.");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -51,7 +114,7 @@ export default function SignalementForm({
         residenceId,
         type,
         description: description.trim() || undefined,
-        photoUrl: photoUrl.trim() || undefined,
+        photoUrl: uploadedPhotoUrl ?? undefined,
       });
       setSucces(true);
     } catch (err) {
@@ -109,21 +172,49 @@ export default function SignalementForm({
             </div>
 
             <div className="signalement-modal__field">
-              <label className="signalement-modal__label">Photo — URL (optionnel)</label>
+              <label className="signalement-modal__label">Photo (optionnel)</label>
+
               <input
-                className="signalement-modal__input"
-                type="text"
-                value={photoUrl}
-                onChange={(e) => setPhotoUrl(e.target.value)}
-                placeholder="https://..."
+                ref={photoInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                style={{ display: "none" }}
               />
+
+              {photoPreviewUrl ? (
+                <div className="signalement-modal__photo-preview">
+                  <img src={photoPreviewUrl} alt="Aperçu de la photo" />
+                  <div className="signalement-modal__photo-status">
+                    {isUploadingPhoto && <span className="signalement-modal__photo-uploading">Envoi en cours...</span>}
+                    {!isUploadingPhoto && uploadedPhotoUrl && <span className="signalement-modal__photo-ok">Photo envoyée ✓</span>}
+                    {!isUploadingPhoto && photoError && <span className="signalement-modal__photo-error">{photoError}</span>}
+                    <button type="button" className="signalement-modal__photo-remove" onClick={handleRetirerPhoto}>
+                      Retirer
+                    </button>
+                  </div>
+                  {photoError && !isUploadingPhoto && (
+                    <button
+                      type="button"
+                      className="signalement-modal__photo-retry"
+                      onClick={() => selectedFile && void lancerUpload(selectedFile)}
+                    >
+                      Réessayer l'envoi
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <button type="button" className="signalement-modal__photo-btn" onClick={() => photoInputRef.current?.click()}>
+                  Importer une photo
+                </button>
+              )}
             </div>
 
             <div className="signalement-modal__actions">
               <button type="button" className="signalement-modal__cancel" onClick={onClose}>
                 Annuler
               </button>
-              <button type="submit" className="signalement-modal__submit" disabled={isSubmitting}>
+              <button type="submit" className="signalement-modal__submit" disabled={isSubmitting || isUploadingPhoto}>
                 {isSubmitting ? "Envoi..." : "Envoyer le signalement"}
               </button>
             </div>

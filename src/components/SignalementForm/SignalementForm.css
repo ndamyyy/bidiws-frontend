@@ -152,3 +152,84 @@
   transform: translateY(-2px);
 }
 .signalement-modal__submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── Photo ─── */
+.signalement-modal__photo-btn {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1.5px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.signalement-modal__photo-btn:hover {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+.signalement-modal__photo-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.signalement-modal__photo-preview img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-subtle);
+}
+
+.signalement-modal__photo-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.signalement-modal__photo-uploading {
+  color: var(--text-secondary);
+}
+
+.signalement-modal__photo-ok {
+  color: var(--signal);
+  font-weight: 600;
+}
+
+.signalement-modal__photo-error {
+  color: var(--critical);
+}
+
+.signalement-modal__photo-remove {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.signalement-modal__photo-remove:hover {
+  color: var(--critical);
+}
+
+.signalement-modal__photo-retry {
+  align-self: flex-start;
+  padding: 6px 14px;
+  background: var(--overlay-6);
+  border: 1px solid var(--overlay-10);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.signalement-modal__photo-retry:hover {
+  background: var(--overlay-8);
+}
