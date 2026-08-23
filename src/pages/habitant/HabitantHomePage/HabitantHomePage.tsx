@@ -3,22 +3,14 @@
 // Fichier : src/pages/habitant/HabitantHomePage/HabitantHomePage.tsx
 // ============================================================
 
+import { useState } from "react";
 import { useAuth } from "../../../hooks/useAuth";
 import { useResidencesHabitant } from "../../../hooks/useResidences";
 import { useCalendrierCollecte, useTypesCollecte } from "../../../hooks/useCalendrierCollecte";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import { TypeCollecteIcon } from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
+import SignalementForm from "../../../components/SignalementForm/SignalementForm";
 import "./HabitantHomePage.css";
-
-// ─────────────────────────────────────────
-// ICÔNE TRASH
-// ─────────────────────────────────────────
-
-const IconTrash = ({ color }: { color: string }) => (
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="3 6 5 6 21 6"/>
-    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-  </svg>
-);
 
 // ─────────────────────────────────────────
 // ICÔNES CONSEILS
@@ -81,6 +73,7 @@ const formatHeure = (heure: string | undefined): string =>
 
 export default function HabitantHomePage() {
   const { utilisateur } = useAuth();
+  const [signalementOpen, setSignalementOpen] = useState<boolean>(false);
 
   const habitantId = utilisateur?.id;
   const { data: residencesHabitant, isLoading: isLoadingResidences } =
@@ -119,8 +112,13 @@ export default function HabitantHomePage() {
     <div>
       {/* ── En-tête ── */}
       <div className="habitant__header">
-        <h1 className="habitant__title">Prochaine collecte</h1>
-        <p className="habitant__subtitle" style={{ textTransform: "capitalize" }}>{today}</p>
+        <div>
+          <h1 className="habitant__title">Prochaine collecte</h1>
+          <p className="habitant__subtitle" style={{ textTransform: "capitalize" }}>{today}</p>
+        </div>
+        <button className="habitant__signaler-btn" onClick={() => setSignalementOpen(true)}>
+          Signaler un problème
+        </button>
       </div>
 
       {/* ── Hero prochaine collecte ── */}
@@ -131,7 +129,7 @@ export default function HabitantHomePage() {
         {prochaine ? (
           <div className="habitant__next-content">
             <div className="habitant__next-icon">
-              <IconTrash color={prochainType?.couleur ?? "#4caf50"} />
+              <TypeCollecteIcon code={prochainType?.code} size={28} />
             </div>
             <div>
               <div className="habitant__next-type">{prochaine.typeCollecteLibelle}</div>
@@ -165,10 +163,7 @@ export default function HabitantHomePage() {
             const tc = typesCollecte?.find(t => t.id === c.typeCollecteId);
             return (
               <div key={c.id} className="schedule-item">
-                <div
-                  className="schedule-item__color"
-                  style={{ background: tc?.couleur ?? "#4caf50" }}
-                />
+                <TypeCollecteIcon code={tc?.code} size={20} />
                 <div className="schedule-item__type">{c.typeCollecteLibelle}</div>
                 <div className="schedule-item__jour">{JOURS[c.jourSemaine]}</div>
                 <div className="schedule-item__heure">{formatHeure(c.heureEstimee)}</div>
@@ -192,6 +187,10 @@ export default function HabitantHomePage() {
           </div>
         ))}
       </div>
+
+      {signalementOpen && (
+        <SignalementForm residenceId={residenceId} onClose={() => setSignalementOpen(false)} />
+      )}
     </div>
   );
 }

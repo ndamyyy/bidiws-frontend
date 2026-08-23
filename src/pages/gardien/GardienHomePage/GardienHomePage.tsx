@@ -3,6 +3,7 @@
 // Fichier : src/pages/gardien/GardienHomePage/GardienHomePage.tsx
 // ============================================================
 
+import { useState } from "react";
 import { JSX } from "react/jsx-runtime";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../../hooks/useAuth";
@@ -11,6 +12,7 @@ import { useResidencesGardien } from "../../../hooks/useResidences";
 import { useTournee } from "../../../hooks/useTournees";
 import { getArretsByResidence } from "../../../api/arrets.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import SignalementForm from "../../../components/SignalementForm/SignalementForm";
 import "./GardienHomePage.css";
 
 // ─────────────────────────────────────────
@@ -64,6 +66,7 @@ const IconSmall = ({ name, color }: { name: string; color: string }) => {
 export default function GardienHomePage() {
   const { utilisateur } = useAuth();
   const { notifications } = useNotifications();
+  const [signalementOpen, setSignalementOpen] = useState<boolean>(false);
 
   // ── Résidence(s) du gardien connecté ──
   const gardienId = utilisateur?.id;
@@ -123,10 +126,15 @@ export default function GardienHomePage() {
     <div>
       {/* ── En-tête ── */}
       <div className="gardien__header">
-        <h1 className="gardien__title">Ma résidence</h1>
-        <p className="gardien__subtitle">
-          {residenceLien?.residenceNom ?? "Résidence non assignée"}
-        </p>
+        <div>
+          <h1 className="gardien__title">Ma résidence</h1>
+          <p className="gardien__subtitle">
+            {residenceLien?.residenceNom ?? "Résidence non assignée"}
+          </p>
+        </div>
+        <button className="gardien__signaler-btn" onClick={() => setSignalementOpen(true)}>
+          Signaler un problème
+        </button>
       </div>
 
       {/* ── Hero statut ── */}
@@ -209,6 +217,10 @@ export default function GardienHomePage() {
           </div>
         ))}
       </div>
+
+      {signalementOpen && (
+        <SignalementForm residenceId={residenceId} onClose={() => setSignalementOpen(false)} />
+      )}
     </div>
   );
 }
