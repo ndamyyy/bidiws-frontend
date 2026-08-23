@@ -28,6 +28,7 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 // ─── Pages chargées à la demande (une par route) ────────────
 const AdminLoginPage       = lazy(() => import("./pages/admin/AdminLoginPage/AdminLoginPage"));
+const RegisterPage         = lazy(() => import("./pages/RegisterPage/RegisterPage"));
 
 const DashboardPage        = lazy(() => import("./pages/syndic/DashboardPage/DashboardPage"));
 const TourneesPage         = lazy(() => import("./pages/syndic/TourneesPage/TourneesPage"));
@@ -122,6 +123,20 @@ function AppShell() {
                     <PageTransition key={location.pathname}>
                       <Suspense fallback={<LoadingSpinner />}>
                         <AdminLoginPage />
+                      </Suspense>
+                    </PageTransition>
+                  </AnimatePresence>
+                }
+              />
+
+              {/* ── Inscription habitant ── */}
+              <Route
+                path="/register"
+                element={
+                  <AnimatePresence mode="wait" initial={false}>
+                    <PageTransition key={location.pathname}>
+                      <Suspense fallback={<LoadingSpinner />}>
+                        <RegisterPage />
                       </Suspense>
                     </PageTransition>
                   </AnimatePresence>

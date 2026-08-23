@@ -356,13 +356,16 @@ export interface LoginRequest {
   motDePasse : string;
 }
 
+// Pas de champ role : le backend (UtilisateurService.register) assigne
+// toujours HABITANT côté serveur — l'auto-inscription publique ne peut
+// pas choisir un autre rôle (retiré du DTO backend pour empêcher une
+// escalade de privilège).
 export interface RegisterRequest {
   nom        : string;
   prenom     : string;
   email      : string;
   motDePasse : string;
   telephone ?: string;
-  role       : Role;
 }
 
 export interface TourneeRequest {

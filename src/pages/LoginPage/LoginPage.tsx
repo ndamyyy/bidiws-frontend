@@ -358,6 +358,15 @@ export default function LoginPage() {
             }
           </button>
 
+          {/* ── Lien inscription ── */}
+          <button
+            type="button"
+            className="login__admin-link"
+            onClick={() => navigate("/register")}
+          >
+            Pas encore de compte ? Créer un compte
+          </button>
+
           {/* ── Lien admin ── */}
           <button
             type="button"
