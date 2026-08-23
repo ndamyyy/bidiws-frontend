@@ -8,8 +8,10 @@ import {
   MOCK_TOURNEES,
   MOCK_NOTIFICATIONS,
   MOCK_DASHBOARD_STATS,
+  MOCK_TYPES_COLLECTE,
   getTourneeProgress,
 } from "../../../mocks/data";
+import { TypeCollecteIcon } from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import type { Tournee, Notification }          from "../../../types";
 import "./DashboardPage.css";
 
@@ -232,11 +234,15 @@ export default function DashboardPage() {
         {tournees.map((t) => {
           const progress = getTourneeProgress(t);
           const done     = t.arrets.filter(a => a.statut === 'COLLECTE_CONFIRMEE').length;
+          const typeCode = MOCK_TYPES_COLLECTE.find(tc => tc.id === t.typeCollecteId)?.code;
           return (
             <div key={t.id} className="tournee-item">
               <div className="tournee-item__header">
                 <div>
-                  <div className="tournee-item__name">{t.typeCollecteLibelle}</div>
+                  <div className="tournee-item__name" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <TypeCollecteIcon code={typeCode} size={16} />
+                    {t.typeCollecteLibelle}
+                  </div>
                   <div className="tournee-item__meta">
                     {t.chauffeurPrenom} {t.chauffeurNom} · {t.camionImmatriculation}
                     {t.zoneNom && ` · ${t.zoneNom}`}

@@ -5,8 +5,10 @@
 
 import { useQueryClient, useQueries }        from "@tanstack/react-query";
 import { useTournees }                       from "../../../hooks/useTournees";
+import { useTypesCollecte }                  from "../../../hooks/useCalendrierCollecte";
 import { getArretsByTournee, validerArret }  from "../../../api/arrets.api";
 import { LoadingSpinner }                    from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import { TypeCollecteIcon }                  from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import type { Arret }                        from "../../../types";
 import "./TourneesPage.css";
 
@@ -172,6 +174,7 @@ export default function TourneesPage() {
   const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
   const { data: tournees, isLoading: isLoadingTournees, isError: isErrorTournees } = useTournees({ date });
+  const { data: typesCollecte } = useTypesCollecte();
 
   // ── Arrêts de chaque tournée, une query par tournée (useQueries, pas
   //    de hook dans une boucle .map()) ──
@@ -243,12 +246,16 @@ export default function TourneesPage() {
         const isLoadingArret = arretsQuery?.isLoading ?? false;
         const done  = arretsListe.filter(a => a.statut === 'COLLECTE_CONFIRMEE').length;
         const total = arretsListe.length;
+        const typeCode = typesCollecte?.find(tc => tc.id === t.typeCollecteId)?.code;
         return (
           <div key={t.id} className="tournee-card">
             {/* Header */}
             <div className="tournee-card__head">
               <div className="tournee-card__head-left">
-                <div className="tournee-card__type">{t.typeCollecteLibelle}</div>
+                <div className="tournee-card__type" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <TypeCollecteIcon code={typeCode} size={16} />
+                  {t.typeCollecteLibelle}
+                </div>
                 <div className="tournee-card__meta">
                   <IconTruck color="#6b84a3" />
                   {t.chauffeurPrenom} {t.chauffeurNom}

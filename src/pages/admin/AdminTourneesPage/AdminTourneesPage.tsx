@@ -20,6 +20,7 @@ import { useArretsByTournee } from "../../../hooks/useArrets";
 import { createArret } from "../../../api/arrets.api";
 import { createTournee, annulerTournee } from "../../../api/tournee.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import { TypeCollecteIcon } from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import type { ApiError, Tournee } from "../../../types";
 import "./AdminTourneesPage.css";
 
@@ -180,12 +181,14 @@ const AjouterArretForm = ({
 
 const TourneeCard = ({
   tournee,
+  typeCode,
   isAnnulPending,
   onAnnuler,
   isAddArretOpen,
   onToggleAddArret,
 }: {
   tournee         : Tournee;
+  typeCode       ?: string;
   isAnnulPending  : boolean;
   onAnnuler       : (id: number) => void;
   isAddArretOpen  : boolean;
@@ -199,7 +202,10 @@ const TourneeCard = ({
     <div className="admin-tournee-card">
       <div className="admin-tournee-card__header">
         <div>
-          <div className="admin-tournee-card__name">{tournee.typeCollecteLibelle}</div>
+          <div className="admin-tournee-card__name" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <TypeCollecteIcon code={typeCode} size={16} />
+            {tournee.typeCollecteLibelle}
+          </div>
           <div className="admin-tournee-card__meta">
             {tournee.chauffeurPrenom} {tournee.chauffeurNom} · {tournee.camionImmatriculation}
             {tournee.zoneNom && ` · ${tournee.zoneNom}`}
@@ -480,6 +486,7 @@ export default function AdminTourneesPage() {
             <TourneeCard
               key={t.id}
               tournee={t}
+              typeCode={typesCollecte?.find(tc => tc.id === t.typeCollecteId)?.code}
               isAnnulPending={annulPendingIds.has(t.id)}
               onAnnuler={handleAnnuler}
               isAddArretOpen={addArretOpenId === t.id}

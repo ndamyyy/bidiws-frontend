@@ -11,7 +11,9 @@ import { useState } from "react";
 import { useAuth } from "../../../hooks/useAuth";
 import { useMaTourneeAujourdhui } from "../../../hooks/useTournees";
 import { useArretsByTournee } from "../../../hooks/useArrets";
+import { useTypesCollecte } from "../../../hooks/useCalendrierCollecte";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import { TypeCollecteIcon } from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import type { Arret } from "../../../types";
 import "./ChauffeurGpsPage.css";
 
@@ -124,6 +126,8 @@ export default function ChauffeurGpsPage() {
   const chauffeurId = utilisateur?.id;
   const { data: tournees, isLoading: isLoadingTournees } = useMaTourneeAujourdhui(chauffeurId);
   const tournee = tournees?.[0];
+  const { data: typesCollecte } = useTypesCollecte();
+  const typeCode = typesCollecte?.find(tc => tc.id === tournee?.typeCollecteId)?.code;
 
   const { data: arrets, isLoading: isLoadingArrets } = useArretsByTournee(tournee?.id);
 
@@ -153,7 +157,8 @@ export default function ChauffeurGpsPage() {
       {/* ── En-tête ── */}
       <div className="chauffeur-gps__header">
         <h1 className="chauffeur-gps__title">Suivi GPS</h1>
-        <p className="chauffeur-gps__subtitle">
+        <p className="chauffeur-gps__subtitle" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <TypeCollecteIcon code={typeCode} size={16} />
           {tournee.typeCollecteLibelle} · {tournee.camionImmatriculation}
           {tournee.zoneNom && ` · ${tournee.zoneNom}`}
         </p>
