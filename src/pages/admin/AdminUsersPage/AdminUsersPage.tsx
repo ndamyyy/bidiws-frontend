@@ -3,12 +3,19 @@
 // Fichier : src/pages/admin/AdminUsersPage/AdminUsersPage.tsx
 // ============================================================
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import { useAdminUtilisateurs } from "../../../hooks/useAdminUtilisateurs";
-import { activerUtilisateur, desactiverUtilisateur } from "../../../api/admin-utilisateurs.api";
+import { useVilles } from "../../../hooks/useVilles";
+import {
+  activerUtilisateur,
+  desactiverUtilisateur,
+  createUtilisateurAdmin,
+  changerVilleUtilisateur,
+} from "../../../api/admin-utilisateurs.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
-import type { Role, Utilisateur } from "../../../types";
+import type { ApiError, Role, Utilisateur } from "../../../types";
 import "./AdminUsersPage.css";
 
 // ─────────────────────────────────────────
@@ -24,6 +31,8 @@ const ROLE_LABEL: Record<Role, string> = {
   HABITANT:  "Habitant",
   ADMIN:     "Admin",
 };
+
+const ALL_ROLES: Role[] = ["ADMIN", "SYNDIC", "BAILLEUR", "MAIRIE", "GARDIEN", "CHAUFFEUR", "HABITANT"];
 
 // ─────────────────────────────────────────
 // BADGE STATUT
@@ -96,9 +105,21 @@ const UserRow = ({
 export default function AdminUsersPage() {
   const queryClient = useQueryClient();
   const { data: utilisateurs, isLoading } = useAdminUtilisateurs();
+  const { data: villes, isLoading: isLoadingVilles } = useVilles();
 
   const [filtreRole, setFiltreRole] = useState<Role | "TOUS">("TOUS");
   const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
+
+  const [createOpen, setCreateOpen] = useState<boolean>(false);
+  const [nom, setNom] = useState<string>("");
+  const [prenom, setPrenom] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [motDePasse, setMotDePasse] = useState<string>("");
+  const [telephone, setTelephone] = useState<string>("");
+  const [role, setRole] = useState<Role>("HABITANT");
+  const [villeId, setVilleId] = useState<string>("");
+  const [createError, setCreateError] = useState<string>("");
+  const [isSubmittingCreate, setIsSubmittingCreate] = useState<boolean>(false);
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -131,6 +152,57 @@ export default function AdminUsersPage() {
     }
   };
 
+  const resetCreateForm = (): void => {
+    setNom("");
+    setPrenom("");
+    setEmail("");
+    setMotDePasse("");
+    setTelephone("");
+    setRole("HABITANT");
+    setVilleId("");
+  };
+
+  const handleCreateSubmit = async (e: FormEvent): Promise<void> => {
+    e.preventDefault();
+    setCreateError("");
+
+    if (!nom.trim() || !prenom.trim() || !email.trim()) {
+      setCreateError("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+    if (motDePasse.length < 8) {
+      setCreateError("Le mot de passe doit contenir au moins 8 caractères.");
+      return;
+    }
+    if (role === "MAIRIE" && !villeId) {
+      setCreateError("Une ville est obligatoire pour un compte Mairie.");
+      return;
+    }
+
+    setIsSubmittingCreate(true);
+    try {
+      const nouvelUtilisateur = await createUtilisateurAdmin({
+        nom: nom.trim(),
+        prenom: prenom.trim(),
+        email: email.trim(),
+        motDePasse,
+        telephone: telephone.trim() || undefined,
+        role,
+      });
+      if (role === "MAIRIE") {
+        await changerVilleUtilisateur(nouvelUtilisateur.id, Number(villeId));
+      }
+      resetCreateForm();
+      setCreateOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ["admin-utilisateurs"] });
+    } catch (err) {
+      const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
+      setCreateError(backendMessage ?? "Erreur lors de la création de l'utilisateur.");
+    } finally {
+      setIsSubmittingCreate(false);
+    }
+  };
+
   return (
     <div>
       {/* ── En-tête ── */}
@@ -141,6 +213,111 @@ export default function AdminUsersPage() {
             {utilisateursListe.length} utilisateur{utilisateursListe.length > 1 ? "s" : ""} enregistré{utilisateursListe.length > 1 ? "s" : ""}
           </p>
         </div>
+      </div>
+
+      {/* ── Création (accordéon) ── */}
+      <div className="admin-users__create">
+        <button className="admin-users__create-toggle" onClick={() => setCreateOpen(o => !o)}>
+          {createOpen ? "Fermer" : "Ajouter un utilisateur"}
+        </button>
+
+        {createOpen && (
+          <div className="admin-users__create-body">
+            <form onSubmit={handleCreateSubmit}>
+              {createError && <div className="admin-users__error">{createError}</div>}
+
+              <div className="admin-users__grid">
+                <div className="admin-users__field">
+                  <label className="admin-users__label">Prénom</label>
+                  <input
+                    className="admin-users__input"
+                    type="text"
+                    value={prenom}
+                    onChange={(e) => setPrenom(e.target.value)}
+                  />
+                </div>
+
+                <div className="admin-users__field">
+                  <label className="admin-users__label">Nom</label>
+                  <input
+                    className="admin-users__input"
+                    type="text"
+                    value={nom}
+                    onChange={(e) => setNom(e.target.value)}
+                  />
+                </div>
+
+                <div className="admin-users__field">
+                  <label className="admin-users__label">Email</label>
+                  <input
+                    className="admin-users__input"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+
+                <div className="admin-users__field">
+                  <label className="admin-users__label">Mot de passe</label>
+                  <input
+                    className="admin-users__input"
+                    type="password"
+                    placeholder="8 caractères minimum"
+                    value={motDePasse}
+                    onChange={(e) => setMotDePasse(e.target.value)}
+                  />
+                </div>
+
+                <div className="admin-users__field">
+                  <label className="admin-users__label">Téléphone (optionnel)</label>
+                  <input
+                    className="admin-users__input"
+                    type="tel"
+                    value={telephone}
+                    onChange={(e) => setTelephone(e.target.value)}
+                  />
+                </div>
+
+                <div className="admin-users__field">
+                  <label className="admin-users__label">Rôle</label>
+                  <select
+                    className="admin-users__select"
+                    value={role}
+                    onChange={(e) => {
+                      setRole(e.target.value as Role);
+                      setVilleId("");
+                    }}
+                  >
+                    {ALL_ROLES.map(r => (
+                      <option key={r} value={r}>{ROLE_LABEL[r]}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {role === "MAIRIE" && (
+                  <div className="admin-users__field">
+                    <label className="admin-users__label">Ville</label>
+                    <select
+                      className="admin-users__select"
+                      value={villeId}
+                      onChange={(e) => setVilleId(e.target.value)}
+                      disabled={isLoadingVilles}
+                    >
+                      <option value="">Sélectionner...</option>
+                      {villes?.map(v => (
+                        <option key={v.id} value={v.id}>{v.nom}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              <button className="admin-users__submit" type="submit" disabled={isSubmittingCreate}>
+                {isSubmittingCreate ? "Création..." : "Créer l'utilisateur"}
+              </button>
+            </form>
+          </div>
+        )}
       </div>
 
       {/* ── Filtre par rôle ── */}
