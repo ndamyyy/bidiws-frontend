@@ -4,7 +4,7 @@
 // ============================================================
 
 import { Suspense, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { useLocation, useOutlet } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import Sidebar from "../SideBar/SideBar";
 import TopBar from "../TopBar/TopBar";
@@ -25,6 +25,16 @@ const MOBILE_BREAKPOINT = 768;
 
 export default function Layout() {
   const location = useLocation();
+  // Élément résolu (pas <Outlet/> en direct) : AnimatePresence garde
+  // l'arbre de la page sortante monté le temps de son animation de
+  // sortie, mais <Outlet/> reste abonné au routeur et re-rendrait la
+  // NOUVELLE page à l'intérieur de ce fantôme encore en train de
+  // s'estomper — la sortie ne se termine alors jamais et la page
+  // suivante ne monte jamais (elle reste bloquée à opacity:0, y:-8,
+  // le style de sortie figé). useOutlet() capture l'élément une seule
+  // fois par rendu de Layout, donc l'arbre figé par AnimatePresence
+  // referme l'ancienne page — pas la nouvelle.
+  const outlet = useOutlet();
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > MOBILE_BREAKPOINT);
 
   // Referme le tiroir au changement de page, mobile uniquement — sur
@@ -58,7 +68,7 @@ export default function Layout() {
             <AnimatePresence mode="wait" initial={false}>
               <PageTransition key={location.pathname}>
                 <Suspense fallback={<LoadingSpinner />}>
-                  <Outlet />
+                  {outlet}
                 </Suspense>
               </PageTransition>
             </AnimatePresence>
