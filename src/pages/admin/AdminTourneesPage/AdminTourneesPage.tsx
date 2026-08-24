@@ -21,6 +21,7 @@ import { createArret } from "../../../api/arrets.api";
 import { createTournee, annulerTournee } from "../../../api/tournee.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon } from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
+import { AnimatedCard } from "../../../components/ui/AnimatedCard/AnimatedCard";
 import type { ApiError, Tournee } from "../../../types";
 import "./AdminTourneesPage.css";
 
@@ -182,6 +183,7 @@ const AjouterArretForm = ({
 const TourneeCard = ({
   tournee,
   typeCode,
+  index,
   isAnnulPending,
   onAnnuler,
   isAddArretOpen,
@@ -189,6 +191,7 @@ const TourneeCard = ({
 }: {
   tournee         : Tournee;
   typeCode       ?: string;
+  index           : number;
   isAnnulPending  : boolean;
   onAnnuler       : (id: number) => void;
   isAddArretOpen  : boolean;
@@ -199,7 +202,7 @@ const TourneeCard = ({
   const arretsListe = [...(arrets ?? [])].sort((a, b) => a.ordre - b.ordre);
 
   return (
-    <div className="admin-tournee-card">
+    <AnimatedCard className="admin-tournee-card" delay={index * 0.06} glow={false}>
       <div className="admin-tournee-card__header">
         <div>
           <div className="admin-tournee-card__name" style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -250,7 +253,7 @@ const TourneeCard = ({
           )}
         </>
       )}
-    </div>
+    </AnimatedCard>
   );
 };
 
@@ -498,11 +501,12 @@ export default function AdminTourneesPage() {
         <div className="admin-tournees__list-empty">Aucune tournée pour cette date.</div>
       ) : (
         <div className="admin-tournees__list">
-          {tourneesListe.map(t => (
+          {tourneesListe.map((t, i) => (
             <TourneeCard
               key={t.id}
               tournee={t}
               typeCode={typesCollecte?.find(tc => tc.id === t.typeCollecteId)?.code}
+              index={i}
               isAnnulPending={annulPendingIds.has(t.id)}
               onAnnuler={handleAnnuler}
               isAddArretOpen={addArretOpenId === t.id}

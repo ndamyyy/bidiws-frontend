@@ -17,6 +17,7 @@ import {
   resetMotDePasseUtilisateur,
 } from "../../../api/admin-utilisateurs.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
 import type { ApiError, Role, Utilisateur } from "../../../types";
 import "./AdminUsersPage.css";
 
@@ -251,7 +252,7 @@ const UserRow = ({
   const initiales = `${utilisateur.prenom[0] ?? ""}${utilisateur.nom[0] ?? ""}`.toUpperCase();
 
   return (
-    <div className="admin-user-row-wrap">
+    <>
       <div className="admin-user-row">
         <div className="admin-user-row__avatar">{initiales}</div>
 
@@ -288,7 +289,7 @@ const UserRow = ({
           onDone={onEditDone}
         />
       )}
-    </div>
+    </>
   );
 };
 
@@ -558,24 +559,28 @@ export default function AdminUsersPage() {
       )}
 
       {/* ── Liste ── */}
-      <div className="admin-users__list">
-        {utilisateursFiltres.length === 0 && (
+      {utilisateursFiltres.length === 0 ? (
+        <div className="admin-users__list">
           <div className="admin-users__empty">Aucun utilisateur.</div>
-        )}
-        {utilisateursFiltres.map(u => (
-          <UserRow
-            key={u.id}
-            utilisateur={u}
-            isPending={pendingIds.has(u.id)}
-            isEditing={editingId === u.id}
-            villes={villes}
-            isLoadingVilles={isLoadingVilles}
-            onToggle={handleToggle}
-            onToggleEdit={() => setEditingId(id => (id === u.id ? null : u.id))}
-            onEditDone={handleEditDone}
-          />
-        ))}
-      </div>
+        </div>
+      ) : (
+        <StaggerContainer className="admin-users__list">
+          {utilisateursFiltres.map(u => (
+            <StaggerItem key={u.id} className="admin-user-row-wrap">
+              <UserRow
+                utilisateur={u}
+                isPending={pendingIds.has(u.id)}
+                isEditing={editingId === u.id}
+                villes={villes}
+                isLoadingVilles={isLoadingVilles}
+                onToggle={handleToggle}
+                onToggleEdit={() => setEditingId(id => (id === u.id ? null : u.id))}
+                onEditDone={handleEditDone}
+              />
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      )}
     </div>
   );
 }

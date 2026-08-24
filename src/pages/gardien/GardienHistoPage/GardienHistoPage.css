@@ -42,7 +42,9 @@
   padding: 16px 20px;
   border-bottom: 1px solid var(--overlay-4);
 }
-.gardien-histo-item:last-child { border-bottom: none; }
+/* Plus l'enfant direct de .gardien-histo__list depuis le passage à
+   StaggerContainer/StaggerItem — cible le dernier wrapper. */
+.gardien-histo__list > *:last-child .gardien-histo-item { border-bottom: none; }
 
 .gardien-histo-item__icon {
   width: 38px;

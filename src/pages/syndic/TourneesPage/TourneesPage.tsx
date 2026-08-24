@@ -9,6 +9,7 @@ import { useTypesCollecte }                  from "../../../hooks/useCalendrierC
 import { getArretsByTournee, validerArret }  from "../../../api/arrets.api";
 import { LoadingSpinner }                    from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon }                  from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
+import { AnimatedCard }                      from "../../../components/ui/AnimatedCard/AnimatedCard";
 import type { Arret }                        from "../../../types";
 import "./TourneesPage.css";
 
@@ -248,7 +249,7 @@ export default function TourneesPage() {
         const total = arretsListe.length;
         const typeCode = typesCollecte?.find(tc => tc.id === t.typeCollecteId)?.code;
         return (
-          <div key={t.id} className="tournee-card">
+          <AnimatedCard key={t.id} className="tournee-card" delay={i * 0.06} glow={false}>
             {/* Header */}
             <div className="tournee-card__head">
               <div className="tournee-card__head-left">
@@ -286,7 +287,7 @@ export default function TourneesPage() {
                 />
               ))
             )}
-          </div>
+          </AnimatedCard>
         );
       })}
     </div>

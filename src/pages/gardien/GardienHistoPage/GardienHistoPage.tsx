@@ -9,6 +9,7 @@ import { useAuth } from "../../../hooks/useAuth";
 import { useResidencesGardien } from "../../../hooks/useResidences";
 import { useArretsByResidence } from "../../../hooks/useArrets";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
 import type { Arret } from "../../../types";
 import "./GardienHistoPage.css";
 
@@ -143,14 +144,17 @@ export default function GardienHistoPage() {
         </p>
       </div>
 
-      <div className="gardien-histo__list">
-        {arretsListe.length === 0 && (
-          <div className="gardien-histo__empty">Aucun passage enregistré pour le moment.</div>
-        )}
-        {arretsListe.map(arret => (
-          <HistoItem key={arret.id} arret={arret} />
-        ))}
-      </div>
+      {arretsListe.length === 0 ? (
+        <div className="gardien-histo__empty">Aucun passage enregistré pour le moment.</div>
+      ) : (
+        <StaggerContainer className="gardien-histo__list">
+          {arretsListe.map(arret => (
+            <StaggerItem key={arret.id}>
+              <HistoItem arret={arret} />
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      )}
     </div>
   );
 }

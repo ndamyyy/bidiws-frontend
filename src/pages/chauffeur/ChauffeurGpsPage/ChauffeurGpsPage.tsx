@@ -14,6 +14,7 @@ import { useArretsByTournee } from "../../../hooks/useArrets";
 import { useTypesCollecte } from "../../../hooks/useCalendrierCollecte";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon } from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
+import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
 import type { Arret } from "../../../types";
 import "./ChauffeurGpsPage.css";
 
@@ -93,7 +94,7 @@ const TimelineItem = ({
         )}
       </div>
 
-      <div className="chauffeur-gps__item-content">
+      <div className="chauffeur-gps__item-content" style={{ paddingBottom: isLast ? 0 : undefined }}>
         <div className="chauffeur-gps__item-name">{arret.residenceNom}</div>
         {arret.residenceAdresse && (
           <div className="chauffeur-gps__item-addr">{arret.residenceAdresse}</div>
@@ -202,17 +203,18 @@ export default function ChauffeurGpsPage() {
       {arretsListe.length === 0 ? (
         <div className="chauffeur-gps__empty">Aucun arrêt sur cette tournée.</div>
       ) : (
-        <div className="chauffeur-gps__timeline">
+        <StaggerContainer className="chauffeur-gps__timeline">
           {arretsListe.map((arret, idx) => (
-            <TimelineItem
-              key={arret.id}
-              arret={arret}
-              index={idx}
-              isCurrent={idx === currentIndex}
-              isLast={idx === arretsListe.length - 1}
-            />
+            <StaggerItem key={arret.id}>
+              <TimelineItem
+                arret={arret}
+                index={idx}
+                isCurrent={idx === currentIndex}
+                isLast={idx === arretsListe.length - 1}
+              />
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       )}
     </div>
   );

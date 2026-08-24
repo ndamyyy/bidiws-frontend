@@ -9,6 +9,7 @@
 
 import { useState, type JSX } from "react";
 import { useNotifications } from "../../../hooks/useNotifications";
+import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
 import type { Notification } from "../../../types";
 import "./GardienAlertsPage.css";
 
@@ -142,21 +143,24 @@ export default function GardienAlertsPage() {
       </div>
 
       {/* ── Liste ── */}
-      <div className="gardien-alerts__list">
-        {notificationsFiltrees.length === 0 && (
-          <div className="gardien-alerts__empty">
-            {filtre === "NON_LUES"
-              ? "Aucune alerte non lue."
-              : filtre === "LUES"
-              ? "Aucune alerte lue."
-              : "Aucune alerte pour le moment."
-            }
-          </div>
-        )}
-        {notificationsFiltrees.map(n => (
-          <NotifItem key={n.id} notif={n} onRead={handleRead} />
-        ))}
-      </div>
+      {notificationsFiltrees.length === 0 ? (
+        <div className="gardien-alerts__empty">
+          {filtre === "NON_LUES"
+            ? "Aucune alerte non lue."
+            : filtre === "LUES"
+            ? "Aucune alerte lue."
+            : "Aucune alerte pour le moment."
+          }
+        </div>
+      ) : (
+        <StaggerContainer className="gardien-alerts__list">
+          {notificationsFiltrees.map(n => (
+            <StaggerItem key={n.id}>
+              <NotifItem notif={n} onRead={handleRead} />
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      )}
     </div>
   );
 }

@@ -26,20 +26,18 @@
 
 /* ─── Card tournée ─── */
 .tournee-card {
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+/* .animated-card (composant partagé) impose son propre padding/fond/
+   bordure par défaut — priorité explicite ici via sélecteur combiné
+   (spécificité) plutôt que de dépendre de l'ordre d'import des CSS. */
+.tournee-card.animated-card {
   background: var(--overlay-4);
   border: 1px solid var(--overlay-7);
   border-radius: 16px;
-  margin-bottom: 20px;
-  overflow: hidden;
-  animation: fadeUp 0.4s both cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.tournee-card:nth-child(1) { animation-delay: 0.05s; }
-.tournee-card:nth-child(2) { animation-delay: 0.12s; }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+  padding: 0;
 }
 
 .tournee-card__head {

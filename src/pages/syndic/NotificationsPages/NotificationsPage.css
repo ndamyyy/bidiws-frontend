@@ -66,7 +66,11 @@
   transition: background 0.18s;
 }
 
-.notif-item:last-child { border-bottom: none; }
+/* .notif-item n'est plus l'enfant direct de .notifs__list depuis le
+   passage à StaggerContainer/StaggerItem (wrapper motion.div
+   intermédiaire) — cible le dernier wrapper plutôt que .notif-item
+   lui-même. */
+.notifs__list > *:last-child .notif-item { border-bottom: none; }
 
 .notif-item:hover {
   background: var(--overlay-3);

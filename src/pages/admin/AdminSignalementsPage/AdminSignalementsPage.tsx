@@ -12,6 +12,7 @@ import axios from "axios";
 import { useSignalementsByStatut } from "../../../hooks/useSignalements";
 import { updateStatutSignalement } from "../../../api/signalements.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import { AnimatedCard } from "../../../components/ui/AnimatedCard/AnimatedCard";
 import type { ApiError, Signalement, StatutSignalement } from "../../../types";
 import "./AdminSignalementsPage.css";
 
@@ -65,10 +66,12 @@ const STATUT_STYLE: Record<StatutSignalement, { bg: string; color: string }> = {
 
 const SignalementCard = ({
   signalement,
+  index,
   isPending,
   onChangeStatut,
 }: {
   signalement  : Signalement;
+  index         : number;
   isPending    : boolean;
   onChangeStatut: (id: number, statut: StatutSignalement) => void;
 }) => {
@@ -78,7 +81,7 @@ const SignalementCard = ({
   });
 
   return (
-    <div className="admin-signalement-card">
+    <AnimatedCard className="admin-signalement-card" delay={index * 0.06} glow={false}>
       <div className="admin-signalement-card__top">
         <div className="admin-signalement-card__left">
           <div className="admin-signalement-card__icon" style={{ background: style.bg, border: `1px solid ${style.color}44` }}>
@@ -120,7 +123,7 @@ const SignalementCard = ({
           ))}
         </select>
       </div>
-    </div>
+    </AnimatedCard>
   );
 };
 
@@ -194,10 +197,11 @@ export default function AdminSignalementsPage() {
         </div>
       ) : (
         <div className="admin-signalements__list">
-          {signalementsListe.map(s => (
+          {signalementsListe.map((s, i) => (
             <SignalementCard
               key={s.id}
               signalement={s}
+              index={i}
               isPending={pendingIds.has(s.id)}
               onChangeStatut={handleChangeStatut}
             />

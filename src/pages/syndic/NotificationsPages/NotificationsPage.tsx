@@ -5,6 +5,7 @@
 
 import { JSX }                  from "react";
 import { useNotifications }     from "../../../hooks/useNotifications";
+import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
 import type { Notification }    from "../../../types";
 import "./NotificationsPage.css";
 
@@ -140,11 +141,13 @@ export default function NotificationsPage() {
         )}
       </div>
 
-      <div className="notifs__list">
+      <StaggerContainer className="notifs__list">
         {notifications.map(n => (
-          <NotifItem key={n.id} notif={n} onRead={handleRead} />
+          <StaggerItem key={n.id}>
+            <NotifItem notif={n} onRead={handleRead} />
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
     </div>
   );
 }

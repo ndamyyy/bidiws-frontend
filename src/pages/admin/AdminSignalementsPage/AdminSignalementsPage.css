@@ -70,7 +70,10 @@
 }
 
 /* ─── Carte signalement ─── */
-.admin-signalement-card {
+/* .animated-card (composant partagé) impose son propre padding/fond/
+   bordure par défaut — priorité explicite ici via sélecteur combiné
+   (spécificité) plutôt que de dépendre de l'ordre d'import des CSS. */
+.admin-signalement-card.animated-card {
   background: var(--overlay-4);
   border: 1px solid var(--overlay-7);
   border-radius: 16px;

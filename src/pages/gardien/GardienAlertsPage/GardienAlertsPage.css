@@ -97,7 +97,9 @@
   cursor: pointer;
   transition: background 0.18s;
 }
-.g-notif-item:last-child { border-bottom: none; }
+/* Plus l'enfant direct de .gardien-alerts__list depuis le passage à
+   StaggerContainer/StaggerItem — cible le dernier wrapper. */
+.gardien-alerts__list > *:last-child .g-notif-item { border-bottom: none; }
 .g-notif-item:hover { background: var(--overlay-3); }
 
 .g-notif-item--unread { background: rgba(76, 175, 80, 0.03); }

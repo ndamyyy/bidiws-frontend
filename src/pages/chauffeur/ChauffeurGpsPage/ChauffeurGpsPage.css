@@ -177,10 +177,6 @@
   padding-bottom: 22px;
 }
 
-.chauffeur-gps__item:last-child .chauffeur-gps__item-content {
-  padding-bottom: 0;
-}
-
 .chauffeur-gps__item-name {
   font-size: 14px;
   font-weight: 600;
