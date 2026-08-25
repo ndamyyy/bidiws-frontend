@@ -61,18 +61,31 @@ const IconAlert = ({ color }: { color: string }) => (
 // ─────────────────────────────────────────
 
 const Badge = ({ statut }: { statut: string }) => {
-  const map: Record<string, { bg: string; color: string; label: string }> = {
-    COLLECTE_CONFIRMEE: { bg: "rgba(76,175,80,0.15)",  color: "#4caf50", label: "Confirmé"   },
-    EN_COURS:           { bg: "rgba(245,158,11,0.15)", color: "#f59e0b", label: "En cours"   },
-    PLANIFIEE:          { bg: "rgba(107,132,163,0.12)",color: "#6b84a3", label: "Planifiée"  },
-    TERMINEE:           { bg: "rgba(76,175,80,0.15)",  color: "#4caf50", label: "Terminée"   },
-    EN_ATTENTE:         { bg: "rgba(107,132,163,0.12)",color: "#6b84a3", label: "En attente" },
+  // PLANIFIEE / EN_ATTENTE : statuts neutres, secondaires — seuls
+  // badges de ce composant à reprendre l'accent de rôle
+  // (--accent-role) plutôt qu'une couleur fixe ; les statuts
+  // "actifs" (confirmé, en cours, terminée) restent sur leurs
+  // couleurs sémantiques dédiées, inchangées.
+  // Le TEXTE reste sur --text-secondary (neutre, garanti lisible dans
+  // les deux thèmes) — seuls le fond et la bordure sont teintés par
+  // --accent-role. Certaines couleurs de rôle (navy syndic, violet
+  // mairie) ont un contraste texte < 2:1 sur fond de carte sombre —
+  // testé au getComputedStyle, illisible en tant que texte plein.
+  // borderColor séparé de color : sur var(--accent-role) on ne peut
+  // pas concaténer un suffixe alpha hexa ("44") comme sur une couleur
+  // fixe — color-mix() fait l'équivalent pour une custom property.
+  const map: Record<string, { bg: string; color: string; borderColor: string; label: string }> = {
+    COLLECTE_CONFIRMEE: { bg: "rgba(76,175,80,0.15)",  color: "#4caf50", borderColor: "#4caf5044", label: "Confirmé"   },
+    EN_COURS:           { bg: "rgba(245,158,11,0.15)", color: "#f59e0b", borderColor: "#f59e0b44", label: "En cours"   },
+    PLANIFIEE:          { bg: "color-mix(in srgb, var(--accent-role) 12%, transparent)", color: "var(--text-secondary)", borderColor: "color-mix(in srgb, var(--accent-role) 27%, transparent)", label: "Planifiée"  },
+    TERMINEE:           { bg: "rgba(76,175,80,0.15)",  color: "#4caf50", borderColor: "#4caf5044", label: "Terminée"   },
+    EN_ATTENTE:         { bg: "color-mix(in srgb, var(--accent-role) 12%, transparent)", color: "var(--text-secondary)", borderColor: "color-mix(in srgb, var(--accent-role) 27%, transparent)", label: "En attente" },
   };
   const s = map[statut] ?? map.EN_ATTENTE;
   return (
     <span style={{
       background: s.bg, color: s.color,
-      border: `1px solid ${s.color}44`,
+      border: `1px solid ${s.borderColor}`,
       borderRadius: 20, padding: "3px 10px",
       fontSize: 11, fontWeight: 600,
       display: "inline-flex", alignItems: "center", gap: 5,

@@ -305,7 +305,10 @@ export default function AdminDashboardPage() {
           const progress = total > 0 ? Math.round((done / total) * 100) : 0;
 
           return (
-            <div key={t.id} className="admin-tournee-item">
+            <div
+              key={t.id}
+              className={`admin-tournee-item ${t.statut === 'EN_COURS' ? 'admin-tournee-item--active' : ''}`}
+            >
               <div className="admin-tournee-item__header">
                 <div>
                   <div className="admin-tournee-item__name">{t.typeCollecteLibelle}</div>

@@ -199,7 +199,7 @@ export default function GardienHomePage() {
         ].map(item => (
           <div key={item.label} className="info-card">
             <div className="info-card__icon">
-              <IconSmall name={item.icon} color="#1b3a6b" />
+              <IconSmall name={item.icon} color="var(--accent-role)" />
             </div>
             <div>
               <div className="info-card__label">{item.label}</div>

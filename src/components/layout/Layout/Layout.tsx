@@ -3,7 +3,7 @@
 // Fichier : src/components/layout/Layout/Layout.tsx
 // ============================================================
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, type CSSProperties } from "react";
 import { useLocation, useOutlet } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import Sidebar from "../SideBar/SideBar";
@@ -11,6 +11,8 @@ import TopBar from "../TopBar/TopBar";
 import PageTransition from "../../ui/PageTransition/PageTransition";
 import { ErrorBoundary } from "../../ErrorBoundary/ErrorBoundary";
 import { LoadingSpinner } from "../../ui/LoadingSpinner/LoadingSpinner";
+import { useAuth } from "../../../hooks/useAuth";
+import { ROLE_ACCENT } from "../../../constants/roleColors";
 import "./Layout.css";
 
 const MOBILE_BREAKPOINT = 768;
@@ -25,6 +27,13 @@ const MOBILE_BREAKPOINT = 768;
 
 export default function Layout() {
   const location = useLocation();
+  const { utilisateur } = useAuth();
+  // Accent secondaire par rôle (--accent-role) : reprend les couleurs
+  // déjà établies par le sélecteur de LoginPage, pour une identité
+  // cohérente entre la connexion et le tableau de bord. Complément
+  // discret de --signal (accent principal de la marque, inchangé),
+  // pas un remplacement — voir src/constants/roleColors.ts.
+  const accentRole = utilisateur ? ROLE_ACCENT[utilisateur.role] : undefined;
   // Élément résolu (pas <Outlet/> en direct) : AnimatePresence garde
   // l'arbre de la page sortante monté le temps de son animation de
   // sortie, mais <Outlet/> reste abonné au routeur et re-rendrait la
@@ -51,7 +60,10 @@ export default function Layout() {
   }
 
   return (
-    <div className={`layout ${!sidebarOpen ? "layout--sidebar-closed" : ""}`}>
+    <div
+      className={`layout ${!sidebarOpen ? "layout--sidebar-closed" : ""}`}
+      style={accentRole ? ({ "--accent-role": accentRole } as CSSProperties) : undefined}
+    >
 
       {/* ── Sidebar fixe à gauche (tiroir en mobile, repliable en desktop) ── */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />

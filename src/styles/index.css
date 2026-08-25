@@ -37,7 +37,15 @@
   --signal-dim-20:  rgba(57, 255, 140, 0.20);
   --signal-dim-40:  rgba(57, 255, 140, 0.40);
   --signal-glow:    0 0 40px rgba(57, 255, 140, 0.15);
-  
+
+  /* ── Accent secondaire par rôle ──
+     Repose sur --signal par défaut ; Layout la redéfinit avec la
+     couleur du rôle connecté (voir src/constants/roleColors.ts) dès
+     qu'un utilisateur est chargé. --signal reste l'accent principal
+     de la marque partout — --accent-role n'est qu'un complément
+     discret, appliqué sur des détails précis (pas une refonte). */
+  --accent-role:    var(--signal);
+
   /* ── Data ── */
   --data:           #5B6CFF;
   --data-dim-15:    rgba(91, 108, 255, 0.15);

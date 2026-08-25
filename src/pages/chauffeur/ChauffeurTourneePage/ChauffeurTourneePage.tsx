@@ -62,7 +62,10 @@ const ProgressBar = ({ progress }: { progress: number }) => (
     }}>
       <div style={{
         height: "100%", width: `${progress}%`, borderRadius: 4,
-        background: "linear-gradient(90deg, #1b3a6b, #4caf50)",
+        // Départ teinté de l'accent de rôle (--accent-role, orange
+        // chauffeur) plutôt que le navy générique — arrivée toujours
+        // sur le vert signal de la marque, inchangé.
+        background: "linear-gradient(90deg, var(--accent-role), #4caf50)",
         transition: "width 0.8s cubic-bezier(0.22,1,0.36,1)",
         boxShadow: "0 0 12px rgba(76,175,80,0.3)",
       }} />

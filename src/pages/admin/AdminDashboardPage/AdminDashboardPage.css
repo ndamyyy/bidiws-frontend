@@ -178,6 +178,14 @@
   border-bottom: none;
 }
 
+/* Accent de rôle (--accent-role) sur la tournée EN_COURS — détail
+   discret, --signal reste l'accent principal de la marque (compteur,
+   route du camion, etc. plus bas, inchangés). */
+.admin-tournee-item--active {
+  border-left: 3px solid var(--accent-role);
+  padding-left: 12px;
+}
+
 .admin-tournee-item__header {
   display: flex;
   justify-content: space-between;
