@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { login as apiLogin, logout as apiLogout, getMe } from "../api/auth.api";
 import { getToken, removeToken } from "../api/axios";
 import { redirectByRole } from "../utils/redirectByRole";
-import type { AuthUser, LoginRequest } from "../types";
+import type { AuthUser, LoginRequest, Utilisateur } from "../types";
 import { AuthContext, type AuthContextType } from "./AuthContextValue";
 
 // ─────────────────────────────────────────
@@ -76,7 +76,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   // ── Login ──
-  const login = useCallback(async (data: LoginRequest): Promise<void> => {
+  // Retourne l'utilisateur connecté (voir AuthContextType.login) —
+  // l'appelant peut ainsi vérifier son rôle sans dépendre du contexte,
+  // qui n'a pas encore re-rendu à ce point de l'exécution.
+  const login = useCallback(async (data: LoginRequest): Promise<Utilisateur> => {
     setIsLoading(true);
     try {
       const response = await apiLogin(data);
@@ -84,16 +87,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.setItem("bidiws_user", JSON.stringify(utilisateur));
       setAuthUser({ token: response.token, utilisateur });
       navigate(redirectByRole[utilisateur.role]);
+      return utilisateur;
     } finally {
       setIsLoading(false);
     }
   }, [navigate]);
 
   // ── Logout ──
-  const logout = useCallback((): void => {
+  const logout = useCallback((redirectTo: string = "/login"): void => {
     apiLogout();
     setAuthUser(null);
-    navigate("/login");
+    navigate(redirectTo);
   }, [navigate]);
 
   // ── Rafraîchir l'utilisateur courant (après modification du profil) ──

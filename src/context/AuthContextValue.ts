@@ -14,8 +14,16 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isLoading      : boolean;
   isInitializing : boolean;
-  login          : (data: LoginRequest) => Promise<void>;
-  logout         : () => void;
+  // Retourne l'utilisateur connecté : permet à l'appelant de vérifier
+  // son rôle juste après un login réussi sans dépendre d'un re-rendu
+  // (le state du contexte n'est pas encore à jour dans la closure de
+  // l'appelant à ce moment précis — voir AdminLoginPage).
+  login          : (data: LoginRequest) => Promise<Utilisateur>;
+  // redirectTo (optionnel, défaut "/login") : laisse un appelant
+  // reprendre la main sur la destination post-déconnexion — voir
+  // AdminLoginPage, qui redirige vers /admin/login le temps d'afficher
+  // un message avant de renvoyer vers /login lui-même.
+  logout         : (redirectTo?: string) => void;
   refreshUtilisateur: () => Promise<void>;
 }
 

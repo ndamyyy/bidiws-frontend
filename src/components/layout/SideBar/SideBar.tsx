@@ -205,7 +205,10 @@ export default function Sidebar({
 
       {/* ── Déconnexion ── */}
       <div className="sidebar__footer">
-        <button className="sidebar__logout" onClick={logout}>
+        {/* logout() prend un redirectTo optionnel (voir AdminLoginPage) —
+            onClick={logout} passerait l'event du clic à la place,
+            d'où l'arrow function pour n'appeler logout() sans argument. */}
+        <button className="sidebar__logout" onClick={() => logout()}>
           <NavIcon name="logout" active={false} />
           <span>Déconnexion</span>
         </button>

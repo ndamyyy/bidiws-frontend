@@ -9,11 +9,16 @@
 // ============================================================
 
 import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../../hooks/useAuth";
 import type { ApiError } from "../../../types";
 import "./AdminLoginPage.css";
+
+// Délai avant la redirection vers /login lorsqu'un compte valide mais
+// non-admin se connecte ici — assez long pour lire le message, assez
+// court pour ne pas sembler figé.
+const REDIRECTION_NON_ADMIN_MS = 2500;
 
 // ─────────────────────────────────────────
 // ICÔNES
@@ -46,7 +51,8 @@ const IconEyeOff = ({ color }: { color: string }) => (
 // ─────────────────────────────────────────
 
 export default function AdminLoginPage() {
-  const { login, isLoading } = useAuth();
+  const { login, logout, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   const [email,          setEmail]          = useState<string>("");
   const [motDePasse,     setMotDePasse]     = useState<string>("");
@@ -68,7 +74,23 @@ export default function AdminLoginPage() {
     }
 
     try {
-      await login({ email: email.trim(), motDePasse });
+      // login() connecte n'importe quel compte valide et redirige déjà
+      // vers l'espace de son rôle — cette page n'est censée servir que
+      // les ADMIN. On vérifie le rôle obtenu via la valeur retournée
+      // (pas via le utilisateur du contexte, pas encore à jour dans
+      // cette closure au moment où login() se termine) et on annule
+      // la session + la redirection si ce n'est pas un admin.
+      const utilisateur = await login({ email: email.trim(), motDePasse });
+
+      if (utilisateur.role !== "ADMIN") {
+        // redirectTo="/admin/login" plutôt que le "/login" par défaut :
+        // annule la redirection déjà lancée par login() vers l'espace
+        // du rôle obtenu, et laisse le message ci-dessous s'afficher
+        // ici avant le renvoi différé vers /login.
+        logout("/admin/login");
+        setError("Cet espace est réservé aux administrateurs. Utilisez la page de connexion principale.");
+        setTimeout(() => navigate("/login"), REDIRECTION_NON_ADMIN_MS);
+      }
     } catch (err) {
       const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
       setError(backendMessage ?? "Email ou mot de passe incorrect. Vérifiez vos identifiants.");
