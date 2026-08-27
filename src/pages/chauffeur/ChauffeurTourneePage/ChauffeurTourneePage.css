@@ -95,6 +95,41 @@
   transition: left 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ─── Démarrer la tournée ─── */
+.chauffeur__demarrer {
+  margin-bottom: 18px;
+  animation: fadeUp 0.4s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-demarrer-chauffeur {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent-role), #f59e0b);
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  color: var(--text-inverse);
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  transition: transform 0.18s, box-shadow 0.18s;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+}
+
+.btn-demarrer-chauffeur:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(245, 158, 11, 0.45);
+}
+
+.btn-demarrer-chauffeur:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ─── Progression ─── */
 .chauffeur__progress {
   background: var(--overlay-4);
@@ -142,11 +177,16 @@
   color: var(--text-primary);
 }
 
-/* ─── Arret item ─── */
+/* ─── Arret item ───
+   Conteneur en colonne : la ligne principale (étape/infos/actions)
+   dans .c-arret-item__row, le formulaire incident (optionnel) en
+   dessous — garde .c-arret-item comme SEUL enfant direct de la liste
+   par arrêt, donc :last-child reste correct que le formulaire soit
+   ouvert ou non. */
 .c-arret-item {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
   padding: 16px 22px;
   border-bottom: 1px solid var(--overlay-4);
   transition: background 0.18s;
@@ -156,6 +196,19 @@
 
 .c-arret-item--current {
   background: rgba(245, 158, 11, 0.05);
+}
+
+.c-arret-item__row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.c-arret-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .c-arret-item__step {
@@ -236,6 +289,100 @@
 .btn-valider-chauffeur:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 22px rgba(76, 175, 80, 0.45);
+}
+
+/* ─── Bouton signaler un incident — distinct de Valider ─── */
+.btn-incident-chauffeur {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.btn-incident-chauffeur:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* ─── Formulaire incident (description brève, pas de photo — pas
+   SignalementForm) ─── */
+.c-arret-item__incident-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: 10px;
+}
+
+.c-arret-item__incident-input {
+  flex: 1;
+  min-width: 160px;
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+}
+
+.c-arret-item__incident-input:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.btn-incident-submit {
+  background: #ef4444;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: #fff;
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s;
+}
+
+.btn-incident-submit:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.btn-incident-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-incident-cancel {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 4px;
+  white-space: nowrap;
+}
+
+.btn-incident-cancel:hover {
+  color: var(--text-primary);
+}
+
+.c-arret-item__incident-error {
+  width: 100%;
+  color: #ef4444;
+  font-size: 11px;
 }
 
 /* ─── Terminer la tournée ─── */
