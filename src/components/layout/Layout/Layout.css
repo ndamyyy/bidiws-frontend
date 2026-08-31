@@ -37,12 +37,28 @@
 .layout__content {
   flex: 1;
   padding: 24px 28px;
-  margin-top: var(--topbar-height);
+  /* topbar fixe (voir TopBar.css) : sa hauteur réelle grandit de
+     env(safe-area-inset-top) sur un écran à encoche (0 sur desktop,
+     donc calc() retombe exactement sur --topbar-height, inchangé) —
+     margin-top doit suivre pour continuer à la dégager pile, pas
+     .safe-top/padding-top comme le reste de l'app : ce conteneur
+     défile (overflow-y:auto), un padding-top y disparaîtrait au
+     premier scroll alors qu'un margin-top reste un dégagement
+     permanent sous l'élément fixe. */
+  margin-top: calc(var(--topbar-height) + env(safe-area-inset-top));
+  /* Pas de barre de navigation basse dans l'app (menu en sidebar) —
+     même logique que .safe-bottom (styles/index.css) mais avec 24px
+     comme plancher plutôt que son 16px, pour ne pas réduire le
+     padding bas déjà en place ici quand l'encoche est petite. */
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 @media (max-width: 768px) {
   .layout__main { margin-left: 0; }
-  .layout__content { padding: 16px; }
+  .layout__content {
+    padding: 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
 }

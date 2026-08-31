@@ -4,13 +4,23 @@
    ============================================================ */
 
 .topbar {
-  height: 64px;
+  min-height: 64px;
   background: var(--bg-card-glass);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 28px;
+  /* env(safe-area-inset-top) vaut 0 hors écran à encoche — aucun
+     changement sur desktop. Sur un écran à encoche, ce padding pousse
+     le contenu de la topbar sous l'encoche tout en laissant son fond
+     (position:fixed, top:0) remonter jusqu'en haut de l'écran, plutôt
+     qu'un bandeau vide de la couleur de fond de page au-dessus.
+     height→min-height : laisse ce padding s'ajouter à la hauteur
+     réelle au lieu de comprimer le contenu (box-sizing:border-box
+     global) — .layout__content (Layout.css) suit avec le même
+     calc(--topbar-height + inset) pour continuer à dégager pile. */
+  padding-top: env(safe-area-inset-top);
   position: fixed;
   top: 0;
   left: 240px;
@@ -169,6 +179,9 @@
   .topbar {
     left: 0;
     padding: 0 16px;
+    /* Le raccourci padding ci-dessus remettrait padding-top à 0 —
+       c'est justement sur mobile (écrans à encoche) que ça compte. */
+    padding-top: env(safe-area-inset-top);
   }
   .topbar__date,
   .topbar__live {
