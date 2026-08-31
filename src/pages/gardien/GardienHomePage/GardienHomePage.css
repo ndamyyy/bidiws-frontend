@@ -15,9 +15,9 @@
 .gardien__signaler-btn {
   padding: 9px 16px;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(239,68,68,0.3);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
   background: var(--overlay-6);
-  color: #ef4444;
+  color: var(--danger);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -25,7 +25,7 @@
   transition: all 0.18s;
 }
 .gardien__signaler-btn:hover {
-  background: rgba(239,68,68,0.1);
+  background: var(--danger-dim-10);
 }
 
 .gardien__title {

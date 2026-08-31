@@ -38,7 +38,7 @@
 
 .error-boundary__button {
   padding: 10px 22px;
-  background: linear-gradient(135deg, var(--signal), #2ECC71);
+  background: var(--signal-gradient);
   border: none;
   border-radius: var(--radius-md);
   color: var(--text-inverse);

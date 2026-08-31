@@ -152,7 +152,7 @@
 
 .admin-tournees__submit {
   padding: 10px 22px;
-  background: linear-gradient(135deg, var(--signal), #2ECC71);
+  background: var(--signal-gradient);
   border: none;
   border-radius: var(--radius-md);
   color: var(--text-inverse);
@@ -226,14 +226,14 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  border: 1px solid rgba(239,68,68,0.3);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
   background: var(--overlay-6);
-  color: #ef4444;
+  color: var(--danger);
   transition: all 0.18s;
   white-space: nowrap;
 }
 .admin-tournee-card__annuler:hover:not(:disabled) {
-  background: rgba(239,68,68,0.1);
+  background: var(--danger-dim-10);
 }
 .admin-tournee-card__annuler:disabled { opacity: 0.5; cursor: not-allowed; }
 

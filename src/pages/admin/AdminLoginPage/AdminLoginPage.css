@@ -132,7 +132,7 @@
 .admin-login__submit {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, var(--signal), #2ECC71);
+  background: var(--signal-gradient);
   border: none;
   border-radius: var(--radius-md);
   color: var(--text-inverse);

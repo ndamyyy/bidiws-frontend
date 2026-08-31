@@ -72,10 +72,11 @@ const ProgressBar = ({ progress }: { progress: number }) => (
         height: "100%", width: `${progress}%`, borderRadius: 4,
         // Départ teinté de l'accent de rôle (--accent-role, orange
         // chauffeur) plutôt que le navy générique — arrivée toujours
-        // sur le vert signal de la marque, inchangé.
-        background: "linear-gradient(90deg, var(--accent-role), #4caf50)",
+        // sur le vert "confirmé/terminé" (--success), pas --signal
+        // (couleur différente, réservée à l'accent de marque).
+        background: "linear-gradient(90deg, var(--accent-role), var(--success))",
         transition: "width 0.8s cubic-bezier(0.22,1,0.36,1)",
-        boxShadow: "0 0 12px rgba(76,175,80,0.3)",
+        boxShadow: "0 0 12px color-mix(in srgb, var(--success) 30%, transparent)",
       }} />
     </div>
     {/* Camion */}
@@ -85,7 +86,7 @@ const ProgressBar = ({ progress }: { progress: number }) => (
       transform: "translateX(-50%)",
       transition: "left 0.8s cubic-bezier(0.22,1,0.36,1)",
     }}>
-      <IconTruck color="#4caf50" />
+      <IconTruck color="var(--success)" />
     </div>
     {/* Labels */}
     <div style={{
@@ -93,7 +94,7 @@ const ProgressBar = ({ progress }: { progress: number }) => (
       display: "flex", justifyContent: "space-between",
     }}>
       <span style={{ fontSize: 11, color: "#6b84a3" }}>Départ</span>
-      <span style={{ fontSize: 11, color: "#4caf50", fontWeight: 600 }}>
+      <span style={{ fontSize: 11, color: "var(--success)", fontWeight: 600 }}>
         {progress}% complété
       </span>
     </div>
@@ -157,7 +158,7 @@ const ArretItem = ({
         {/* Étape */}
         <div className={`c-arret-item__step ${stepClass}`}>
           {isTerminal
-            ? <IconCheck color={isIncident ? "#ef4444" : "#4caf50"} size={16} />
+            ? <IconCheck color={isIncident ? "var(--danger)" : "var(--success)"} size={16} />
             : <span style={{ color: isCurrent ? "#f59e0b" : "#6b84a3" }}>{index + 1}</span>
           }
         </div>
@@ -181,7 +182,7 @@ const ArretItem = ({
             </div>
           )}
           {isIncident && arret.descriptionIncident && (
-            <div style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>
+            <div style={{ fontSize: 11, color: "var(--danger)", marginTop: 4 }}>
               {arret.descriptionIncident}
             </div>
           )}
@@ -190,9 +191,9 @@ const ArretItem = ({
         {/* Action */}
         {isTerminal ? (
           <span style={{
-            background: isIncident ? "rgba(239,68,68,0.12)" : "rgba(76,175,80,0.12)",
-            border: `1px solid ${isIncident ? "rgba(239,68,68,0.25)" : "rgba(76,175,80,0.25)"}`,
-            color: isIncident ? "#ef4444" : "#4caf50", borderRadius: 20,
+            background: isIncident ? "color-mix(in srgb, var(--danger) 12%, transparent)" : "color-mix(in srgb, var(--success) 12%, transparent)",
+            border: `1px solid ${isIncident ? "color-mix(in srgb, var(--danger) 25%, transparent)" : "color-mix(in srgb, var(--success) 25%, transparent)"}`,
+            color: isIncident ? "var(--danger)" : "var(--success)", borderRadius: 20,
             padding: "3px 10px", fontSize: 11, fontWeight: 600,
           }}>
             {isIncident ? "Incident" : "Collecté"}
@@ -209,8 +210,9 @@ const ArretItem = ({
               className="btn-incident-chauffeur"
               onClick={() => setIncidentOpen(v => !v)}
               title="Signaler un incident sur cet arrêt"
+              aria-label="Signaler un incident sur cet arrêt"
             >
-              <IconAlert color="#ef4444" />
+              <IconAlert color="var(--danger)" />
             </button>
           </div>
         )}
@@ -383,11 +385,11 @@ export default function ChauffeurTourneePage() {
         {tourneeTerminee && (
           <span style={{
             display: "inline-flex", alignItems: "center", gap: 5,
-            marginTop: 8, background: "rgba(76,175,80,0.12)",
-            border: "1px solid rgba(76,175,80,0.25)", color: "#4caf50",
+            marginTop: 8, background: "color-mix(in srgb, var(--success) 12%, transparent)",
+            border: "1px solid color-mix(in srgb, var(--success) 25%, transparent)", color: "var(--success)",
             borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 600,
           }}>
-            <IconCheck color="#4caf50" size={13} /> Tournée terminée
+            <IconCheck color="var(--success)" size={13} /> Tournée terminée
           </span>
         )}
       </div>
@@ -400,7 +402,7 @@ export default function ChauffeurTourneePage() {
       {tourneePlanifiee && (
         <div className="chauffeur__demarrer">
           {demarrerError && (
-            <div style={{ color: "#ef4444", fontSize: 12, marginBottom: 8 }}>
+            <div style={{ color: "var(--danger)", fontSize: 12, marginBottom: 8 }}>
               {demarrerError}
             </div>
           )}
@@ -421,18 +423,18 @@ export default function ChauffeurTourneePage() {
           <div
             className="chauffeur__gps-icon"
             style={{
-              background: gpsOn ? "rgba(76,175,80,0.2)"  : "var(--overlay-5)",
-              border    : `1.5px solid ${gpsOn ? "rgba(76,175,80,0.4)" : "var(--overlay-8)"}`,
-              boxShadow : gpsOn ? "0 0 20px rgba(76,175,80,0.2)" : "none",
+              background: gpsOn ? "color-mix(in srgb, var(--success) 20%, transparent)"  : "var(--overlay-5)",
+              border    : `1.5px solid ${gpsOn ? "color-mix(in srgb, var(--success) 40%, transparent)" : "var(--overlay-8)"}`,
+              boxShadow : gpsOn ? "0 0 20px color-mix(in srgb, var(--success) 20%, transparent)" : "none",
             }}
           >
-            <IconGps color={gpsOn ? "#4caf50" : "#6b84a3"} />
+            <IconGps color={gpsOn ? "var(--success)" : "#6b84a3"} />
           </div>
           <div>
             <div className="chauffeur__gps-title">Suivi GPS automatique</div>
             <div
               className="chauffeur__gps-desc"
-              style={{ color: gpsOn ? "#4caf50" : "#6b84a3" }}
+              style={{ color: gpsOn ? "var(--success)" : "#6b84a3" }}
             >
               {gpsOn
                 ? "Actif — détection automatique des arrêts"
@@ -445,8 +447,11 @@ export default function ChauffeurTourneePage() {
         {/* Toggle switch */}
         <button
           className="toggle-switch"
-          style={{ background: gpsOn ? "#4caf50" : "var(--overlay-10)" }}
+          style={{ background: gpsOn ? "var(--success)" : "var(--overlay-10)" }}
           onClick={() => setGpsOn(prev => !prev)}
+          role="switch"
+          aria-checked={gpsOn}
+          aria-label="Suivi GPS automatique"
         >
           <div
             className="toggle-switch__thumb"
@@ -488,7 +493,7 @@ export default function ChauffeurTourneePage() {
       {!tourneeCloturee && tousArretsTermines && (
         <div className="chauffeur__terminer">
           {terminerError && (
-            <div style={{ color: "#ef4444", fontSize: 12, marginBottom: 8 }}>
+            <div style={{ color: "var(--danger)", fontSize: 12, marginBottom: 8 }}>
               {terminerError}
             </div>
           )}

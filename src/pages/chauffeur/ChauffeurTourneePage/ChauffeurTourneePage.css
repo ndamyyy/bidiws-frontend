@@ -29,8 +29,8 @@
 }
 
 .chauffeur__gps--on {
-  background: rgba(76, 175, 80, 0.1);
-  border: 1.5px solid rgba(76, 175, 80, 0.3);
+  background: var(--success-dim-10);
+  border: 1.5px solid color-mix(in srgb, var(--success) 30%, transparent);
 }
 
 .chauffeur__gps--off {
@@ -103,7 +103,10 @@
 
 .btn-demarrer-chauffeur {
   width: 100%;
-  background: linear-gradient(135deg, var(--accent-role), #f59e0b);
+  /* Dégradé vers lui-même : var(--accent-role) == #f59e0b pour un
+     chauffeur (voir roleColors.ts), donc rendu identique — mais reste
+     correct si jamais consulté par un autre rôle (admin). */
+  background: linear-gradient(135deg, var(--accent-role), var(--accent-role));
   border: none;
   border-radius: 12px;
   padding: 14px 20px;
@@ -117,12 +120,12 @@
   justify-content: center;
   gap: 9px;
   transition: transform 0.18s, box-shadow 0.18s;
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent-role) 35%, transparent);
 }
 
 .btn-demarrer-chauffeur:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(245, 158, 11, 0.45);
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--accent-role) 45%, transparent);
 }
 
 .btn-demarrer-chauffeur:disabled {
@@ -225,7 +228,7 @@
 }
 
 .c-arret-item__step--done {
-  background: rgba(76, 175, 80, 0.15);
+  background: var(--success-dim-15);
   border: 1.5px solid var(--signal);
 }
 
@@ -269,7 +272,7 @@
 
 /* ─── Bouton valider ─── */
 .btn-valider-chauffeur {
-  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  background: linear-gradient(135deg, var(--success), #2e7d32);
   border: none;
   border-radius: 12px;
   padding: 10px 18px;
@@ -282,13 +285,13 @@
   align-items: center;
   gap: 7px;
   transition: transform 0.18s, box-shadow 0.18s;
-  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--success) 35%, transparent);
   white-space: nowrap;
 }
 
 .btn-valider-chauffeur:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(76, 175, 80, 0.45);
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--success) 45%, transparent);
 }
 
 /* ─── Bouton signaler un incident — distinct de Valider ─── */
@@ -296,8 +299,8 @@
   width: 38px;
   height: 38px;
   flex-shrink: 0;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: var(--danger-dim-10);
+  border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -307,8 +310,8 @@
 }
 
 .btn-incident-chauffeur:hover {
-  background: rgba(239, 68, 68, 0.18);
-  border-color: rgba(239, 68, 68, 0.4);
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 40%, transparent);
 }
 
 /* ─── Formulaire incident (description brève, pas de photo — pas
@@ -319,8 +322,8 @@
   align-items: center;
   gap: 8px;
   padding: 12px;
-  background: rgba(239, 68, 68, 0.05);
-  border: 1px solid rgba(239, 68, 68, 0.15);
+  background: color-mix(in srgb, var(--danger) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 15%, transparent);
   border-radius: 10px;
 }
 
@@ -337,12 +340,12 @@
 }
 
 .c-arret-item__incident-input:focus {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-dim-10);
 }
 
 .btn-incident-submit {
-  background: #ef4444;
+  background: var(--danger);
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
@@ -381,7 +384,7 @@
 
 .c-arret-item__incident-error {
   width: 100%;
-  color: #ef4444;
+  color: var(--danger);
   font-size: 11px;
 }
 
@@ -392,7 +395,7 @@
 }
 
 .btn-terminer-chauffeur {
-  background: linear-gradient(135deg, #1b3a6b, #2196f3);
+  background: linear-gradient(135deg, #1b3a6b, var(--info));
   border: none;
   border-radius: 12px;
   padding: 12px 28px;
@@ -402,12 +405,12 @@
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.18s, box-shadow 0.18s;
-  box-shadow: 0 4px 16px rgba(33, 150, 243, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--info) 35%, transparent);
 }
 
 .btn-terminer-chauffeur:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(33, 150, 243, 0.45);
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--info) 45%, transparent);
 }
 
 .btn-terminer-chauffeur:disabled {

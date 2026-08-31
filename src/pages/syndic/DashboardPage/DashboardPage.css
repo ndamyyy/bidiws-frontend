@@ -42,7 +42,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #4caf50;
+  background: var(--success);
   animation: livePulse 1.4s infinite;
 }
 
@@ -213,9 +213,9 @@
   left: 0;
   height: 100%;
   border-radius: 4px;
-  background: linear-gradient(90deg, #1b3a6b, #4caf50);
+  background: linear-gradient(90deg, #1b3a6b, var(--success));
   transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--success) 30%, transparent);
 }
 
 .truck-route__stop {
@@ -229,9 +229,9 @@
 }
 
 .truck-route__stop--done {
-  background: #4caf50;
+  background: var(--success);
   border: 2px solid var(--signal);
-  box-shadow: 0 0 10px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--success) 40%, transparent);
 }
 
 .truck-route__stop--pending {
@@ -332,7 +332,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #4caf50;
+  background: var(--success);
   flex-shrink: 0;
   animation: livePulse 1.4s infinite;
 }

@@ -105,7 +105,7 @@
 
 .admin-affectations__submit {
   padding: 10px 22px;
-  background: linear-gradient(135deg, var(--signal), #2ECC71);
+  background: var(--signal-gradient);
   border: none;
   border-radius: var(--radius-md);
   color: var(--text-inverse);
@@ -172,12 +172,12 @@
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  border: 1px solid rgba(239,68,68,0.3);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
   background: var(--overlay-6);
-  color: #ef4444;
+  color: var(--danger);
   transition: all 0.18s;
 }
 .admin-affectation-row__action:hover:not(:disabled) {
-  background: rgba(239,68,68,0.1);
+  background: var(--danger-dim-10);
 }
 .admin-affectation-row__action:disabled { opacity: 0.5; cursor: not-allowed; }

@@ -99,13 +99,18 @@
   color: var(--text-inverse);
 }
 
-.sidebar__user-avatar--syndic    { background: #1b3a6b; color: #fff; }
-.sidebar__user-avatar--gardien   { background: #4caf50; color: #fff; }
-.sidebar__user-avatar--chauffeur { background: #f59e0b; color: var(--text-inverse); }
-.sidebar__user-avatar--habitant  { background: #6b84a3; color: #fff; }
-.sidebar__user-avatar--admin     { background: #ef4444; color: #fff; }
-.sidebar__user-avatar--mairie    { background: #1b3a6b; color: #fff; }
-.sidebar__user-avatar--bailleur  { background: #1b3a6b; color: #fff; }
+/* Fond : var(--accent-role) partout — l'avatar est toujours celui de
+   l'utilisateur CONNECTÉ, donc toujours la même teinte que son propre
+   --accent-role (posé par Layout depuis roleColors.ts). Les 7 règles
+   par rôle ne restent que pour la couleur de texte, qui elle varie
+   réellement (texte sombre sur le orange chauffeur, clair ailleurs). */
+.sidebar__user-avatar--syndic    { background: var(--accent-role); color: #fff; }
+.sidebar__user-avatar--gardien   { background: var(--accent-role); color: #fff; }
+.sidebar__user-avatar--chauffeur { background: var(--accent-role); color: var(--text-inverse); }
+.sidebar__user-avatar--habitant  { background: var(--accent-role); color: #fff; }
+.sidebar__user-avatar--admin     { background: var(--accent-role); color: #fff; }
+.sidebar__user-avatar--mairie    { background: var(--accent-role); color: #fff; }
+.sidebar__user-avatar--bailleur  { background: var(--accent-role); color: #fff; }
 
 .sidebar__user-info {
   flex: 1;
@@ -172,7 +177,7 @@
 .sidebar__nav-item--active {
   color: var(--signal);
   font-weight: 600;
-  background: rgba(76, 175, 80, 0.1);
+  background: var(--success-dim-10);
 }
 
 .sidebar__nav-item--active::before {
@@ -183,12 +188,12 @@
   bottom: 20%;
   width: 3px;
   border-radius: 0 3px 3px 0;
-  background: #4caf50;
+  background: var(--success);
 }
 
 .sidebar__nav-badge {
   margin-left: auto;
-  background: #ef4444;
+  background: var(--danger);
   color: #fff;
   border-radius: 10px;
   padding: 1px 7px;
@@ -225,7 +230,7 @@
 }
 
 .sidebar__logout:hover {
-  background: rgba(239, 68, 68, 0.1);
+  background: var(--danger-dim-10);
   color: var(--critical);
 }
 
@@ -247,7 +252,7 @@
 }
 
 .sidebar__ws-dot--connected {
-  background: #4caf50;
+  background: var(--success);
   animation: wsPulse 2s infinite;
 }
 

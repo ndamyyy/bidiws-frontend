@@ -78,7 +78,7 @@
 
 .admin-appareils-iot__reveal-copy {
   padding: 9px 18px;
-  background: linear-gradient(135deg, var(--signal), #2ECC71);
+  background: var(--signal-gradient);
   border: none;
   border-radius: var(--radius-md);
   color: var(--text-inverse);
@@ -176,7 +176,7 @@
 
 .admin-appareils-iot__submit {
   padding: 10px 22px;
-  background: linear-gradient(135deg, var(--signal), #2ECC71);
+  background: var(--signal-gradient);
   border: none;
   border-radius: var(--radius-md);
   color: var(--text-inverse);
@@ -245,14 +245,14 @@
   white-space: nowrap;
 }
 .admin-appareil-iot-row__statut--actif {
-  background: rgba(76,175,80,0.15);
-  color: #4caf50;
-  border: 1px solid #4caf5044;
+  background: var(--success-dim-15);
+  color: var(--success);
+  border: 1px solid color-mix(in srgb, var(--success) 27%, transparent);
 }
 .admin-appareil-iot-row__statut--inactif {
-  background: rgba(107,132,163,0.12);
-  color: #6b84a3;
-  border: 1px solid #6b84a344;
+  background: color-mix(in srgb, var(--neutral) 12%, transparent);
+  color: var(--neutral);
+  border: 1px solid color-mix(in srgb, var(--neutral) 27%, transparent);
 }
 
 .admin-appareil-iot-row__action {
@@ -276,10 +276,10 @@
 }
 
 .admin-appareil-iot-row__action--desactiver {
-  border: 1px solid rgba(239,68,68,0.3);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
   background: var(--overlay-6);
-  color: #ef4444;
+  color: var(--danger);
 }
 .admin-appareil-iot-row__action--desactiver:hover:not(:disabled) {
-  background: rgba(239,68,68,0.1);
+  background: var(--danger-dim-10);
 }

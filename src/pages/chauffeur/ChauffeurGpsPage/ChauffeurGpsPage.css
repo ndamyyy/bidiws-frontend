@@ -136,9 +136,9 @@
 }
 
 .chauffeur-gps__marker--done {
-  background: rgba(76,175,80,0.2);
-  border: 2px solid #4caf50;
-  color: #4caf50;
+  background: color-mix(in srgb, var(--success) 20%, transparent);
+  border: 2px solid var(--success);
+  color: var(--success);
 }
 
 .chauffeur-gps__marker--current {
@@ -169,7 +169,7 @@
 }
 
 .chauffeur-gps__line--done {
-  background: #4caf50;
+  background: var(--success);
 }
 
 .chauffeur-gps__item-content {

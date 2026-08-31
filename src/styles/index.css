@@ -37,23 +37,46 @@
   --signal-dim-20:  rgba(57, 255, 140, 0.20);
   --signal-dim-40:  rgba(57, 255, 140, 0.40);
   --signal-glow:    0 0 40px rgba(57, 255, 140, 0.15);
+  /* Dégradé de bouton primaire — chaîne identique dupliquée telle
+     quelle dans 12+ fichiers avant centralisation ici. */
+  --signal-gradient: linear-gradient(135deg, var(--signal), #2ECC71);
 
   /* ── Accent secondaire par rôle ──
      Repose sur --signal par défaut ; Layout la redéfinit avec la
      couleur du rôle connecté (voir src/constants/roleColors.ts) dès
      qu'un utilisateur est chargé. --signal reste l'accent principal
      de la marque partout — --accent-role n'est qu'un complément
-     discret, appliqué sur des détails précis (pas une refonte). */
-  --accent-role:    var(--signal);
+     discret, appliqué sur des détails précis (pas une refonte).
+     --accent-role-dim : variante translucide dérivée via color-mix(),
+     pas précalculée par rôle — s'ajuste automatiquement à la couleur
+     posée par Layout, sans jeu de valeurs à maintenir par rôle. Un
+     site qui a besoin d'une autre opacité que ce défaut (12%) peut
+     toujours écrire son propre color-mix(var(--accent-role) X%, …). */
+  --accent-role:      var(--signal);
+  --accent-role-dim:  color-mix(in srgb, var(--accent-role) 12%, transparent);
 
   /* ── Data ── */
   --data:           #5B6CFF;
   --data-dim-15:    rgba(91, 108, 255, 0.15);
-  
+
   /* ── Alertes ── */
   --alert:          #FFB020;
   --critical:       #FF4F64;
-  
+
+  /* ── Statuts récurrents (hors palette Signal/Data/Alertes/Critical) ──
+     #4caf50 et #ef4444 étaient dupliqués en dur dans des dizaines de
+     fichiers (vert "confirmé/terminé", rouge "incident/danger" —
+     distincts de --signal et --critical, dont les teintes sont
+     différentes) avant d'être centralisés ici. */
+  --success:        #4caf50;
+  --success-dim-10: rgba(76, 175, 80, 0.10);
+  --success-dim-15: rgba(76, 175, 80, 0.15);
+  --danger:         #ef4444;
+  --danger-dim-10:  rgba(239, 68, 68, 0.10);
+  --danger-dim-15:  rgba(239, 68, 68, 0.15);
+  --info:           #2196f3;
+  --neutral:        #6b84a3;
+
   /* ── Texte ── */
   --text-primary:   #EDF2FB;
   --text-secondary: #8E9BB5;

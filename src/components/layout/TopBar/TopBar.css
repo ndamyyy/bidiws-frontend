@@ -155,7 +155,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #4caf50;
+  background: var(--success);
   animation: livePulse 1.4s infinite;
 }
 
