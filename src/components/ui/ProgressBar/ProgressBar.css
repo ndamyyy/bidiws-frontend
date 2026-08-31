@@ -1,0 +1,45 @@
+/* ============================================================
+   BIDIWS — ProgressBar
+   Fichier : src/components/ui/ProgressBar/ProgressBar.css
+   ============================================================ */
+
+.ui-progress__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.ui-progress__label {
+  color: var(--text-secondary);
+}
+
+.ui-progress__percent {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.ui-progress__track {
+  height: 4px;
+  background: var(--overlay-6);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.ui-progress__fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width var(--t-slow) var(--ease-smooth);
+}
+
+.ui-progress__fill--signal {
+  background: linear-gradient(90deg, var(--signal), var(--data));
+}
+.ui-progress__fill--success {
+  background: var(--success);
+}
+.ui-progress__fill--accent-role {
+  background: linear-gradient(90deg, var(--accent-role), var(--success));
+}

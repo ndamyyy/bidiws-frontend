@@ -1,7 +1,12 @@
 // src/components/ui/LoadingSpinner/LoadingSpinner.tsx
 import { motion } from "framer-motion";
+import { Spinner } from "../Spinner/Spinner";
 import "./LoadingSpinner.css";
 
+// Fallback de route/Suspense pleine page — l'anneau lui-même vient de
+// Spinner (primitive réutilisable, voir components/ui/Spinner) plutôt
+// que d'être redessiné ici ; LoadingSpinner n'ajoute que la mise en
+// page pleine page + le texte, inchangés pour les appelants existants.
 export const LoadingSpinner = () => {
   return (
     <motion.div
@@ -12,9 +17,7 @@ export const LoadingSpinner = () => {
       transition={{ duration: 0.2 }}
     >
       <div className="loading-spinner__container">
-        <div className="loading-spinner__ring">
-          <div className="loading-spinner__ring-inner"></div>
-        </div>
+        <Spinner size="lg" />
         <motion.p
           className="loading-spinner__text"
           initial={{ opacity: 0 }}
