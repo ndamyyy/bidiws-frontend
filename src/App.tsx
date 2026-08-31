@@ -4,7 +4,7 @@
 // ============================================================
 
 import { Suspense, lazy } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthContext";
@@ -77,13 +77,17 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
+      {/* HashRouter plutôt que BrowserRouter : requis pour Capacitor
+          (scheme capacitor://, pas de vrai serveur pour réécrire les
+          routes profondes côté WebView — un reload sur /admin/users
+          casserait avec BrowserRouter, fonctionne avec le #/ du hash). */}
+      <HashRouter>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <AppShell />
           </AuthProvider>
         </QueryClientProvider>
-      </BrowserRouter>
+      </HashRouter>
     </ThemeProvider>
   );
 }
