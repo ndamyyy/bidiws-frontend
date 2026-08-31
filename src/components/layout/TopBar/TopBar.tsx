@@ -132,6 +132,7 @@ export default function TopBar({
         className="topbar__menu-btn"
         onClick={onMenuClick}
         title={isSidebarOpen ? "Fermer le menu" : "Ouvrir le menu"}
+        aria-label={isSidebarOpen ? "Fermer le menu" : "Ouvrir le menu"}
       >
         <IconMenu />
       </button>
@@ -161,6 +162,7 @@ export default function TopBar({
           className="topbar__theme-btn"
           onClick={() => setTheme(NEXT_THEME[theme])}
           title={`Thème : ${THEME_LABEL[theme]} — cliquer pour changer`}
+          aria-label={`Basculer le thème (actuellement ${THEME_LABEL[theme]})`}
         >
           {themeResolu === "dark" ? <IconMoon /> : <IconSun />}
         </button>
@@ -171,6 +173,7 @@ export default function TopBar({
             className="topbar__notif-btn"
             onClick={() => navigate(notifRoute)}
             title="Voir les notifications"
+            aria-label={nonLuesCount > 0 ? `Voir les notifications (${nonLuesCount} non lues)` : "Voir les notifications"}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>

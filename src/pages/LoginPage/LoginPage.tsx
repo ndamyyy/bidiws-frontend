@@ -336,6 +336,7 @@ export default function LoginPage() {
                   onClick={() => setShowMotDePasse((v) => !v)}
                   tabIndex={-1}
                   title={showMotDePasse ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                  aria-label={showMotDePasse ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                 >
                   {showMotDePasse ? <IconEyeOff color="#6b84a3" /> : <IconEye color="#6b84a3" />}
                 </button>

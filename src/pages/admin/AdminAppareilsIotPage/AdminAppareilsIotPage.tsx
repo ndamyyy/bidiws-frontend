@@ -86,7 +86,11 @@ const CleApiReveal = ({
         </div>
       )}
       <div className="admin-appareils-iot__reveal-actions">
-        <button className="admin-appareils-iot__reveal-copy" onClick={handleCopy}>
+        <button
+          className="admin-appareils-iot__reveal-copy"
+          onClick={handleCopy}
+          aria-label={copied ? "Clé API copiée" : "Copier la clé API"}
+        >
           {copied ? "Copiée ✓" : "Copier"}
         </button>
         <button className="admin-appareils-iot__reveal-close" onClick={onClose}>

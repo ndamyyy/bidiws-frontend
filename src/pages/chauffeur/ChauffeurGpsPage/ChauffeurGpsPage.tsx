@@ -193,6 +193,9 @@ export default function ChauffeurGpsPage() {
           className="toggle-switch"
           style={{ background: gpsOn ? "#4caf50" : "var(--overlay-10)" }}
           onClick={() => setGpsOn(prev => !prev)}
+          role="switch"
+          aria-checked={gpsOn}
+          aria-label="Suivi GPS automatique"
         >
           <div className="toggle-switch__thumb" style={{ left: gpsOn ? 28 : 4 }} />
         </button>

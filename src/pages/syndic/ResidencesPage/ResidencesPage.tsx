@@ -195,6 +195,7 @@ const CalendrierSection = ({ residenceId }: { residenceId: number }) => {
                 onClick={() => handleDesactiver(c.id)}
                 disabled={pendingIds.has(c.id)}
                 title="Désactiver ce passage"
+                aria-label={`Désactiver le passage ${c.typeCollecteLibelle}`}
               >
                 {pendingIds.has(c.id) ? "…" : "Désactiver"}
               </button>
@@ -342,6 +343,7 @@ const ConteneursSection = ({ residenceId }: { residenceId: number }) => {
                 onClick={() => handleDesactiver(c.id)}
                 disabled={pendingIds.has(c.id)}
                 title="Désactiver ce conteneur"
+                aria-label={`Désactiver le conteneur ${c.code}`}
               >
                 {pendingIds.has(c.id) ? "…" : "Désactiver"}
               </button>
@@ -498,7 +500,7 @@ const AjouterResidenceModal = ({ onClose }: { onClose: () => void }) => {
       <div className="residence-modal__card" onClick={(e) => e.stopPropagation()}>
         <div className="residence-modal__header">
           <h2 className="residence-modal__title">Ajouter une résidence</h2>
-          <button className="residence-modal__close" onClick={onClose} title="Fermer">×</button>
+          <button className="residence-modal__close" onClick={onClose} title="Fermer" aria-label="Fermer">×</button>
         </div>
 
         <form onSubmit={handleSubmit}>

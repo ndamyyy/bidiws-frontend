@@ -170,8 +170,12 @@ export default function Sidebar({
         </div>
       </button>
 
-      {/* ── Navigation ── */}
-      <nav className="sidebar__nav">
+      {/* ── Navigation ──
+          <nav> porte déjà implicitement le rôle "navigation" — role
+          explicite tout de même pour lever toute ambiguïté pour les
+          lecteurs d'écran, plus aria-label vu qu'il pourrait y avoir
+          d'autres repères de navigation sur la page. */}
+      <nav className="sidebar__nav" role="navigation" aria-label="Navigation principale">
         <div className="sidebar__nav-label">Navigation</div>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -179,6 +183,7 @@ export default function Sidebar({
             <button
               key={item.path}
               className={`sidebar__nav-item ${isActive ? "sidebar__nav-item--active" : ""}`}
+              aria-current={isActive ? "page" : undefined}
               onClick={() => {
                 navigate(item.path);
                 // Referme le tiroir mobile après sélection, mais pas la

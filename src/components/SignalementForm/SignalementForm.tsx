@@ -130,7 +130,7 @@ export default function SignalementForm({
       <div className="signalement-modal__card" onClick={(e) => e.stopPropagation()}>
         <div className="signalement-modal__header">
           <h2 className="signalement-modal__title">Signaler un problème</h2>
-          <button className="signalement-modal__close" onClick={onClose} title="Fermer">×</button>
+          <button className="signalement-modal__close" onClick={onClose} title="Fermer" aria-label="Fermer">×</button>
         </div>
 
         {succes ? (
