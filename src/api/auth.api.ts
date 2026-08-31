@@ -13,7 +13,7 @@ import type { AuthResponse, LoginRequest, RegisterRequest, Utilisateur } from ".
 
 export const login = async (data: LoginRequest): Promise<AuthResponse> => {
   const response = await apiClient.post<AuthResponse>("/auth/login", data);
-  setToken(response.data.token);
+  await setToken(response.data.token);
   return response.data;
 };
 
@@ -30,11 +30,11 @@ export const register = async (data: RegisterRequest): Promise<Utilisateur> => {
 
 // ─────────────────────────────────────────
 // LOGOUT
-// Côté frontend uniquement — on nettoie le localStorage
+// Côté frontend uniquement — on nettoie le stockage local
 // ─────────────────────────────────────────
 
-export const logout = (): void => {
-  removeToken();
+export const logout = async (): Promise<void> => {
+  await removeToken();
   localStorage.removeItem("bidiws_user");
 };
 

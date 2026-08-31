@@ -13,7 +13,7 @@ import {
 import { Client, type IMessage, type StompSubscription } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { useAuth } from "../hooks/useAuth";
-import { getToken } from "../api/axios";
+import { getToken } from "../api/tokenStorage";
 import { WebSocketContext, type WebSocketContextType } from "./WebSocketContextValue";
 
 // ─────────────────────────────────────────
@@ -66,43 +66,57 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
   }, []);
 
   // ── Connexion / déconnexion du client STOMP ──
+  // getToken() est asynchrone (voir tokenStorage.ts) — le client STOMP
+  // ne peut donc plus être construit de façon synchrone dans l'effet ;
+  // `cancelled` évite d'activer un client après un démontage survenu
+  // pendant l'attente du token.
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    const token = getToken();
-    const client = new Client({
-      webSocketFactory: () => new SockJS(WS_URL),
-      connectHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-      reconnectDelay: 5000,
-
-      onConnect: () => {
-        setConnected(true);
-        flushPendingSubscriptions(client);
-      },
-
-      onDisconnect: () => {
-        setConnected(false);
-        // Les abonnements STOMP ne survivent pas à la reconnexion :
-        // on les marque inactifs pour qu'ils soient rejoués au prochain onConnect
-        subscriptionsRef.current.forEach((entry) => {
-          entry.active = null;
-        });
-      },
-
-      onStompError: (frame) => {
-        console.error("BIDIWS WS — Erreur STOMP :", frame);
-        setConnected(false);
-      },
-    });
-
-    client.activate();
-    clientRef.current = client;
+    let cancelled = false;
+    let client: Client | null = null;
     const subscriptions = subscriptionsRef.current;
 
+    const connect = async (): Promise<void> => {
+      const token = await getToken();
+      if (cancelled) return;
+
+      client = new Client({
+        webSocketFactory: () => new SockJS(WS_URL),
+        connectHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+        reconnectDelay: 5000,
+
+        onConnect: () => {
+          setConnected(true);
+          flushPendingSubscriptions(client as Client);
+        },
+
+        onDisconnect: () => {
+          setConnected(false);
+          // Les abonnements STOMP ne survivent pas à la reconnexion :
+          // on les marque inactifs pour qu'ils soient rejoués au prochain onConnect
+          subscriptionsRef.current.forEach((entry) => {
+            entry.active = null;
+          });
+        },
+
+        onStompError: (frame) => {
+          console.error("BIDIWS WS — Erreur STOMP :", frame);
+          setConnected(false);
+        },
+      });
+
+      client.activate();
+      clientRef.current = client;
+    };
+
+    connect();
+
     return () => {
-      client.deactivate();
+      cancelled = true;
+      client?.deactivate();
       clientRef.current = null;
       setConnected(false);
       subscriptions.forEach((entry) => {

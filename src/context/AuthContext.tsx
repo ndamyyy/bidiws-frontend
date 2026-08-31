@@ -11,7 +11,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { login as apiLogin, logout as apiLogout, getMe } from "../api/auth.api";
-import { getToken, removeToken } from "../api/axios";
+import { getToken, removeToken } from "../api/tokenStorage";
 import { redirectByRole } from "../utils/redirectByRole";
 import type { AuthUser, LoginRequest, Utilisateur } from "../types";
 import { AuthContext, type AuthContextType } from "./AuthContextValue";
@@ -47,7 +47,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const revaliderSession = async (): Promise<void> => {
-      const token = getToken();
+      const token = await getToken();
       if (!token) return;
 
       try {
@@ -56,7 +56,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         localStorage.setItem("bidiws_user", JSON.stringify(utilisateur));
         setAuthUser({ token, utilisateur });
       } catch {
-        removeToken();
+        await removeToken();
         localStorage.removeItem("bidiws_user");
       }
     };
@@ -94,15 +94,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [navigate]);
 
   // ── Logout ──
-  const logout = useCallback((redirectTo: string = "/login"): void => {
-    apiLogout();
+  const logout = useCallback(async (redirectTo: string = "/login"): Promise<void> => {
+    await apiLogout();
     setAuthUser(null);
     navigate(redirectTo);
   }, [navigate]);
 
   // ── Rafraîchir l'utilisateur courant (après modification du profil) ──
   const refreshUtilisateur = useCallback(async (): Promise<void> => {
-    const token = getToken();
+    const token = await getToken();
     if (!token) return;
     const utilisateur = await getMe();
     localStorage.setItem("bidiws_user", JSON.stringify(utilisateur));

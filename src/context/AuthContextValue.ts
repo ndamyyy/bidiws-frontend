@@ -23,7 +23,7 @@ export interface AuthContextType {
   // reprendre la main sur la destination post-déconnexion — voir
   // AdminLoginPage, qui redirige vers /admin/login le temps d'afficher
   // un message avant de renvoyer vers /login lui-même.
-  logout         : (redirectTo?: string) => void;
+  logout         : (redirectTo?: string) => Promise<void>;
   refreshUtilisateur: () => Promise<void>;
 }
 
