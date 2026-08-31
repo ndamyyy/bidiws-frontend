@@ -1,0 +1,29 @@
+/* ============================================================
+   BIDIWS — Card
+   Fichier : src/components/ui/Card/Card.css
+   ============================================================ */
+
+.ui-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px 18px;
+  transition: all var(--t-base) var(--ease-smooth);
+}
+
+@media (min-width: 768px) {
+  .ui-card { padding: 22px 24px; }
+}
+
+.ui-card--compact {
+  padding: 14px 16px;
+}
+
+.ui-card--interactive {
+  cursor: pointer;
+}
+.ui-card--interactive:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-default);
+  box-shadow: var(--shadow-card), var(--shadow-glow);
+}

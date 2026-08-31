@@ -1,0 +1,363 @@
+/* ============================================================
+   BIDIWS — AdminDashboardPage
+   Fichier : src/pages/admin/AdminDashboardPage/AdminDashboardPage.css
+   Structure dupliquée de DashboardPage.css (syndic) — classes préfixées
+   admin- pour éviter toute collision globale avec .stat-card/.tournee-item/
+   .truck-route/.activity-item, qui existent déjà (non namespacées) dans
+   DashboardPage.css et styles/index.css. Pas de composant partagé entre
+   les deux pages pour l'instant (décision explicite).
+   ============================================================ */
+
+/* ─── En-tête ─── */
+.admin-dashboard__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+}
+
+.admin-dashboard__title {
+  font-family: "Syne", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.admin-dashboard__subtitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.admin-dashboard__live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--signal);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.admin-dashboard__live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--signal);
+  animation: adminLivePulse 1.4s infinite;
+}
+
+@keyframes adminLivePulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ─── Grille stats ─── */
+.admin-dashboard__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.admin-stat-card {
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+  padding: 22px;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.25s,
+              background 0.2s;
+  animation: adminStatFadeUp 0.4s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.admin-stat-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--overlay-14);
+  background: var(--overlay-7);
+}
+
+.admin-stat-card:nth-child(1) { animation-delay: 0.05s; }
+.admin-stat-card:nth-child(2) { animation-delay: 0.10s; }
+.admin-stat-card:nth-child(3) { animation-delay: 0.15s; }
+.admin-stat-card:nth-child(4) { animation-delay: 0.20s; }
+
+@keyframes adminStatFadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.admin-stat-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.admin-stat-card__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-stat-card__period {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.admin-stat-card__value {
+  font-family: "Syne", sans-serif;
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 6px;
+  animation: adminCountUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes adminCountUp {
+  from { opacity: 0; transform: scale(0.7); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.admin-stat-card__label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ─── Tournées du jour ─── */
+.admin-dashboard__tournees {
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  animation: adminStatFadeUp 0.4s 0.2s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.admin-dashboard__section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.admin-dashboard__section-title {
+  font-family: "Syne", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.admin-dashboard__empty {
+  padding: 8px 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* ─── Tournée item ─── */
+.admin-tournee-item {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--overlay-6);
+}
+
+.admin-tournee-item:last-child {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+/* Accent de rôle (--accent-role) sur la tournée EN_COURS — détail
+   discret, --signal reste l'accent principal de la marque (compteur,
+   route du camion, etc. plus bas, inchangés). */
+.admin-tournee-item--active {
+  border-left: 3px solid var(--accent-role);
+  padding-left: 12px;
+}
+
+.admin-tournee-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.admin-tournee-item__name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.admin-tournee-item__meta {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+.admin-tournee-item__count {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--signal);
+}
+
+/* ─── Barre de progression camion ─── */
+.admin-truck-route {
+  position: relative;
+  height: 52px;
+}
+
+.admin-truck-route__track {
+  position: absolute;
+  top: 20px;
+  left: 2%;
+  right: 2%;
+  height: 4px;
+  background: var(--overlay-6);
+  border-radius: 4px;
+}
+
+.admin-truck-route__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #1b3a6b, var(--signal));
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
+}
+
+.admin-truck-route__stop {
+  position: absolute;
+  top: -6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  transition: all 0.4s ease;
+}
+
+.admin-truck-route__stop--done {
+  background: var(--signal);
+  border: 2px solid var(--signal);
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.4);
+}
+
+.admin-truck-route__stop--pending {
+  background: var(--overlay-6);
+  border: 2px solid var(--overlay-10);
+}
+
+.admin-truck-route__truck {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  transition: left 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.admin-truck-route__labels {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.admin-truck-route__label-left {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.admin-truck-route__label-right {
+  font-size: 11px;
+  color: var(--signal);
+  font-weight: 600;
+}
+
+/* ─── Signalements récents ─── */
+.admin-dashboard__signalements {
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: adminStatFadeUp 0.4s 0.25s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.admin-dashboard__signalements-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--overlay-6);
+}
+
+.admin-dashboard__see-all {
+  background: none;
+  border: none;
+  color: var(--signal);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+.admin-dashboard__see-all:hover {
+  text-decoration: underline;
+}
+
+.admin-signalement-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--overlay-4);
+  transition: background 0.18s;
+}
+
+.admin-signalement-item:last-child {
+  border-bottom: none;
+}
+
+.admin-signalement-item:hover {
+  background: var(--overlay-3);
+}
+
+.admin-signalement-item__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-signalement-item__content {
+  flex: 1;
+}
+
+.admin-signalement-item__msg {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.admin-signalement-item__meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}

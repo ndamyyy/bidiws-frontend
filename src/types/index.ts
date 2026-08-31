@@ -77,6 +77,11 @@ export type Plateforme =
 // ENTITÉS PRINCIPALES
 // ─────────────────────────────────────────
 
+// Forme confirmée directement depuis le DTO Java (UtilisateurResponseDto,
+// lu en construisant GET /utilisateurs/moi cette session) : (Long id,
+// String email, String nom, String prenom, String telephone, Role role,
+// Boolean actif, Long villeId) — exactement ces 8 champs, ni createdAt
+// ni updatedAt.
 export interface Utilisateur {
   id          : number;
   nom         : string;
@@ -85,8 +90,7 @@ export interface Utilisateur {
   telephone  ?: string;
   role        : Role;
   actif       : boolean;
-  createdAt   : string;
-  updatedAt   : string;
+  villeId    ?: number;
 }
 
 export interface Ville {
@@ -97,29 +101,37 @@ export interface Ville {
   actif       : boolean;
 }
 
+// villeNom confirmé en conditions réelles (GET /zones), absent
+// jusqu'ici — ajouté en plus des champs déjà là.
 export interface Zone {
   id          : number;
   villeId     : number;
+  villeNom   ?: string;
   nom         : string;
   code        : string;
   description?: string;
 }
 
+// Forme plate confirmée contre le vrai ResidenceResponseDto (testé en
+// Postman) : villeId/villeNom et zoneId/zoneNom dénormalisés (pas
+// d'objets Ville/Zone imbriqués, pas de champ "code" de zone). Ni
+// gardiens ni createdAt dans cette réponse — les gardiens sont une
+// relation séparée (GET /residence-gardiens/residence/:id).
 export interface Residence {
   id              : number;
   nom             : string;
   adresse         : string;
   complement     ?: string;
   codePostal      : string;
-  ville           : Ville;
-  zone           ?: Zone;
+  villeId         : number;
+  villeNom        : string;
+  zoneId         ?: number;
+  zoneNom        ?: string;
   latitude       ?: number;
   longitude      ?: number;
   rayonDetection  : number;
   nbConteneurs    : number;
   actif           : boolean;
-  createdAt       : string;
-  gardiens        : Utilisateur[];
 }
 
 export interface TypeCollecte {
@@ -130,15 +142,27 @@ export interface TypeCollecte {
   icone  ?: string;
 }
 
+// Forme plate supposée par analogie avec Tournee/Arret/ResidenceGardien
+// (dénormalisation confirmée sur ces trois-là, jamais en défaut cette
+// session) — mais AUCUNE donnée peuplée disponible pour vérifier
+// celle-ci précisément (résidence de test sans calendrier renseigné,
+// GET /calendriers-collecte/residence/1 confirmé 200 mais []). La
+// convention de jourSemaine (1=lundi...7=dimanche, ISO-8601/
+// java.time.DayOfWeek) est un choix motivé par la stack Spring Boot du
+// projet, PAS une valeur vérifiée — à confirmer dès qu'une résidence
+// avec calendrier réel sera testable.
 export interface CalendrierCollecte {
-  id              : number;
-  residenceId     : number;
-  typeCollecte    : TypeCollecte;
-  jourSemaine     : number;       // 1=Lundi ... 7=Dimanche
-  heureEstimee   ?: string;       // "HH:mm"
-  actif           : boolean;
+  id                  : number;
+  residenceId         : number;
+  typeCollecteId      : number;
+  typeCollecteLibelle : string;
+  jourSemaine         : number;   // 1=lundi ... 7=dimanche (ISO-8601, NON vérifié)
+  heureEstimee       ?: string;   // "HH:mm"
+  actif               : boolean;
 }
 
+// Forme confirmée contre CamionResponseDto (backend) : villeId/villeNom
+// dénormalisés (Camion.villeId, migration V4) — absents jusqu'ici.
 export interface Camion {
   id              : number;
   immatriculation : string;
@@ -148,26 +172,117 @@ export interface Camion {
   gpsActif        : boolean;
   capteurBenne    : boolean;
   actif           : boolean;
+  villeId        ?: number;
+  villeNom       ?: string;
 }
 
+// Forme confirmée contre ChauffeurCamionResponseDto (backend) : pas de
+// PK propre exposée (identifiée par la paire chauffeurId/camionId côté
+// API — "terminer" prend les deux en paramètres, pas un id unique).
+export interface ChauffeurCamion {
+  chauffeurId           : number;
+  chauffeurNom          : string;
+  chauffeurPrenom       : string;
+  camionId              : number;
+  camionImmatriculation : string;
+  dateDebut              : string; // "YYYY-MM-DD"
+  dateFin               ?: string; // "YYYY-MM-DD" — absent = affectation active
+}
+
+// Forme confirmée contre ConteneurResponseDto (backend) : residenceId/
+// residenceNom dénormalisés, pas de GET liste à plat (uniquement
+// /conteneurs/residence/:residenceId et /conteneurs/:id).
+export interface Conteneur {
+  id           : number;
+  code         : string;
+  residenceId  : number;
+  residenceNom : string;
+  rfidTag     ?: string;
+  actif        : boolean;
+}
+
+// ─────────────────────────────────────────
+// APPAREILS IOT (capteurs de benne / lecteurs RFID)
+// ─────────────────────────────────────────
+
+export type TypeAppareilIot = "CAPTEUR_BENNE" | "LECTEUR_RFID";
+
+// Forme confirmée contre AppareilIotResponseDto (backend) : ni cleApi
+// ni cleApiHash — la clé n'est jamais renvoyée après la création.
+export interface AppareilIot {
+  id                    : number;
+  identifiantMateriel   : string;
+  typeAppareil          : TypeAppareilIot;
+  conteneurId          ?: number;
+  conteneurCode        ?: string;
+  camionId             ?: number;
+  camionImmatriculation?: string;
+  actif                 : boolean;
+  createdAt             : string;
+}
+
+// Forme confirmée contre AppareilIotRequestDto : conteneurId/camionId
+// tous deux optionnels, au plus un des deux (contrainte appliquée côté
+// service, aucun des deux n'est requis).
+export interface AppareilIotRequest {
+  identifiantMateriel: string;
+  typeAppareil       : TypeAppareilIot;
+  conteneurId       ?: number;
+  camionId          ?: number;
+}
+
+// Forme confirmée contre AppareilIotCreeResponseDto : uniquement ces 3
+// champs, cleApi en clair — renvoyée UNE SEULE FOIS (création ou
+// régénération), jamais récupérable ensuite.
+export interface AppareilIotCreeResponse {
+  id                 : number;
+  identifiantMateriel: string;
+  cleApi             : string;
+}
+
+// Forme plate confirmée contre le vrai TourneeResponseDto (testé en
+// Postman) — le backend dénormalise typeCollecte/camion/chauffeur/zone
+// au lieu de les imbriquer. `createdAt` n'a pas pu être confirmé
+// (absent de l'échantillon vérifié, tentative de retest en session
+// bloquée par des 500 backend sur /tournees) — laissé optionnel par
+// prudence plutôt que deviné. `arrets` conservé tel quel : absent de
+// l'échantillon DTO mais toujours utilisé comme état imbriqué mutable
+// par ChauffeurTourneePage/TourneesPage (mocks) — sortir ce champ du
+// type est un changement plus large que le simple aplatissement demandé
+// ici, à traiter quand ces pages seront débranchées des mocks.
 export interface Tournee {
-  id              : number;
-  dateTournee     : string;       // "YYYY-MM-DD"
-  typeCollecte    : TypeCollecte;
-  camion          : Camion;
-  chauffeur       : Utilisateur;
-  zone           ?: Zone;
-  statut          : StatutTournee;
-  heureDebut     ?: string;
-  heureFin       ?: string;
-  createdAt       : string;
-  arrets          : Arret[];
+  id                    : number;
+  dateTournee           : string;       // "YYYY-MM-DD"
+  typeCollecteId        : number;
+  typeCollecteLibelle   : string;
+  camionId              : number;
+  camionImmatriculation : string;
+  chauffeurId           : number;
+  chauffeurNom          : string;
+  chauffeurPrenom       : string;
+  zoneId               ?: number;
+  zoneNom              ?: string;
+  statut                : StatutTournee;
+  heureDebut           ?: string;
+  heureFin             ?: string;
+  createdAt            ?: string;
+  arrets                 : Arret[];
 }
 
+// Forme plate confirmée contre le vrai backend (GET /arrets/residence/:id
+// testé en session) : residence dénormalisée en residenceId/residenceNom
+// (pas d'objet Residence imbriqué), et createdAt/updatedAt CONFIRMÉS
+// ABSENTS du DTO réel (c'est ce qui faisait planter le tri par createdAt
+// dans GardienHomePage — undefined.localeCompare(...)).
+// residenceAdresse : NON confirmé côté vrai DTO (absent de l'échantillon
+// testé) — gardé en optionnel uniquement pour ne pas casser l'affichage
+// adresse de TourneesPage/ChauffeurTourneePage, qui restent sur mocks.
 export interface Arret {
   id                   : number;
   tourneeId            : number;
-  residence            : Residence;
+  residenceId          : number;
+  residenceNom         : string;
+  residenceAdresse    ?: string;
   ordre                : number;
   statut               : StatutArret;
   heureEstimee        ?: string;
@@ -181,8 +296,20 @@ export interface Arret {
   incident             : boolean;
   descriptionIncident ?: string;
   photoIncidentUrl    ?: string;
-  createdAt            : string;
-  updatedAt            : string;
+}
+
+// Détail d'un bac/conteneur rattaché à un arrêt — forme exacte du
+// backend ArretConteneurResponseDto (vérifiée en conditions réelles,
+// session du 16/08/2026)
+export interface ArretConteneur {
+  id                     : number;
+  conteneurId            : number;
+  conteneurCode          : string;
+  statut                 : 'EN_ATTENTE' | 'EN_APPROCHE' | 'COLLECTE_PROBABLE' | 'COLLECTE_CONFIRMEE' | 'INCIDENT';
+  modeDetection          : 'VALIDATION_CHAUFFEUR' | 'CAPTEUR_BENNE' | 'RFID' | 'GPS_AUTO' | null;
+  scoreConfiance         : number | null;
+  horodatageConfirmation : string | null;
+  niveauRemplissagePct   : number | null;
 }
 
 export interface SignalGps {
@@ -213,19 +340,28 @@ export interface Notification {
   createdAt       : string;
 }
 
+// Forme plate NON confirmée en conditions réelles — GET /signalements
+// renvoie 500 avec les comptes GARDIEN et CHAUFFEUR disponibles cette
+// session (cause à investiguer séparément côté backend, sans rapport
+// avec le typage). Alignée par cohérence sur la convention systématique
+// du reste du projet (Tournee/Arret/Residence/ResidenceGardien, tous
+// confirmés dénormalisés) — à ajuster dès qu'un vrai test sera possible.
 export interface Signalement {
-  id           : number;
-  auteur       : Utilisateur;
-  residence   ?: Residence;
-  arretId     ?: number;
-  type         : TypeSignalement;
-  description ?: string;
-  photoUrl    ?: string;
-  latitude    ?: number;
-  longitude   ?: number;
-  statut       : StatutSignalement;
-  createdAt    : string;
-  resoluAt    ?: string;
+  id             : number;
+  auteurId       : number;
+  auteurNom     ?: string;
+  auteurPrenom  ?: string;
+  residenceId   ?: number;
+  residenceNom  ?: string;
+  arretId       ?: number;
+  type           : TypeSignalement;
+  description   ?: string;
+  photoUrl      ?: string;
+  latitude      ?: number;
+  longitude     ?: number;
+  statut         : StatutSignalement;
+  createdAt      : string;
+  resoluAt      ?: string;
 }
 
 // ─────────────────────────────────────────
@@ -237,13 +373,16 @@ export interface LoginRequest {
   motDePasse : string;
 }
 
+// Pas de champ role : le backend (UtilisateurService.register) assigne
+// toujours HABITANT côté serveur — l'auto-inscription publique ne peut
+// pas choisir un autre rôle (retiré du DTO backend pour empêcher une
+// escalade de privilège).
 export interface RegisterRequest {
   nom        : string;
   prenom     : string;
   email      : string;
   motDePasse : string;
   telephone ?: string;
-  role       : Role;
 }
 
 export interface TourneeRequest {
@@ -254,6 +393,14 @@ export interface TourneeRequest {
   zoneId         ?: number;
 }
 
+export interface ArretRequest {
+  tourneeId       : number;
+  residenceId     : number;
+  ordre           : number;
+  nbConteneurs    : number;
+  typesConteneurs?: string;
+}
+
 export interface ArretValiderRequest {
   modeDetection   : ModeDetection;
   typesConteneurs?: string;
@@ -262,11 +409,13 @@ export interface ArretValiderRequest {
 }
 
 export interface SignalGpsRequest {
+  tourneeId   : number;
   latitude    : number;
   longitude   : number;
   vitesseKmh ?: number;
   cap        ?: number;
   precisionM ?: number;
+  horodatage  : string;
   source      : SourceGps;
 }
 
@@ -275,6 +424,7 @@ export interface SignalementRequest {
   arretId     ?: number;
   type         : TypeSignalement;
   description ?: string;
+  photoUrl    ?: string;
   latitude    ?: number;
   longitude   ?: number;
 }
@@ -284,9 +434,7 @@ export interface SignalementRequest {
 // ─────────────────────────────────────────
 
 export interface AuthResponse {
-  token       : string;
-  type        : string;       // "Bearer"
-  utilisateur : Utilisateur;
+  token : string;
 }
 
 export interface PageResponse<T> {
@@ -305,6 +453,7 @@ export interface ApiError {
   timestamp : string;
   path      : string;
 }
+
 
 // ─────────────────────────────────────────
 // TYPES UTILITAIRES FRONTEND
@@ -337,13 +486,4 @@ export interface PositionCamion {
   longitude : number;
   vitesse   : number;
   horodatage: string;
-}
-
-// Message WebSocket entrant
-export interface WsNotification {
-  type      : TypeNotification;
-  arretId   : number;
-  residenceId: number;
-  message   : string;
-  heure     : string;
 }

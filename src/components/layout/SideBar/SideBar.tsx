@@ -7,7 +7,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/useAuth";
 import { useNotifications } from "../../../hooks/useNotifications";
 import { Role } from "../../../types";
-import "./Sidebar.css";
+import "./SideBar.css";
 import { JSX } from "react/jsx-runtime";
 
 // ─────────────────────────────────────────
@@ -55,8 +55,13 @@ const getNavItems = (role: Role, nonLuesCount: number): NavItem[] => {
       return [
         { label: "Dashboard",     path: "/admin/dashboard",     icon: "grid"  },
         { label: "Utilisateurs",  path: "/admin/users",         icon: "users" },
-        { label: "Tournées",      path: "/syndic/tournees",     icon: "truck" },
+        { label: "Tournées",      path: "/admin/tournees",      icon: "plus"  },
+        { label: "Suivi tournées", path: "/syndic/tournees",    icon: "truck" },
         { label: "Résidences",    path: "/syndic/residences",   icon: "home"  },
+        { label: "Signalements",  path: "/admin/signalements",  icon: "alert" },
+        { label: "Appareils IoT", path: "/admin/appareils-iot", icon: "cpu"   },
+        { label: "Camions",       path: "/admin/camions",       icon: "truck" },
+        { label: "Affectations",  path: "/admin/affectations",  icon: "link"  },
       ];
     default:
       return [];
@@ -93,6 +98,10 @@ const NavIcon = ({ name, active }: { name: string; active: boolean }) => {
     gps:   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>,
     users: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
     logout:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+    plus:  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+    alert: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+    cpu:   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>,
+    link:  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>,
   };
   return icons[name] ?? null;
 };
@@ -101,7 +110,13 @@ const NavIcon = ({ name, active }: { name: string; active: boolean }) => {
 // COMPOSANT
 // ─────────────────────────────────────────
 
-export default function Sidebar() {
+export default function Sidebar({
+  isOpen,
+  onClose,
+}: {
+  isOpen : boolean;
+  onClose: () => void;
+}) {
   const navigate                        = useNavigate();
   const location                        = useLocation();
   const { utilisateur, logout }         = useAuth();
@@ -116,7 +131,9 @@ export default function Sidebar() {
   const avatarClass = `sidebar__user-avatar sidebar__user-avatar--${utilisateur.role.toLowerCase()}`;
 
   return (
-    <aside className="sidebar">
+    <>
+    {isOpen && <div className="sidebar__backdrop" onClick={onClose} />}
+    <aside className={`sidebar ${isOpen ? "sidebar--open" : ""}`}>
 
       {/* ── Logo ── */}
       <div className="sidebar__logo">
@@ -134,7 +151,14 @@ export default function Sidebar() {
       </div>
 
       {/* ── Profil ── */}
-      <div className="sidebar__user">
+      <button
+        className="sidebar__user"
+        onClick={() => {
+          navigate("/profil");
+          if (window.innerWidth <= 768) onClose();
+        }}
+        title="Mon profil"
+      >
         <div className={avatarClass}>{initiales}</div>
         <div className="sidebar__user-info">
           <div className="sidebar__user-name">
@@ -144,10 +168,14 @@ export default function Sidebar() {
             {roleLabel[utilisateur.role]}
           </div>
         </div>
-      </div>
+      </button>
 
-      {/* ── Navigation ── */}
-      <nav className="sidebar__nav">
+      {/* ── Navigation ──
+          <nav> porte déjà implicitement le rôle "navigation" — role
+          explicite tout de même pour lever toute ambiguïté pour les
+          lecteurs d'écran, plus aria-label vu qu'il pourrait y avoir
+          d'autres repères de navigation sur la page. */}
+      <nav className="sidebar__nav" role="navigation" aria-label="Navigation principale">
         <div className="sidebar__nav-label">Navigation</div>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -155,7 +183,14 @@ export default function Sidebar() {
             <button
               key={item.path}
               className={`sidebar__nav-item ${isActive ? "sidebar__nav-item--active" : ""}`}
-              onClick={() => navigate(item.path)}
+              aria-current={isActive ? "page" : undefined}
+              onClick={() => {
+                navigate(item.path);
+                // Referme le tiroir mobile après sélection, mais pas la
+                // sidebar desktop (repli explicite de l'utilisateur,
+                // pas un overlay à escamoter après navigation).
+                if (window.innerWidth <= 768) onClose();
+              }}
             >
               <NavIcon name={item.icon} active={isActive} />
               <span>{item.label}</span>
@@ -175,12 +210,16 @@ export default function Sidebar() {
 
       {/* ── Déconnexion ── */}
       <div className="sidebar__footer">
-        <button className="sidebar__logout" onClick={logout}>
+        {/* logout() prend un redirectTo optionnel (voir AdminLoginPage) —
+            onClick={logout} passerait l'event du clic à la place,
+            d'où l'arrow function pour n'appeler logout() sans argument. */}
+        <button className="sidebar__logout" onClick={() => logout()}>
           <NavIcon name="logout" active={false} />
           <span>Déconnexion</span>
         </button>
       </div>
 
     </aside>
+    </>
   );
 }

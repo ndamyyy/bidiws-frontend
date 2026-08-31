@@ -3,9 +3,11 @@
 // Fichier : src/pages/LoginPage/LoginPage.tsx
 // ============================================================
 
-import { JSX, useState }        from "react";
+import { JSX, useRef, useState } from "react";
+import { useNavigate }     from "react-router-dom";
+import axios                from "axios";
 import { useAuth }         from "../../hooks/useAuth";
-import type { Role }       from "../../types";
+import type { Role, ApiError } from "../../types";
 import "./LoginPage.css";
 
 // ─────────────────────────────────────────
@@ -67,6 +69,42 @@ const IconCheck = () => (
   </svg>
 );
 
+const IconBolt = ({ color }: { color: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+  </svg>
+);
+
+const IconMapPin = ({ color }: { color: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+    <circle cx="12" cy="10" r="3"/>
+  </svg>
+);
+
+const IconBarChart = ({ color }: { color: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="20" x2="12" y2="10"/>
+    <line x1="18" y1="20" x2="18" y2="4"/>
+    <line x1="6" y1="20" x2="6" y2="16"/>
+  </svg>
+);
+
+const IconEye = ({ color }: { color: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+
+const IconEyeOff = ({ color }: { color: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+    <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
+
 // ─────────────────────────────────────────
 // RÔLES DISPONIBLES
 // ─────────────────────────────────────────
@@ -115,28 +153,19 @@ const ROLE_OPTIONS: RoleOption[] = [
 
 export default function LoginPage() {
   const { login, isLoading } = useAuth();
+  const navigate = useNavigate();
 
-  const [selectedRole, setSelectedRole] = useState<Role>('SYNDIC');
-  const [email,        setEmail]        = useState<string>("");
-  const [motDePasse,   setMotDePasse]   = useState<string>("");
-  const [error,        setError]        = useState<string>("");
+  const [selectedRole,    setSelectedRole]    = useState<Role>('SYNDIC');
+  const [email,           setEmail]           = useState<string>("");
+  const [motDePasse,      setMotDePasse]      = useState<string>("");
+  const [error,           setError]           = useState<string>("");
+  const [showMotDePasse,  setShowMotDePasse]  = useState<boolean>(false);
 
-  // ── Pré-remplir l'email selon le rôle sélectionné (mock) ──
+  const emailInputRef = useRef<HTMLInputElement>(null);
+
   const handleRoleSelect = (role: Role): void => {
     setSelectedRole(role);
     setError("");
-
-    // Emails de démo correspondant aux mocks
-    const demoEmails: Partial<Record<Role, string>> = {
-      'SYNDIC':    "syndic@bidiws.com",
-      'GARDIEN':   "gardien1@bidiws.com",
-      'CHAUFFEUR': "chauffeur1@bidiws.com",
-      'HABITANT':  "habitant@bidiws.com",
-      'MAIRIE':    "syndic@bidiws.com",
-      'ADMIN':     "admin@bidiws.com",
-    };
-    setEmail(demoEmails[role] ?? "");
-    setMotDePasse("Demo1234!");
   };
 
   // ── Soumission ──
@@ -154,18 +183,22 @@ export default function LoginPage() {
 
     try {
       await login({ email: email.trim(), motDePasse });
-    } catch {
-      setError("Email ou mot de passe incorrect. Vérifiez vos identifiants.");
+    } catch (err) {
+      // Le backend distingue plusieurs cas (401 mauvais identifiants,
+      // 423 compte verrouillé, etc.) avec un message précis à chaque
+      // fois — on l'affiche tel quel plutôt qu'un message générique
+      // qui ferait croire à un mauvais mot de passe dans tous les cas.
+      const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
+      setError(backendMessage ?? "Email ou mot de passe incorrect. Vérifiez vos identifiants.");
     }
   };
 
   return (
     <div className="login">
 
-      {/* ── Blobs décoratifs ── */}
-      <div className="login__blob login__blob--top-left"    />
-      <div className="login__blob login__blob--bottom-right"/>
-      <div className="login__blob login__blob--center"      />
+      {/* ── Orbes décoratifs ── */}
+      <div className="login__orb login__orb--1" />
+      <div className="login__orb login__orb--2" />
 
       {/* ══════════════════════════════
           PANNEAU GAUCHE — Branding
@@ -203,13 +236,13 @@ export default function LoginPage() {
         {/* Features */}
         <div className="login__features">
           {[
-            { icon: "⚡", text: <><strong>Notification instantanée</strong> dès que le camion est passé</> },
-            { icon: "📍", text: <><strong>Suivi GPS temps réel</strong> du camion sur votre secteur</> },
-            { icon: "📊", text: <><strong>Dashboard complet</strong> pour les gestionnaires et mairies</> },
+            { icon: <IconBolt color="#39FF8C" />, text: <><strong>Notification instantanée</strong> dès que le camion est passé</> },
+            { icon: <IconMapPin color="#39FF8C" />, text: <><strong>Suivi GPS temps réel</strong> du camion sur votre secteur</> },
+            { icon: <IconBarChart color="#39FF8C" />, text: <><strong>Dashboard complet</strong> pour les gestionnaires et mairies</> },
           ].map((f, i) => (
             <div key={i} className="login__feature">
               <div className="login__feature-icon">
-                <span style={{ fontSize: 16 }}>{f.icon}</span>
+                {f.icon}
               </div>
               <span className="login__feature-text">{f.text}</span>
             </div>
@@ -245,8 +278,8 @@ export default function LoginPage() {
                     style={{
                       background: isActive
                         ? `${option.color}22`
-                        : "rgba(255,255,255,0.04)",
-                      border: `1px solid ${isActive ? option.color + "55" : "rgba(255,255,255,0.08)"}`,
+                        : "var(--overlay-4)",
+                      border: `1px solid ${isActive ? option.color + "55" : "var(--overlay-8)"}`,
                     }}
                   >
                     {option.icon}
@@ -277,6 +310,7 @@ export default function LoginPage() {
             <div className="login__field">
               <label className="login__field-label">Email</label>
               <input
+                ref={emailInputRef}
                 className="login__field-input"
                 type="email"
                 placeholder="votre@email.com"
@@ -287,14 +321,26 @@ export default function LoginPage() {
             </div>
             <div className="login__field">
               <label className="login__field-label">Mot de passe</label>
-              <input
-                className="login__field-input"
-                type="password"
-                placeholder="••••••••"
-                value={motDePasse}
-                onChange={(e) => setMotDePasse(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              />
+              <div className="login__field-wrap">
+                <input
+                  className="login__field-input"
+                  type={showMotDePasse ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={motDePasse}
+                  onChange={(e) => setMotDePasse(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                />
+                <button
+                  type="button"
+                  className="login__field-toggle"
+                  onClick={() => setShowMotDePasse((v) => !v)}
+                  tabIndex={-1}
+                  title={showMotDePasse ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                  aria-label={showMotDePasse ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                >
+                  {showMotDePasse ? <IconEyeOff color="#6b84a3" /> : <IconEye color="#6b84a3" />}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -311,6 +357,24 @@ export default function LoginPage() {
               ? <span className="login__spinner" />
               : <>Accéder à mon espace</>
             }
+          </button>
+
+          {/* ── Lien inscription ── */}
+          <button
+            type="button"
+            className="login__admin-link"
+            onClick={() => navigate("/register")}
+          >
+            Pas encore de compte ? Créer un compte
+          </button>
+
+          {/* ── Lien admin ── */}
+          <button
+            type="button"
+            className="login__admin-link"
+            onClick={() => navigate("/admin/login")}
+          >
+            Connexion administrateur
           </button>
 
           {/* ── Footer ── */}

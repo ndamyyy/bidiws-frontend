@@ -1,0 +1,199 @@
+/* ============================================================
+   BIDIWS — HabitantHomePage
+   Fichier : src/pages/habitant/HabitantHomePage/HabitantHomePage.css
+   ============================================================ */
+
+.habitant__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.habitant__signaler-btn {
+  padding: 9px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  background: var(--overlay-6);
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s;
+}
+.habitant__signaler-btn:hover {
+  background: var(--danger-dim-10);
+}
+
+.habitant__title {
+  font-family: "Syne", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.habitant__subtitle { font-size: 13px; color: var(--text-secondary); }
+
+/* ─── Prochaine collecte hero ─── */
+.habitant__next {
+  background: var(--signal-dim-05);
+  border: 1.5px solid var(--signal-dim-20);
+  /* Accent de rôle (--accent-role) en complément du signal — détail
+     sur un seul côté, le fond/la bordure principale restent sur
+     --signal (accent de marque, inchangé). */
+  border-left: 3px solid var(--accent-role);
+  border-radius: 18px;
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-card);
+  animation: fadeUp 0.4s both cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.habitant__next-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+
+.habitant__next-content {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.habitant__next-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(76, 175, 80, 0.15);
+  border: 1.5px solid rgba(76, 175, 80, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.habitant__next-type {
+  font-family: "Syne", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.habitant__next-heure {
+  font-size: 32px;
+  font-weight: 800;
+  font-family: "Syne", sans-serif;
+  color: var(--signal);
+  margin-top: 4px;
+}
+
+.habitant__next-jour {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ─── Grille collectes ─── */
+.habitant__schedule {
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  animation: fadeUp 0.4s 0.1s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.habitant__schedule-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--overlay-6);
+  font-family: "Syne", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--overlay-4);
+  transition: background 0.18s;
+}
+
+.schedule-item:last-child { border-bottom: none; }
+.schedule-item:hover { background: var(--overlay-3); }
+
+.schedule-item__type {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.schedule-item__jour {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.schedule-item__heure {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--signal);
+}
+
+/* ─── Conseils ─── */
+.habitant__tips {
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+  padding: 22px;
+  animation: fadeUp 0.4s 0.15s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.habitant__tips-title {
+  font-family: "Syne", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+
+.tip-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.tip-item:last-child { margin-bottom: 0; }
+
+.tip-item__icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+}
+
+.tip-item__text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.tip-item__text strong { color: var(--text-primary); }

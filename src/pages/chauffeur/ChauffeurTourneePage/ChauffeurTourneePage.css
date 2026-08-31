@@ -1,0 +1,419 @@
+/* ============================================================
+   BIDIWS — ChauffeurTourneePage
+   Fichier : src/pages/chauffeur/ChauffeurTourneePage/ChauffeurTourneePage.css
+   ============================================================ */
+
+.chauffeur__header { margin-bottom: 24px; }
+
+.chauffeur__title {
+  font-family: "Syne", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.chauffeur__subtitle { font-size: 13px; color: var(--text-secondary); }
+
+/* ─── GPS Toggle ─── */
+.chauffeur__gps {
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s;
+  animation: fadeUp 0.4s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.chauffeur__gps--on {
+  background: var(--success-dim-10);
+  border: 1.5px solid color-mix(in srgb, var(--success) 30%, transparent);
+}
+
+.chauffeur__gps--off {
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.chauffeur__gps-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.chauffeur__gps-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.chauffeur__gps-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.chauffeur__gps-desc {
+  font-size: 12px;
+  margin-top: 2px;
+  transition: color 0.3s;
+}
+
+/* ─── Toggle switch ─── */
+.toggle-switch {
+  width: 52px;
+  height: 28px;
+  border-radius: 14px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.25s;
+  border: none;
+  outline: none;
+  flex-shrink: 0;
+}
+
+.toggle-switch__thumb {
+  position: absolute;
+  top: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: left 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── Démarrer la tournée ─── */
+.chauffeur__demarrer {
+  margin-bottom: 18px;
+  animation: fadeUp 0.4s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-demarrer-chauffeur {
+  width: 100%;
+  /* Dégradé vers lui-même : var(--accent-role) == #f59e0b pour un
+     chauffeur (voir roleColors.ts), donc rendu identique — mais reste
+     correct si jamais consulté par un autre rôle (admin). */
+  background: linear-gradient(135deg, var(--accent-role), var(--accent-role));
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  color: var(--text-inverse);
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  transition: transform 0.18s, box-shadow 0.18s;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent-role) 35%, transparent);
+}
+
+.btn-demarrer-chauffeur:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--accent-role) 45%, transparent);
+}
+
+.btn-demarrer-chauffeur:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── Progression ─── */
+.chauffeur__progress {
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 18px;
+  animation: fadeUp 0.4s 0.08s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.chauffeur__progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.chauffeur__progress-title {
+  font-family: "Syne", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.chauffeur__progress-count {
+  font-size: 13px;
+  color: var(--signal);
+  font-weight: 600;
+}
+
+/* ─── Liste arrêts ─── */
+.chauffeur__arrets {
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: fadeUp 0.4s 0.15s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.chauffeur__arrets-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--overlay-6);
+  font-family: "Syne", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ─── Arret item ───
+   Conteneur en colonne : la ligne principale (étape/infos/actions)
+   dans .c-arret-item__row, le formulaire incident (optionnel) en
+   dessous — garde .c-arret-item comme SEUL enfant direct de la liste
+   par arrêt, donc :last-child reste correct que le formulaire soit
+   ouvert ou non. */
+.c-arret-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--overlay-4);
+  transition: background 0.18s;
+}
+
+.c-arret-item:last-child { border-bottom: none; }
+
+.c-arret-item--current {
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.c-arret-item__row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.c-arret-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.c-arret-item__step {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.c-arret-item__step--done {
+  background: var(--success-dim-15);
+  border: 1.5px solid var(--signal);
+}
+
+.c-arret-item__step--current {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1.5px solid var(--alert);
+  animation: glowAmber 2s infinite;
+}
+
+.c-arret-item__step--pending {
+  background: var(--overlay-4);
+  border: 1.5px solid var(--overlay-10);
+  color: var(--text-secondary);
+}
+
+@keyframes glowAmber {
+  0%, 100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.3); }
+  50%       { box-shadow: 0 0 20px rgba(245, 158, 11, 0.6); }
+}
+
+.c-arret-item__info { flex: 1; }
+
+.c-arret-item__name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.c-arret-item__addr {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.c-arret-item__heure {
+  font-size: 11px;
+  color: var(--signal);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* ─── Bouton valider ─── */
+.btn-valider-chauffeur {
+  background: linear-gradient(135deg, var(--success), #2e7d32);
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  color: var(--text-inverse);
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: transform 0.18s, box-shadow 0.18s;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--success) 35%, transparent);
+  white-space: nowrap;
+}
+
+.btn-valider-chauffeur:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--success) 45%, transparent);
+}
+
+/* ─── Bouton signaler un incident — distinct de Valider ─── */
+.btn-incident-chauffeur {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  background: var(--danger-dim-10);
+  border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.btn-incident-chauffeur:hover {
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 40%, transparent);
+}
+
+/* ─── Formulaire incident (description brève, pas de photo — pas
+   SignalementForm) ─── */
+.c-arret-item__incident-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: color-mix(in srgb, var(--danger) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 15%, transparent);
+  border-radius: 10px;
+}
+
+.c-arret-item__incident-input {
+  flex: 1;
+  min-width: 160px;
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+}
+
+.c-arret-item__incident-input:focus {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-dim-10);
+}
+
+.btn-incident-submit {
+  background: var(--danger);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: #fff;
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s;
+}
+
+.btn-incident-submit:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.btn-incident-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-incident-cancel {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 4px;
+  white-space: nowrap;
+}
+
+.btn-incident-cancel:hover {
+  color: var(--text-primary);
+}
+
+.c-arret-item__incident-error {
+  width: 100%;
+  color: var(--danger);
+  font-size: 11px;
+}
+
+/* ─── Terminer la tournée ─── */
+.chauffeur__terminer {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.btn-terminer-chauffeur {
+  background: linear-gradient(135deg, #1b3a6b, var(--info));
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  color: var(--text-inverse);
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--info) 35%, transparent);
+}
+
+.btn-terminer-chauffeur:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--info) 45%, transparent);
+}
+
+.btn-terminer-chauffeur:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

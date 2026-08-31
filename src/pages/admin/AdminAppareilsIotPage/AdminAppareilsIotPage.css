@@ -1,0 +1,285 @@
+/* ============================================================
+   BIDIWS — AdminAppareilsIotPage
+   Fichier : src/pages/admin/AdminAppareilsIotPage/AdminAppareilsIotPage.css
+   Classes préfixées admin-appareils-iot- / admin-appareil-iot-row- :
+   pas de style partagé avec les autres pages admin.
+   ============================================================ */
+
+/* ─── En-tête ─── */
+.admin-appareils-iot__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-appareils-iot__title {
+  font-family: "Syne", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.admin-appareils-iot__subtitle {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* ─── Encart clé API (révélation unique) ─── */
+.admin-appareils-iot__reveal {
+  background: linear-gradient(135deg, rgba(76,175,80,0.12), rgba(46,204,113,0.06));
+  border: 1.5px solid var(--signal-dim-20);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+
+.admin-appareils-iot__reveal-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.admin-appareils-iot__reveal-warning {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+.admin-appareils-iot__reveal-key {
+  font-family: "Fira Code", "Consolas", monospace;
+  font-size: 14px;
+  word-break: break-all;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  color: var(--signal);
+  margin-bottom: 14px;
+}
+
+.admin-appareils-iot__reveal-copy-error {
+  font-size: 12px;
+  color: var(--critical);
+  margin-bottom: 14px;
+}
+
+.admin-appareils-iot__reveal-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-appareils-iot__reveal-copy {
+  padding: 9px 18px;
+  background: var(--signal-gradient);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-inverse);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-appareils-iot__reveal-close {
+  padding: 9px 18px;
+  background: none;
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ─── Accordéon création ─── */
+.admin-appareils-iot__create {
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.admin-appareils-iot__create-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.admin-appareils-iot__create-body {
+  padding: 0 20px 20px;
+}
+
+.admin-appareils-iot__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.admin-appareils-iot__field { display: flex; flex-direction: column; gap: 6px; }
+
+.admin-appareils-iot__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.admin-appareils-iot__input,
+.admin-appareils-iot__select {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: all var(--t-fast) var(--ease-smooth);
+}
+.admin-appareils-iot__input:focus,
+.admin-appareils-iot__select:focus {
+  border-color: var(--signal);
+  box-shadow: 0 0 0 4px var(--signal-dim-05);
+}
+.admin-appareils-iot__select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.admin-appareils-iot__error {
+  background: rgba(255, 79, 100, 0.08);
+  border: 1px solid rgba(255, 79, 100, 0.2);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--critical);
+  margin-bottom: 14px;
+}
+
+.admin-appareils-iot__submit {
+  padding: 10px 22px;
+  background: var(--signal-gradient);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-inverse);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease-smooth);
+}
+.admin-appareils-iot__submit:hover:not(:disabled) { transform: translateY(-2px); }
+.admin-appareils-iot__submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── Liste ─── */
+.admin-appareils-iot__list-empty {
+  padding: 22px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+}
+
+.admin-appareils-iot__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ─── Ligne appareil ─── */
+.admin-appareil-iot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 14px;
+  padding: 14px 18px;
+}
+
+.admin-appareil-iot-row__id {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.admin-appareil-iot-row__meta {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.admin-appareil-iot-row__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-appareil-iot-row__statut {
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.admin-appareil-iot-row__statut--actif {
+  background: var(--success-dim-15);
+  color: var(--success);
+  border: 1px solid color-mix(in srgb, var(--success) 27%, transparent);
+}
+.admin-appareil-iot-row__statut--inactif {
+  background: color-mix(in srgb, var(--neutral) 12%, transparent);
+  color: var(--neutral);
+  border: 1px solid color-mix(in srgb, var(--neutral) 27%, transparent);
+}
+
+.admin-appareil-iot-row__action {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s;
+}
+.admin-appareil-iot-row__action:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.admin-appareil-iot-row__action--regenerer {
+  border: 1px solid var(--signal-dim-20);
+  background: var(--overlay-6);
+  color: var(--signal);
+}
+.admin-appareil-iot-row__action--regenerer:hover:not(:disabled) {
+  background: var(--signal-dim-10);
+}
+
+.admin-appareil-iot-row__action--desactiver {
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  background: var(--overlay-6);
+  color: var(--danger);
+}
+.admin-appareil-iot-row__action--desactiver:hover:not(:disabled) {
+  background: var(--danger-dim-10);
+}

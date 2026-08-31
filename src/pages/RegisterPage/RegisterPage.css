@@ -1,0 +1,402 @@
+/* ═══════════════════════════════════════════════════════════════
+   BIDIWS — RegisterPage
+   Dupliqué à l'identique du style de LoginPage.css (orbes, carte,
+   panneau branding) plutôt que factorisé — même décision explicite
+   que AdminLoginPage.css vs LoginPage.css.
+   ═══════════════════════════════════════════════════════════════ */
+
+.register {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-deep);
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .register { flex-direction: row; }
+}
+
+/* ── Orbes ── */
+.register__orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+}
+.register__orb--1 {
+  width: 300px;
+  height: 300px;
+  top: -100px;
+  left: -100px;
+  background: radial-gradient(circle, rgba(91,108,255,0.15), transparent 70%);
+  animation: registerFloat1 12s ease-in-out infinite;
+}
+.register__orb--2 {
+  width: 200px;
+  height: 200px;
+  bottom: -50px;
+  right: -50px;
+  background: radial-gradient(circle, rgba(57,255,140,0.08), transparent 70%);
+  animation: registerFloat2 10s ease-in-out infinite;
+}
+
+@keyframes registerFloat1 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(30px, 20px); }
+}
+@keyframes registerFloat2 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-20px, -30px); }
+}
+
+@media (min-width: 768px) {
+  .register__orb--1 {
+    width: 500px;
+    height: 500px;
+    top: -200px;
+    left: -150px;
+  }
+  .register__orb--2 {
+    width: 350px;
+    height: 350px;
+    bottom: -100px;
+    right: -80px;
+  }
+}
+
+/* ── Panneau gauche ── */
+.register__left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px 24px;
+  position: relative;
+  z-index: 1;
+  min-height: 30vh;
+}
+
+@media (min-width: 768px) {
+  .register__left { padding: 48px 56px; min-height: auto; }
+}
+
+@media (min-width: 1024px) {
+  .register__left { padding: 60px 72px; }
+}
+
+.register__brand {
+  margin-bottom: 32px;
+}
+
+@media (min-width: 768px) {
+  .register__brand { margin-bottom: 48px; }
+}
+
+.register__brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+@media (min-width: 768px) {
+  .register__brand-logo { gap: 16px; margin-bottom: 16px; }
+}
+
+.register__brand-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--signal-dim-20), var(--data-dim-15));
+  border: 1.5px solid var(--signal-dim-20);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .register__brand-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+  }
+}
+
+.register__brand-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -1px;
+}
+.register__brand-name span { color: var(--signal); }
+
+@media (min-width: 768px) {
+  .register__brand-name { font-size: 38px; }
+}
+
+.register__brand-tagline {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+  .register__brand-tagline { font-size: 12px; }
+}
+
+.register__headline {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.15;
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+}
+.register__headline span {
+  background: linear-gradient(135deg, var(--signal), var(--data));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (min-width: 768px) {
+  .register__headline { font-size: 34px; margin-bottom: 16px; }
+}
+
+@media (min-width: 1024px) {
+  .register__headline { font-size: 40px; margin-bottom: 20px; }
+}
+
+.register__description {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 420px;
+}
+
+@media (min-width: 768px) {
+  .register__description { font-size: 14px; }
+}
+
+/* ── Panneau droit ── */
+.register__right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 768px) {
+  .register__right {
+    max-width: 480px;
+    padding: 32px 24px;
+  }
+}
+
+.register__card {
+  width: 100%;
+  background: var(--bg-card-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 28px 20px;
+  box-shadow: var(--shadow-elevated);
+}
+
+@media (min-width: 768px) {
+  .register__card {
+    padding: 36px 32px;
+    border-radius: var(--radius-xl);
+  }
+}
+
+.register__card-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+@media (min-width: 768px) {
+  .register__card-title { font-size: 26px; }
+}
+
+.register__card-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+/* ── Champs ── */
+.register__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.register__fields-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.register__field-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.register__field-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: all var(--t-fast) var(--ease-smooth);
+}
+.register__field-input:focus {
+  border-color: var(--signal);
+  box-shadow: 0 0 0 4px var(--signal-dim-05);
+}
+
+@media (min-width: 768px) {
+  .register__field-input { padding: 12px 16px; font-size: 14px; }
+}
+
+.register__field-wrap { position: relative; }
+.register__field-wrap .register__field-input { padding-right: 40px; }
+
+.register__field-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity var(--t-fast) var(--ease-smooth);
+}
+.register__field-toggle:hover { opacity: 1; }
+
+.register__login-link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 12px;
+  padding: 4px;
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color var(--t-fast) var(--ease-smooth);
+}
+.register__login-link:hover { color: var(--text-primary); }
+
+.register__error {
+  background: rgba(255, 79, 100, 0.08);
+  border: 1px solid rgba(255, 79, 100, 0.2);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--critical);
+  margin-bottom: 12px;
+}
+
+.register__submit {
+  width: 100%;
+  padding: 12px;
+  background: var(--signal-gradient);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-inverse);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--t-fast) var(--ease-smooth);
+  box-shadow: 0 4px 24px rgba(57, 255, 140, 0.2);
+}
+.register__submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(57, 255, 140, 0.3);
+}
+.register__submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (min-width: 768px) {
+  .register__submit { padding: 14px; font-size: 15px; }
+}
+
+.register__footer {
+  text-align: center;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 16px;
+}
+
+@media (min-width: 768px) {
+  .register__footer { font-size: 11px; margin-top: 20px; }
+}
+
+/* ── Succès ── */
+.register__succes {
+  text-align: center;
+}
+
+.register__succes-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(76,175,80,0.15);
+  border: 1.5px solid rgba(76,175,80,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+/* ── Masquer le branding sur mobile ── */
+@media (max-width: 767px) {
+  .register__brand-tagline,
+  .register__description {
+    display: none;
+  }
+  .register__headline {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  .register__brand { margin-bottom: 16px; }
+  .register__brand-name { font-size: 22px; }
+  .register__brand-icon { width: 36px; height: 36px; }
+  .register__fields-row {
+    grid-template-columns: 1fr;
+  }
+}
