@@ -80,6 +80,19 @@
   padding: 18px 20px;
 }
 
+/* Arrivée d'un signalement réellement nouveau (voir AdminSignalementsPage.tsx,
+   diff par id) — glow d'accueil qui s'efface, en plus du slide+fade déjà
+   fourni par AnimatedCard au montage. Écran unique, non réutilisé ailleurs. */
+.admin-signalement-card--new.animated-card {
+  border-color: var(--signal-dim-20);
+  animation: signalementArrive 1.6s var(--ease-smooth) forwards;
+}
+
+@keyframes signalementArrive {
+  0%   { background: var(--signal-dim-10); }
+  100% { background: var(--overlay-4); }
+}
+
 .admin-signalement-card__top {
   display: flex;
   justify-content: space-between;

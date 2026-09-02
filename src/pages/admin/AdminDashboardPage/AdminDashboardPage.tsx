@@ -268,18 +268,18 @@ export default function AdminDashboardPage() {
         />
         <StatCard
           label="Camions" value={camions?.length ?? 0}
-          color="#f59e0b" bg="rgba(245,158,11,0.12)"
-          icon={<IconTruck color="#f59e0b" />} delay={0.10}
+          color="#39FF8C" bg="rgba(57,255,140,0.12)"
+          icon={<IconTruck color="#39FF8C" />} delay={0.10}
         />
         <StatCard
           label="Tournées en cours" value={tourneesEnCours}
-          color="#4caf50" bg="rgba(76,175,80,0.12)"
-          icon={<IconClock color="#4caf50" />} delay={0.15}
+          color="#5B6CFF" bg="rgba(91,108,255,0.12)"
+          icon={<IconClock color="#5B6CFF" />} delay={0.15}
         />
         <StatCard
           label="Résidences" value={residences?.length ?? 0}
-          color="#1b3a6b" bg="rgba(27,58,107,0.15)"
-          icon={<IconHome color="#1b3a6b" />} delay={0.20}
+          color="#39FF8C" bg="rgba(57,255,140,0.12)"
+          icon={<IconHome color="#39FF8C" />} delay={0.20}
         />
       </div>
 

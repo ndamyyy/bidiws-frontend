@@ -3,6 +3,7 @@
 // Fichier : src/components/layout/Sidebar/Sidebar.tsx
 // ============================================================
 
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/useAuth";
 import { useNotifications } from "../../../hooks/useNotifications";
@@ -87,7 +88,7 @@ const roleLabel: Record<Role, string> = {
 // ─────────────────────────────────────────
 
 const NavIcon = ({ name, active }: { name: string; active: boolean }) => {
-  const color = active ? "#4caf50" : "#6b84a3";
+  const color = active ? "var(--accent-role)" : "var(--text-secondary)";
   const icons: Record<string, JSX.Element> = {
     grid:  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
     truck: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>,
@@ -121,6 +122,20 @@ export default function Sidebar({
   const location                        = useLocation();
   const { utilisateur, logout }         = useAuth();
   const { nonLuesCount, wsConnected }   = useNotifications();
+
+  // Bump du badge uniquement quand nonLuesCount AUGMENTE (nouvelle
+  // notif reçue en WebSocket) — pas à chaque rendu, pas en boucle.
+  const [isBumping, setIsBumping]       = useState(false);
+  const prevCountRef                    = useRef(nonLuesCount);
+  useEffect(() => {
+    if (nonLuesCount > prevCountRef.current) {
+      setIsBumping(true);
+      const timer = setTimeout(() => setIsBumping(false), 300);
+      prevCountRef.current = nonLuesCount;
+      return () => clearTimeout(timer);
+    }
+    prevCountRef.current = nonLuesCount;
+  }, [nonLuesCount]);
 
   if (!utilisateur) return null;
 
@@ -195,7 +210,9 @@ export default function Sidebar({
               <NavIcon name={item.icon} active={isActive} />
               <span>{item.label}</span>
               {item.badge !== undefined && item.badge > 0 && (
-                <span className="sidebar__nav-badge">{item.badge}</span>
+                <span className={`sidebar__nav-badge ${isBumping ? "sidebar__nav-badge--bump" : ""}`}>
+                  {item.badge}
+                </span>
               )}
             </button>
           );

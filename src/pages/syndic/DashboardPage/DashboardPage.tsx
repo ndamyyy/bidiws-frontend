@@ -214,23 +214,23 @@ export default function DashboardPage() {
       <div className="dashboard__stats">
         <StatCard
           label="Collectes confirmées" value={stats.collectesConfirmees}
-          color="#4caf50" bg="rgba(76,175,80,0.12)"
-          icon={<IconCheck color="#4caf50" />} delay={0.05}
+          color="#39FF8C" bg="rgba(57,255,140,0.12)"
+          icon={<IconCheck color="#39FF8C" />} delay={0.05}
         />
         <StatCard
           label="Tournées en cours" value={stats.tourneesEnCours}
-          color="#f59e0b" bg="rgba(245,158,11,0.12)"
-          icon={<IconTruck color="#f59e0b" />} delay={0.10}
+          color="#5B6CFF" bg="rgba(91,108,255,0.12)"
+          icon={<IconTruck color="#5B6CFF" />} delay={0.10}
         />
         <StatCard
           label="En attente" value={stats.enAttente}
-          color="#6b84a3" bg="rgba(107,132,163,0.12)"
-          icon={<IconClock color="#6b84a3" />} delay={0.15}
+          color="#39FF8C" bg="rgba(57,255,140,0.12)"
+          icon={<IconClock color="#39FF8C" />} delay={0.15}
         />
         <StatCard
           label="Alertes non lues" value={stats.notificationsNonLues}
-          color="#ef4444" bg="rgba(239,68,68,0.12)"
-          icon={<IconBell color="#ef4444" />} delay={0.20}
+          color="#5B6CFF" bg="rgba(91,108,255,0.12)"
+          icon={<IconBell color="#5B6CFF" />} delay={0.20}
         />
       </div>
 

@@ -6,13 +6,14 @@
 // gestion complète (updateStatutSignalement, jamais câblé jusqu'ici).
 // ============================================================
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useSignalementsByStatut } from "../../../hooks/useSignalements";
 import { updateStatutSignalement } from "../../../api/signalements.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { AnimatedCard } from "../../../components/ui/AnimatedCard/AnimatedCard";
+import { useToast } from "../../../hooks/useToast";
 import type { ApiError, Signalement, StatutSignalement } from "../../../types";
 import "./AdminSignalementsPage.css";
 
@@ -68,11 +69,13 @@ const SignalementCard = ({
   signalement,
   index,
   isPending,
+  isNew,
   onChangeStatut,
 }: {
   signalement  : Signalement;
   index         : number;
   isPending    : boolean;
+  isNew        : boolean;
   onChangeStatut: (id: number, statut: StatutSignalement) => void;
 }) => {
   const style = STATUT_STYLE[signalement.statut] ?? STATUT_STYLE.OUVERT;
@@ -81,7 +84,11 @@ const SignalementCard = ({
   });
 
   return (
-    <AnimatedCard className="admin-signalement-card" delay={index * 0.06} glow={false}>
+    <AnimatedCard
+      className={`admin-signalement-card ${isNew ? "admin-signalement-card--new" : ""}`}
+      delay={isNew ? 0 : index * 0.06}
+      glow={isNew}
+    >
       <div className="admin-signalement-card__top">
         <div className="admin-signalement-card__left">
           <div className="admin-signalement-card__icon" style={{ background: style.bg, border: `1px solid ${style.color}44` }}>
@@ -133,6 +140,7 @@ const SignalementCard = ({
 
 export default function AdminSignalementsPage() {
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   // Un statut doit toujours être sélectionné — le backend n'a pas de
   // route "tous statuts confondus" (voir signalements.api.ts). OUVERT
@@ -141,6 +149,20 @@ export default function AdminSignalementsPage() {
   const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
 
   const { data: signalements, isLoading, isError, error } = useSignalementsByStatut(filtreStatut);
+
+  // Détection des signalements réellement nouveaux (id jamais vu avant),
+  // pas juste "affiché pour la première fois" — un changement de filtre
+  // ou un refetch classique ne doit pas déclencher l'animation d'arrivée.
+  const seenIdsRef = useRef<Set<number> | null>(null);
+  const currentIds = new Set((signalements ?? []).map(s => s.id));
+  const newIds = seenIdsRef.current
+    ? new Set([...currentIds].filter(id => !seenIdsRef.current!.has(id)))
+    : new Set<number>();
+
+  useEffect(() => {
+    seenIdsRef.current = currentIds;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signalements]);
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -154,6 +176,7 @@ export default function AdminSignalementsPage() {
     } catch (err) {
       const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
       console.error("BIDIWS — Erreur changement statut signalement", backendMessage ?? err);
+      toast.error("Le changement de statut a échoué, réessayez.");
     } finally {
       setPendingIds(prev => {
         const next = new Set(prev);
@@ -203,6 +226,7 @@ export default function AdminSignalementsPage() {
               signalement={s}
               index={i}
               isPending={pendingIds.has(s.id)}
+              isNew={newIds.has(s.id)}
               onChangeStatut={handleChangeStatut}
             />
           ))}
