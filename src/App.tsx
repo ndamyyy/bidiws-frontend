@@ -11,7 +11,10 @@ import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { WebSocketProvider } from "./context/WebSocketContext";
 import { NotificationProvider } from "./context/NotificationContext";
+import { ToastProvider } from "./context/ToastContext";
 import { useAuth } from "./hooks/useAuth";
+import { useToast } from "./hooks/useToast";
+import { Toast, ToastContainer } from "./components/ui/Toast/Toast";
 // Role values are used as runtime strings here;
 
 // ─── Pages publiques ───────────────────────────────────────
@@ -77,18 +80,42 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <ThemeProvider>
-      {/* HashRouter plutôt que BrowserRouter : requis pour Capacitor
-          (scheme capacitor://, pas de vrai serveur pour réécrire les
-          routes profondes côté WebView — un reload sur /admin/users
-          casserait avec BrowserRouter, fonctionne avec le #/ du hash). */}
-      <HashRouter>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <AppShell />
-          </AuthProvider>
-        </QueryClientProvider>
-      </HashRouter>
+      {/* ToastProvider à la racine, hors HashRouter : les toasts n'ont
+          besoin ni du routeur ni de l'auth, et ToastHost doit rester
+          monté même pendant le SplashScreen (isInitializing). */}
+      <ToastProvider>
+        {/* HashRouter plutôt que BrowserRouter : requis pour Capacitor
+            (scheme capacitor://, pas de vrai serveur pour réécrire les
+            routes profondes côté WebView — un reload sur /admin/users
+            casserait avec BrowserRouter, fonctionne avec le #/ du hash). */}
+        <HashRouter>
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+              <AppShell />
+            </AuthProvider>
+          </QueryClientProvider>
+        </HashRouter>
+        <ToastHost />
+      </ToastProvider>
     </ThemeProvider>
+  );
+}
+
+// ─────────────────────────────────────────
+// TOAST HOST
+// Monté une seule fois au niveau racine — lit la liste active du
+// contexte et l'affiche via le ToastContainer déjà existant.
+// ─────────────────────────────────────────
+
+function ToastHost() {
+  const { toasts, dismiss } = useToast();
+
+  return (
+    <ToastContainer>
+      {toasts.map((t) => (
+        <Toast key={t.id} id={t.id} variant={t.variant} message={t.message} onDismiss={dismiss} />
+      ))}
+    </ToastContainer>
   );
 }
 

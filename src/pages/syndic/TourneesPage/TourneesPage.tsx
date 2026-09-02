@@ -3,6 +3,7 @@
 // Fichier : src/pages/syndic/TourneesPage/TourneesPage.tsx
 // ============================================================
 
+import { useState }                          from "react";
 import { useQueryClient, useQueries }        from "@tanstack/react-query";
 import { useTournees }                       from "../../../hooks/useTournees";
 import { useTypesCollecte }                  from "../../../hooks/useCalendrierCollecte";
@@ -10,6 +11,7 @@ import { getArretsByTournee, validerArret }  from "../../../api/arrets.api";
 import { LoadingSpinner }                    from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon }                  from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import { AnimatedCard }                      from "../../../components/ui/AnimatedCard/AnimatedCard";
+import { useToast }                          from "../../../hooks/useToast";
 import type { Arret }                        from "../../../types";
 import "./TourneesPage.css";
 
@@ -99,11 +101,13 @@ const ScoreBadge = ({ score }: { score: number }) => {
 const ArretItem = ({
   arret,
   index,
+  isValidating,
   onValider,
 }: {
-  arret    : Arret;
-  index    : number;
-  onValider: (id: number) => void;
+  arret       : Arret;
+  index       : number;
+  isValidating: boolean;
+  onValider   : (id: number) => void;
 }) => {
   const isDone    = arret.statut === 'COLLECTE_CONFIRMEE';
   const isEnCours = arret.statut === 'EN_APPROCHE' || arret.statut === 'COLLECTE_PROBABLE';
@@ -155,8 +159,8 @@ const ArretItem = ({
         <Badge statut={arret.statut} />
         {arret.scoreConfiance > 0 && <ScoreBadge score={arret.scoreConfiance} />}
         {arret.statut === 'EN_ATTENTE' && (
-          <button className="btn-valider" onClick={() => onValider(arret.id)}>
-            <IconCheck color="#fff" /> Valider
+          <button className="btn-valider" onClick={() => onValider(arret.id)} disabled={isValidating}>
+            <IconCheck color="#fff" /> {isValidating ? "Validation..." : "Valider"}
           </button>
         )}
       </div>
@@ -170,6 +174,8 @@ const ArretItem = ({
 
 export default function TourneesPage() {
   const queryClient = useQueryClient();
+  const toast = useToast();
+  const [pendingArretIds, setPendingArretIds] = useState<Set<number>>(new Set());
 
   const now = new Date();
   const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
@@ -191,11 +197,19 @@ export default function TourneesPage() {
   //    queries d'arrêts (plus simple/sûr que de retrouver la tournée
   //    précise contenant cet arrêt) ──
   const handleValider = async (arretId: number): Promise<void> => {
+    setPendingArretIds(prev => new Set(prev).add(arretId));
     try {
       await validerArret(arretId, 'COLLECTE_CONFIRMEE');
       await queryClient.invalidateQueries({ queryKey: ["arrets", "tournee"] });
     } catch (e) {
       console.error("BIDIWS — Erreur validation arrêt", e);
+      toast.error("La validation de l'arrêt a échoué, réessayez.");
+    } finally {
+      setPendingArretIds(prev => {
+        const next = new Set(prev);
+        next.delete(arretId);
+        return next;
+      });
     }
   };
 
@@ -283,6 +297,7 @@ export default function TourneesPage() {
                   key={arret.id}
                   arret={arret}
                   index={idx}
+                  isValidating={pendingArretIds.has(arret.id)}
                   onValider={handleValider}
                 />
               ))

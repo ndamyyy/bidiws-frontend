@@ -3,9 +3,10 @@
 // Fichier : src/pages/syndic/NotificationsPage/NotificationsPage.tsx
 // ============================================================
 
-import { JSX }                  from "react";
+import { JSX, useState }        from "react";
 import { useNotifications }     from "../../../hooks/useNotifications";
 import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
+import { useToast }             from "../../../hooks/useToast";
 import type { Notification }    from "../../../types";
 import "./NotificationsPage.css";
 
@@ -116,13 +117,26 @@ const NotifItem = ({
 
 export default function NotificationsPage() {
   const { notifications, nonLuesCount, marquerLue, marquerToutesLues } = useNotifications();
+  const toast = useToast();
+  const [isMarkingAll, setIsMarkingAll] = useState<boolean>(false);
 
   const handleRead = (id: number): void => {
-    marquerLue(id).catch(e => console.error("BIDIWS — Erreur marquerLue", e));
+    marquerLue(id).catch(e => {
+      console.error("BIDIWS — Erreur marquerLue", e);
+      toast.error("Impossible de marquer la notification comme lue.");
+    });
   };
 
-  const handleToutLire = (): void => {
-    marquerToutesLues().catch(e => console.error("BIDIWS — Erreur marquerToutesLues", e));
+  const handleToutLire = async (): Promise<void> => {
+    setIsMarkingAll(true);
+    try {
+      await marquerToutesLues();
+    } catch (e) {
+      console.error("BIDIWS — Erreur marquerToutesLues", e);
+      toast.error("Impossible de marquer les notifications comme lues.");
+    } finally {
+      setIsMarkingAll(false);
+    }
   };
 
   return (
@@ -135,8 +149,8 @@ export default function NotificationsPage() {
           </p>
         </div>
         {nonLuesCount > 0 && (
-          <button className="notifs__tout-lire" onClick={handleToutLire}>
-            Tout marquer comme lu
+          <button className="notifs__tout-lire" onClick={handleToutLire} disabled={isMarkingAll}>
+            {isMarkingAll ? "Mise à jour..." : "Tout marquer comme lu"}
           </button>
         )}
       </div>

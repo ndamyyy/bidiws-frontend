@@ -14,6 +14,7 @@ import { validerArret, signalerIncident } from "../../../api/arrets.api";
 import { demarrerTournee, terminerTournee } from "../../../api/tournee.api";
 import { LoadingSpinner }              from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon }            from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
+import { useToast }                    from "../../../hooks/useToast";
 import type { Arret, ApiError }        from "../../../types";
 import "./ChauffeurTourneePage.css";
 
@@ -108,12 +109,14 @@ const ProgressBar = ({ progress }: { progress: number }) => (
 const ArretItem = ({
   arret,
   index,
+  isValidating,
   onValider,
   onSignalerIncident,
   readOnly,
 }: {
   arret             : Arret;
   index             : number;
+  isValidating      : boolean;
   onValider         : (id: number) => void;
   onSignalerIncident: (id: number, description: string) => Promise<void>;
   readOnly          : boolean;
@@ -203,14 +206,16 @@ const ArretItem = ({
             <button
               className="btn-valider-chauffeur"
               onClick={() => onValider(arret.id)}
+              disabled={isValidating}
             >
-              <IconCheck color="#fff" size={14} /> Valider
+              <IconCheck color="#fff" size={14} /> {isValidating ? "Validation..." : "Valider"}
             </button>
             <button
               className="btn-incident-chauffeur"
               onClick={() => setIncidentOpen(v => !v)}
               title="Signaler un incident sur cet arrêt"
               aria-label="Signaler un incident sur cet arrêt"
+              disabled={isValidating}
             >
               <IconAlert color="var(--danger)" />
             </button>
@@ -259,8 +264,10 @@ const ArretItem = ({
 export default function ChauffeurTourneePage() {
   const { utilisateur } = useAuth();
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   const [gpsOn, setGpsOn] = useState<boolean>(true);
+  const [pendingArretIds, setPendingArretIds] = useState<Set<number>>(new Set());
   const [isTerminating, setIsTerminating] = useState<boolean>(false);
   const [terminerError, setTerminerError] = useState<string>("");
   const [isStarting, setIsStarting] = useState<boolean>(false);
@@ -308,11 +315,19 @@ export default function ChauffeurTourneePage() {
 
   // ── Valider un arrêt : appel serveur réel, puis refetch ──
   const handleValider = async (arretId: number): Promise<void> => {
+    setPendingArretIds(prev => new Set(prev).add(arretId));
     try {
       await validerArret(arretId, 'COLLECTE_CONFIRMEE');
       await queryClient.invalidateQueries({ queryKey: ["arrets", "tournee", tournee?.id] });
     } catch (e) {
       console.error("BIDIWS — Erreur validation arrêt", e);
+      toast.error("La validation de l'arrêt a échoué, réessayez.");
+    } finally {
+      setPendingArretIds(prev => {
+        const next = new Set(prev);
+        next.delete(arretId);
+        return next;
+      });
     }
   };
 
@@ -482,6 +497,7 @@ export default function ChauffeurTourneePage() {
             key={arret.id}
             arret={arret}
             index={idx}
+            isValidating={pendingArretIds.has(arret.id)}
             onValider={handleValider}
             onSignalerIncident={handleSignalerIncident}
             readOnly={tourneeCloturee || tourneePlanifiee}

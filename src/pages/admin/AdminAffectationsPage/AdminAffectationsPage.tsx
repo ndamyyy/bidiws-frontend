@@ -15,6 +15,7 @@ import { useCamions } from "../../../hooks/useCamions";
 import { useAdminUtilisateurs } from "../../../hooks/useAdminUtilisateurs";
 import { getAffectationsByCamion, affecterChauffeurCamion, terminerAffectation } from "../../../api/chauffeur-camions.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import { useToast } from "../../../hooks/useToast";
 import type { ApiError, ChauffeurCamion } from "../../../types";
 import "./AdminAffectationsPage.css";
 
@@ -31,6 +32,7 @@ const TODAY_ISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStar
 
 export default function AdminAffectationsPage() {
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   const { data: camions, isLoading: isLoadingCamions } = useCamions();
   const { data: utilisateurs, isLoading: isLoadingUsers } = useAdminUtilisateurs();
@@ -110,6 +112,7 @@ export default function AdminAffectationsPage() {
     } catch (err) {
       const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
       console.error("BIDIWS — Erreur fin d'affectation", backendMessage ?? err);
+      toast.error("La fin d'affectation a échoué, réessayez.");
     } finally {
       setPendingKeys(prev => {
         const next = new Set(prev);

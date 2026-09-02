@@ -17,6 +17,7 @@ import { createCalendrier, desactiverCalendrier } from "../../../api/calendrier-
 import { createConteneur, desactiverConteneur } from "../../../api/conteneurs.api";
 import { LoadingSpinner }                   from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { StaggerContainer, StaggerItem }    from "../../../components/ui/StaggerContainer/StaggerContainer";
+import { useToast }                         from "../../../hooks/useToast";
 import type { Residence, Arret, ApiError }  from "../../../types";
 import "./ResidencesPage.css";
 
@@ -93,6 +94,7 @@ const Badge = ({ statut }: { statut: string }) => {
 
 const CalendrierSection = ({ residenceId }: { residenceId: number }) => {
   const queryClient = useQueryClient();
+  const toast = useToast();
   const [expanded, setExpanded] = useState<boolean>(false);
 
   // Chargé uniquement une fois la section dépliée — residenceId
@@ -150,6 +152,7 @@ const CalendrierSection = ({ residenceId }: { residenceId: number }) => {
     } catch (err) {
       const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
       console.error("BIDIWS — Erreur désactivation calendrier", backendMessage ?? err);
+      toast.error("La désactivation du passage a échoué, réessayez.");
     } finally {
       setPendingIds(prev => {
         const next = new Set(prev);
@@ -251,6 +254,7 @@ const CalendrierSection = ({ residenceId }: { residenceId: number }) => {
 
 const ConteneursSection = ({ residenceId }: { residenceId: number }) => {
   const queryClient = useQueryClient();
+  const toast = useToast();
   const [expanded, setExpanded] = useState<boolean>(false);
 
   const { data: conteneurs, isLoading: isLoadingConteneurs } =
@@ -301,6 +305,7 @@ const ConteneursSection = ({ residenceId }: { residenceId: number }) => {
     } catch (err) {
       const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
       console.error("BIDIWS — Erreur désactivation conteneur", backendMessage ?? err);
+      toast.error("La désactivation du conteneur a échoué, réessayez.");
     } finally {
       setPendingIds(prev => {
         const next = new Set(prev);

@@ -11,6 +11,7 @@ import {
 } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useWebSocket } from "../hooks/useWebSocket";
+import { useToast } from "../hooks/useToast";
 import {
   getNotificationsByDestinataire,
   marquerCommeLue,
@@ -29,6 +30,7 @@ interface NotificationProviderProps {
 export function NotificationProvider({ children }: NotificationProviderProps) {
   const { isAuthenticated, utilisateur } = useAuth();
   const { connected: wsConnected, subscribe } = useWebSocket();
+  const toast = useToast();
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   // ── Compter les non lues ──
@@ -77,6 +79,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
         if (!cancelled) setNotifications(historique);
       } catch (e) {
         console.error("BIDIWS — Erreur chargement historique notifications", e);
+        toast.error("Impossible de charger vos notifications.");
       }
     };
 
@@ -85,6 +88,10 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
     return () => {
       cancelled = true;
     };
+    // toast volontairement exclu : sa référence change à chaque toast
+    // affiché n'importe où dans l'app (ToastProvider re-render), ce qui
+    // relancerait ce chargement d'historique sans rapport.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, utilisateur]);
 
   // ── Abonnement aux notifications personnelles ──

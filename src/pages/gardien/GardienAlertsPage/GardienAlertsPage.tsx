@@ -10,6 +10,7 @@
 import { useState, type JSX } from "react";
 import { useNotifications } from "../../../hooks/useNotifications";
 import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
+import { useToast } from "../../../hooks/useToast";
 import type { Notification } from "../../../types";
 import "./GardienAlertsPage.css";
 
@@ -92,14 +93,27 @@ type Filtre = "TOUTES" | "NON_LUES" | "LUES";
 
 export default function GardienAlertsPage() {
   const { notifications, nonLuesCount, marquerLue, marquerToutesLues } = useNotifications();
+  const toast = useToast();
   const [filtre, setFiltre] = useState<Filtre>("TOUTES");
+  const [isMarkingAll, setIsMarkingAll] = useState<boolean>(false);
 
   const handleRead = (id: number): void => {
-    marquerLue(id).catch(e => console.error("BIDIWS — Erreur marquerLue", e));
+    marquerLue(id).catch(e => {
+      console.error("BIDIWS — Erreur marquerLue", e);
+      toast.error("Impossible de marquer l'alerte comme lue.");
+    });
   };
 
-  const handleToutLire = (): void => {
-    marquerToutesLues().catch(e => console.error("BIDIWS — Erreur marquerToutesLues", e));
+  const handleToutLire = async (): Promise<void> => {
+    setIsMarkingAll(true);
+    try {
+      await marquerToutesLues();
+    } catch (e) {
+      console.error("BIDIWS — Erreur marquerToutesLues", e);
+      toast.error("Impossible de marquer les alertes comme lues.");
+    } finally {
+      setIsMarkingAll(false);
+    }
   };
 
   const notificationsFiltrees = notifications.filter(n => {
@@ -119,8 +133,8 @@ export default function GardienAlertsPage() {
           </p>
         </div>
         {nonLuesCount > 0 && (
-          <button className="gardien-alerts__tout-lire" onClick={handleToutLire}>
-            Tout marquer comme lu
+          <button className="gardien-alerts__tout-lire" onClick={handleToutLire} disabled={isMarkingAll}>
+            {isMarkingAll ? "Mise à jour..." : "Tout marquer comme lu"}
           </button>
         )}
       </div>
