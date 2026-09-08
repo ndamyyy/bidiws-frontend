@@ -175,7 +175,7 @@
 }
 
 .sidebar__nav-item--active {
-  color: var(--signal);
+  color: var(--accent-role);
   font-weight: 600;
   background: color-mix(in srgb, var(--accent-role) 10%, transparent);
 }
