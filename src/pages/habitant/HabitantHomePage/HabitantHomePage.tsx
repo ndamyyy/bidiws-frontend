@@ -9,6 +9,7 @@ import { useResidencesHabitant } from "../../../hooks/useResidences";
 import { useCalendrierCollecte, useTypesCollecte } from "../../../hooks/useCalendrierCollecte";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon } from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
+import { Button } from "../../../components/ui/Button/Button";
 import SignalementForm from "../../../components/SignalementForm/SignalementForm";
 import "./HabitantHomePage.css";
 
@@ -133,9 +134,9 @@ export default function HabitantHomePage() {
           <h1 className="habitant__title">Prochaine collecte</h1>
           <p className="habitant__subtitle" style={{ textTransform: "capitalize" }}>{today}</p>
         </div>
-        <button className="habitant__signaler-btn" onClick={() => setSignalementOpen(true)}>
+        <Button variant="danger" onClick={() => setSignalementOpen(true)}>
           Signaler un problème
-        </button>
+        </Button>
       </div>
 
       {/* ── Hero prochaine collecte ── */}

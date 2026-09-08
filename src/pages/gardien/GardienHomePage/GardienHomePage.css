@@ -12,22 +12,6 @@
   margin-bottom: 24px;
 }
 
-.gardien__signaler-btn {
-  padding: 9px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
-  background: var(--overlay-6);
-  color: var(--danger);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.18s;
-}
-.gardien__signaler-btn:hover {
-  background: var(--danger-dim-10);
-}
-
 .gardien__title {
   font-family: "Syne", sans-serif;
   font-size: 28px;

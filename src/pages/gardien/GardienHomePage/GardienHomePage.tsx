@@ -12,6 +12,7 @@ import { useResidencesGardien } from "../../../hooks/useResidences";
 import { useTournee } from "../../../hooks/useTournees";
 import { getArretsByResidence } from "../../../api/arrets.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import { Button } from "../../../components/ui/Button/Button";
 import SignalementForm from "../../../components/SignalementForm/SignalementForm";
 import "./GardienHomePage.css";
 
@@ -150,9 +151,9 @@ export default function GardienHomePage() {
             {residenceLien?.residenceNom ?? "Résidence non assignée"}
           </p>
         </div>
-        <button className="gardien__signaler-btn" onClick={() => setSignalementOpen(true)}>
+        <Button variant="danger" onClick={() => setSignalementOpen(true)}>
           Signaler un problème
-        </button>
+        </Button>
       </div>
 
       {/* ── Hero statut ── */}

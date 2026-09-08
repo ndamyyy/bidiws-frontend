@@ -71,56 +71,7 @@
   margin-top: 4px;
 }
 
-.signalement-modal__cancel {
-  padding: 10px 18px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--overlay-10);
-  background: var(--overlay-6);
-  color: var(--text-primary);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.18s;
-}
-.signalement-modal__cancel:hover {
-  background: var(--overlay-8);
-}
-
-.signalement-modal__submit {
-  padding: 10px 22px;
-  background: var(--signal-gradient);
-  border: none;
-  border-radius: var(--radius-md);
-  color: var(--text-inverse);
-  font-family: "Syne", sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.18s;
-}
-.signalement-modal__submit:hover:not(:disabled) {
-  transform: translateY(-2px);
-}
-.signalement-modal__submit:disabled { opacity: 0.5; cursor: not-allowed; }
-
 /* ─── Photo ─── */
-.signalement-modal__photo-btn {
-  width: 100%;
-  padding: 10px 14px;
-  background: var(--bg-input);
-  border: 1.5px dashed var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.18s;
-}
-.signalement-modal__photo-btn:hover {
-  border-color: var(--signal);
-  color: var(--signal);
-}
-
 .signalement-modal__photo-preview {
   display: flex;
   flex-direction: column;
@@ -155,31 +106,3 @@
   color: var(--critical);
 }
 
-.signalement-modal__photo-remove {
-  margin-left: auto;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 2px 4px;
-}
-.signalement-modal__photo-remove:hover {
-  color: var(--critical);
-}
-
-.signalement-modal__photo-retry {
-  align-self: flex-start;
-  padding: 6px 14px;
-  background: var(--overlay-6);
-  border: 1px solid var(--overlay-10);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.signalement-modal__photo-retry:hover {
-  background: var(--overlay-8);
-}

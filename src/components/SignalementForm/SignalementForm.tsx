@@ -15,6 +15,7 @@ import axios from "axios";
 import { uploadPhoto } from "../../api/uploads.api";
 import { createSignalementOffline, OfflineQueuedError } from "../../utils/offlineQueue";
 import { Modal } from "../ui/Modal/Modal";
+import { Button } from "../ui/Button/Button";
 import type { ApiError, TypeSignalement } from "../../types";
 import "./SignalementForm.css";
 
@@ -144,7 +145,7 @@ export default function SignalementForm({
               }
             </div>
             <div className="signalement-modal__actions">
-              <button className="signalement-modal__submit" onClick={onClose}>Fermer</button>
+              <Button variant="primary" onClick={onClose}>Fermer</Button>
             </div>
           </div>
         ) : (
@@ -194,34 +195,35 @@ export default function SignalementForm({
                     {isUploadingPhoto && <span className="signalement-modal__photo-uploading">Envoi en cours...</span>}
                     {!isUploadingPhoto && uploadedPhotoUrl && <span className="signalement-modal__photo-ok">Photo envoyée ✓</span>}
                     {!isUploadingPhoto && photoError && <span className="signalement-modal__photo-error">{photoError}</span>}
-                    <button type="button" className="signalement-modal__photo-remove" onClick={handleRetirerPhoto}>
+                    <Button type="button" variant="danger" size="sm" onClick={handleRetirerPhoto}>
                       Retirer
-                    </button>
+                    </Button>
                   </div>
                   {photoError && !isUploadingPhoto && (
-                    <button
+                    <Button
                       type="button"
-                      className="signalement-modal__photo-retry"
+                      variant="secondary"
+                      size="sm"
                       onClick={() => selectedFile && void lancerUpload(selectedFile)}
                     >
                       Réessayer l'envoi
-                    </button>
+                    </Button>
                   )}
                 </div>
               ) : (
-                <button type="button" className="signalement-modal__photo-btn" onClick={() => photoInputRef.current?.click()}>
+                <Button type="button" variant="secondary" fullWidth onClick={() => photoInputRef.current?.click()}>
                   Importer une photo
-                </button>
+                </Button>
               )}
             </div>
 
             <div className="signalement-modal__actions">
-              <button type="button" className="signalement-modal__cancel" onClick={onClose}>
+              <Button type="button" variant="secondary" onClick={onClose}>
                 Annuler
-              </button>
-              <button type="submit" className="signalement-modal__submit" disabled={isSubmitting || isUploadingPhoto}>
+              </Button>
+              <Button type="submit" variant="primary" loading={isSubmitting} disabled={isUploadingPhoto}>
                 {isSubmitting ? "Envoi..." : "Envoyer le signalement"}
-              </button>
+              </Button>
             </div>
           </form>
         )}
