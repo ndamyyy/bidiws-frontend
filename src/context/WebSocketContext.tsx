@@ -11,7 +11,6 @@ import {
   type ReactNode,
 } from "react";
 import { Client, type IMessage, type StompSubscription } from "@stomp/stompjs";
-import SockJS from "sockjs-client";
 import { useAuth } from "../hooks/useAuth";
 import { getToken } from "../api/tokenStorage";
 import { WebSocketContext, type WebSocketContextType } from "./WebSocketContextValue";
@@ -29,9 +28,17 @@ interface PendingSubscription {
   active: StompSubscription | null;
 }
 
-const WS_URL =
+const WS_URL_HTTP =
   (import.meta as { env?: { VITE_WS_URL?: string } }).env?.VITE_WS_URL ??
   "http://localhost:8081/bidiws/ws";
+
+// WebSocket natif plutôt que SockJS : inutile en WebView Capacitor (pas
+// de proxy/vieux navigateur à contourner), et stompjs sait s'y connecter
+// directement via brokerURL (schéma ws(s)://) sans webSocketFactory.
+// Le endpoint /ws reste enregistré .withSockJS() côté backend — son
+// sous-chemin /websocket accepte une upgrade WebSocket native sans
+// négociation SockJS, donc aucun changement backend n'est nécessaire.
+const WS_URL = WS_URL_HTTP.replace(/^http/, "ws") + "/websocket";
 
 // ─────────────────────────────────────────
 // PROVIDER
@@ -82,7 +89,7 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
       if (cancelled) return;
 
       client = new Client({
-        webSocketFactory: () => new SockJS(WS_URL),
+        brokerURL: WS_URL,
         connectHeaders: {
           Authorization: `Bearer ${token}`,
         },
