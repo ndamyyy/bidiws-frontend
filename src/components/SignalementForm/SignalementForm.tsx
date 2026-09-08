@@ -12,8 +12,8 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import axios from "axios";
-import { createSignalement } from "../../api/signalements.api";
 import { uploadPhoto } from "../../api/uploads.api";
+import { createSignalementOffline, OfflineQueuedError } from "../../utils/offlineQueue";
 import { Modal } from "../ui/Modal/Modal";
 import type { ApiError, TypeSignalement } from "../../types";
 import "./SignalementForm.css";
@@ -40,6 +40,9 @@ export default function SignalementForm({
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [succes, setSucces] = useState<boolean>(false);
+  // Mis en file faute de réseau — distinct de succes : message différent,
+  // mais même écran de fin (l'action est prise en charge, pas perdue).
+  const [queued, setQueued] = useState<boolean>(false);
 
   // ── Photo : aperçu local + upload réel avant soumission ──
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
@@ -111,7 +114,7 @@ export default function SignalementForm({
 
     setIsSubmitting(true);
     try {
-      await createSignalement({
+      await createSignalementOffline({
         residenceId,
         type,
         description: description.trim() || undefined,
@@ -119,8 +122,12 @@ export default function SignalementForm({
       });
       setSucces(true);
     } catch (err) {
-      const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
-      setError(backendMessage ?? "Erreur lors de l'envoi du signalement.");
+      if (err instanceof OfflineQueuedError) {
+        setQueued(true);
+      } else {
+        const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
+        setError(backendMessage ?? "Erreur lors de l'envoi du signalement.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -128,10 +135,13 @@ export default function SignalementForm({
 
   return (
     <Modal onClose={onClose} title="Signaler un problème">
-        {succes ? (
+        {succes || queued ? (
           <div>
             <div className="signalement-modal__succes">
-              Votre signalement a bien été envoyé. Merci !
+              {succes
+                ? "Votre signalement a bien été envoyé. Merci !"
+                : "Pas de réseau — votre signalement sera envoyé automatiquement dès que la connexion revient."
+              }
             </div>
             <div className="signalement-modal__actions">
               <button className="signalement-modal__submit" onClick={onClose}>Fermer</button>

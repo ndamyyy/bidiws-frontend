@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/useAuth";
 import { useNotifications } from "../../../hooks/useNotifications";
+import { useOfflineQueue } from "../../../hooks/useOfflineQueue";
 import { Role } from "../../../types";
 import "./SideBar.css";
 import { JSX } from "react/jsx-runtime";
@@ -122,6 +123,7 @@ export default function Sidebar({
   const location                        = useLocation();
   const { utilisateur, logout }         = useAuth();
   const { nonLuesCount, wsConnected }   = useNotifications();
+  const { pendingCount, isReplaying }   = useOfflineQueue();
 
   // Bump du badge uniquement quand nonLuesCount AUGMENTE (nouvelle
   // notif reçue en WebSocket) — pas à chaque rendu, pas en boucle.
@@ -224,6 +226,18 @@ export default function Sidebar({
         <span className={`sidebar__ws-dot ${wsConnected ? "sidebar__ws-dot--connected" : ""}`} />
         <span>{wsConnected ? "Connecté en temps réel" : "Hors ligne"}</span>
       </div>
+
+      {/* ── File hors-ligne : actions en attente de connexion ── */}
+      {pendingCount > 0 && (
+        <div className="sidebar__offline-status">
+          <span className={`sidebar__offline-dot ${isReplaying ? "sidebar__offline-dot--replaying" : ""}`} />
+          <span>
+            {isReplaying
+              ? "Envoi des actions en attente..."
+              : `${pendingCount} action${pendingCount > 1 ? "s" : ""} en attente de connexion`}
+          </span>
+        </div>
+      )}
 
       {/* ── Déconnexion ── */}
       <div className="sidebar__footer">

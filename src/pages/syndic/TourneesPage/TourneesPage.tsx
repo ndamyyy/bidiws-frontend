@@ -7,13 +7,14 @@ import { useState }                          from "react";
 import { useQueryClient, useQueries }        from "@tanstack/react-query";
 import { useTournees }                       from "../../../hooks/useTournees";
 import { useTypesCollecte }                  from "../../../hooks/useCalendrierCollecte";
-import { getArretsByTournee, validerArret }  from "../../../api/arrets.api";
+import { getArretsByTournee }                from "../../../api/arrets.api";
 import { LoadingSpinner }                    from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon }                  from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import { AnimatedCard }                      from "../../../components/ui/AnimatedCard/AnimatedCard";
 import { Button }                            from "../../../components/ui/Button/Button";
 import { useToast }                          from "../../../hooks/useToast";
 import { extractErrorMessage }               from "../../../utils/extractErrorMessage";
+import { validerArretOffline, OfflineQueuedError } from "../../../utils/offlineQueue";
 import type { Arret }                        from "../../../types";
 import "./TourneesPage.css";
 
@@ -207,11 +208,15 @@ export default function TourneesPage() {
   const handleValider = async (arretId: number): Promise<void> => {
     setPendingArretIds(prev => new Set(prev).add(arretId));
     try {
-      await validerArret(arretId, 'COLLECTE_CONFIRMEE');
+      await validerArretOffline(arretId, 'COLLECTE_CONFIRMEE');
       await queryClient.invalidateQueries({ queryKey: ["arrets", "tournee"] });
     } catch (e) {
-      console.error("BIDIWS — Erreur validation arrêt", e);
-      toast.error(extractErrorMessage(e, "La validation de l'arrêt a échoué, réessayez."));
+      if (e instanceof OfflineQueuedError) {
+        toast.info("Pas de réseau — sera renvoyé automatiquement.");
+      } else {
+        console.error("BIDIWS — Erreur validation arrêt", e);
+        toast.error(extractErrorMessage(e, "La validation de l'arrêt a échoué, réessayez."));
+      }
     } finally {
       setPendingArretIds(prev => {
         const next = new Set(prev);

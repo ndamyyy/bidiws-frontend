@@ -12,6 +12,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { WebSocketProvider } from "./context/WebSocketContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { ToastProvider } from "./context/ToastContext";
+import { OfflineQueueProvider } from "./context/OfflineQueueContext";
 import { useAuth } from "./hooks/useAuth";
 import { useToast } from "./hooks/useToast";
 import { Toast, ToastContainer } from "./components/ui/Toast/Toast";
@@ -84,17 +85,22 @@ export default function App() {
           besoin ni du routeur ni de l'auth, et ToastHost doit rester
           monté même pendant le SplashScreen (isInitializing). */}
       <ToastProvider>
-        {/* HashRouter plutôt que BrowserRouter : requis pour Capacitor
-            (scheme capacitor://, pas de vrai serveur pour réécrire les
-            routes profondes côté WebView — un reload sur /admin/users
-            casserait avec BrowserRouter, fonctionne avec le #/ du hash). */}
-        <HashRouter>
-          <QueryClientProvider client={queryClient}>
-            <AuthProvider>
-              <AppShell />
-            </AuthProvider>
-          </QueryClientProvider>
-        </HashRouter>
+        {/* OfflineQueueProvider a besoin de useToast() (message de rejeu) —
+            à l'intérieur de ToastProvider, autour du reste : la file et
+            son rejeu ne dépendent ni du routeur ni de l'auth. */}
+        <OfflineQueueProvider>
+          {/* HashRouter plutôt que BrowserRouter : requis pour Capacitor
+              (scheme capacitor://, pas de vrai serveur pour réécrire les
+              routes profondes côté WebView — un reload sur /admin/users
+              casserait avec BrowserRouter, fonctionne avec le #/ du hash). */}
+          <HashRouter>
+            <QueryClientProvider client={queryClient}>
+              <AuthProvider>
+                <AppShell />
+              </AuthProvider>
+            </QueryClientProvider>
+          </HashRouter>
+        </OfflineQueueProvider>
         <ToastHost />
       </ToastProvider>
     </ThemeProvider>

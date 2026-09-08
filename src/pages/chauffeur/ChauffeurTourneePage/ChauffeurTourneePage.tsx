@@ -10,13 +10,13 @@ import { useAuth }                     from "../../../hooks/useAuth";
 import { useMaTourneeAujourdhui }      from "../../../hooks/useTournees";
 import { useArretsByTournee }          from "../../../hooks/useArrets";
 import { useTypesCollecte }            from "../../../hooks/useCalendrierCollecte";
-import { validerArret, signalerIncident } from "../../../api/arrets.api";
 import { demarrerTournee, terminerTournee } from "../../../api/tournee.api";
 import { LoadingSpinner }              from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon }            from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import { Button }                      from "../../../components/ui/Button/Button";
 import { useToast }                    from "../../../hooks/useToast";
 import { extractErrorMessage }         from "../../../utils/extractErrorMessage";
+import { validerArretOffline, signalerIncidentOffline, OfflineQueuedError } from "../../../utils/offlineQueue";
 import type { Arret, ApiError }        from "../../../types";
 import "./ChauffeurTourneePage.css";
 
@@ -123,6 +123,7 @@ const ArretItem = ({
   onSignalerIncident: (id: number, description: string) => Promise<void>;
   readOnly          : boolean;
 }) => {
+  const toast = useToast();
   const isDone     = arret.statut === 'COLLECTE_CONFIRMEE';
   const isIncident = arret.statut === 'INCIDENT';
   const isCurrent  = arret.statut === 'EN_APPROCHE';
@@ -150,8 +151,16 @@ const ArretItem = ({
       await onSignalerIncident(arret.id, description.trim());
       setIncidentOpen(false);
       setDescription("");
-    } catch {
-      setIncidentError("Erreur lors du signalement de l'incident.");
+    } catch (err) {
+      if (err instanceof OfflineQueuedError) {
+        // Mis en file : traité comme un envoi réussi côté formulaire,
+        // avec un toast à la place du message d'erreur inline.
+        setIncidentOpen(false);
+        setDescription("");
+        toast.info("Pas de réseau — sera renvoyé automatiquement.");
+      } else {
+        setIncidentError("Erreur lors du signalement de l'incident.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -324,11 +333,15 @@ export default function ChauffeurTourneePage() {
   const handleValider = async (arretId: number): Promise<void> => {
     setPendingArretIds(prev => new Set(prev).add(arretId));
     try {
-      await validerArret(arretId, 'COLLECTE_CONFIRMEE');
+      await validerArretOffline(arretId, 'COLLECTE_CONFIRMEE');
       await queryClient.invalidateQueries({ queryKey: ["arrets", "tournee", tournee?.id] });
     } catch (e) {
-      console.error("BIDIWS — Erreur validation arrêt", e);
-      toast.error(extractErrorMessage(e, "La validation de l'arrêt a échoué, réessayez."));
+      if (e instanceof OfflineQueuedError) {
+        toast.info("Pas de réseau — sera renvoyé automatiquement.");
+      } else {
+        console.error("BIDIWS — Erreur validation arrêt", e);
+        toast.error(extractErrorMessage(e, "La validation de l'arrêt a échoué, réessayez."));
+      }
     } finally {
       setPendingArretIds(prev => {
         const next = new Set(prev);
@@ -342,7 +355,7 @@ export default function ChauffeurTourneePage() {
   // refetch — erreur remontée à l'appelant (ArretItem gère l'affichage
   // localement, propre à cet arrêt plutôt qu'un état page-level). ──
   const handleSignalerIncident = async (arretId: number, description: string): Promise<void> => {
-    await signalerIncident(arretId, { descriptionIncident: description });
+    await signalerIncidentOffline(arretId, { descriptionIncident: description });
     await queryClient.invalidateQueries({ queryKey: ["arrets", "tournee", tournee?.id] });
   };
 
