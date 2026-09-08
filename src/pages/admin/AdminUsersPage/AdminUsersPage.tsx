@@ -19,6 +19,7 @@ import {
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
 import { useToast } from "../../../hooks/useToast";
+import { extractErrorMessage } from "../../../utils/extractErrorMessage";
 import type { ApiError, Role, Utilisateur } from "../../../types";
 import "./AdminUsersPage.css";
 
@@ -357,7 +358,7 @@ export default function AdminUsersPage() {
       await queryClient.invalidateQueries({ queryKey: ["admin-utilisateurs"] });
     } catch (e) {
       console.error("BIDIWS — Erreur changement statut utilisateur", e);
-      toast.error("Le changement de statut a échoué, réessayez.");
+      toast.error(extractErrorMessage(e, "Le changement de statut a échoué, réessayez."));
     } finally {
       setPendingIds(prev => {
         const next = new Set(prev);

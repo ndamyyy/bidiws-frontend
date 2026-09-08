@@ -14,6 +14,7 @@ import { updateStatutSignalement } from "../../../api/signalements.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { AnimatedCard } from "../../../components/ui/AnimatedCard/AnimatedCard";
 import { useToast } from "../../../hooks/useToast";
+import { extractErrorMessage } from "../../../utils/extractErrorMessage";
 import type { ApiError, Signalement, StatutSignalement } from "../../../types";
 import "./AdminSignalementsPage.css";
 
@@ -176,7 +177,7 @@ export default function AdminSignalementsPage() {
     } catch (err) {
       const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
       console.error("BIDIWS — Erreur changement statut signalement", backendMessage ?? err);
-      toast.error("Le changement de statut a échoué, réessayez.");
+      toast.error(extractErrorMessage(err, "Le changement de statut a échoué, réessayez."));
     } finally {
       setPendingIds(prev => {
         const next = new Set(prev);

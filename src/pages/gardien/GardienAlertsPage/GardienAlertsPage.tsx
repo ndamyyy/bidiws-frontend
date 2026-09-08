@@ -11,6 +11,7 @@ import { useState, type JSX } from "react";
 import { useNotifications } from "../../../hooks/useNotifications";
 import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
 import { useToast } from "../../../hooks/useToast";
+import { extractErrorMessage } from "../../../utils/extractErrorMessage";
 import type { Notification } from "../../../types";
 import "./GardienAlertsPage.css";
 
@@ -100,7 +101,7 @@ export default function GardienAlertsPage() {
   const handleRead = (id: number): void => {
     marquerLue(id).catch(e => {
       console.error("BIDIWS — Erreur marquerLue", e);
-      toast.error("Impossible de marquer l'alerte comme lue.");
+      toast.error(extractErrorMessage(e, "Impossible de marquer l'alerte comme lue."));
     });
   };
 
@@ -110,7 +111,7 @@ export default function GardienAlertsPage() {
       await marquerToutesLues();
     } catch (e) {
       console.error("BIDIWS — Erreur marquerToutesLues", e);
-      toast.error("Impossible de marquer les alertes comme lues.");
+      toast.error(extractErrorMessage(e, "Impossible de marquer les alertes comme lues."));
     } finally {
       setIsMarkingAll(false);
     }

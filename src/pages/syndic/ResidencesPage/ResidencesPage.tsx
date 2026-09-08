@@ -19,6 +19,7 @@ import { LoadingSpinner }                   from "../../../components/ui/Loading
 import { StaggerContainer, StaggerItem }    from "../../../components/ui/StaggerContainer/StaggerContainer";
 import { Modal }                            from "../../../components/ui/Modal/Modal";
 import { useToast }                         from "../../../hooks/useToast";
+import { extractErrorMessage }              from "../../../utils/extractErrorMessage";
 import type { Residence, Arret, ApiError }  from "../../../types";
 import "./ResidencesPage.css";
 
@@ -153,7 +154,7 @@ const CalendrierSection = ({ residenceId }: { residenceId: number }) => {
     } catch (err) {
       const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
       console.error("BIDIWS — Erreur désactivation calendrier", backendMessage ?? err);
-      toast.error("La désactivation du passage a échoué, réessayez.");
+      toast.error(extractErrorMessage(err, "La désactivation du passage a échoué, réessayez."));
     } finally {
       setPendingIds(prev => {
         const next = new Set(prev);
@@ -306,7 +307,7 @@ const ConteneursSection = ({ residenceId }: { residenceId: number }) => {
     } catch (err) {
       const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
       console.error("BIDIWS — Erreur désactivation conteneur", backendMessage ?? err);
-      toast.error("La désactivation du conteneur a échoué, réessayez.");
+      toast.error(extractErrorMessage(err, "La désactivation du conteneur a échoué, réessayez."));
     } finally {
       setPendingIds(prev => {
         const next = new Set(prev);

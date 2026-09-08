@@ -16,6 +16,7 @@ import { LoadingSpinner }              from "../../../components/ui/LoadingSpinn
 import { TypeCollecteIcon }            from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import { Button }                      from "../../../components/ui/Button/Button";
 import { useToast }                    from "../../../hooks/useToast";
+import { extractErrorMessage }         from "../../../utils/extractErrorMessage";
 import type { Arret, ApiError }        from "../../../types";
 import "./ChauffeurTourneePage.css";
 
@@ -327,7 +328,7 @@ export default function ChauffeurTourneePage() {
       await queryClient.invalidateQueries({ queryKey: ["arrets", "tournee", tournee?.id] });
     } catch (e) {
       console.error("BIDIWS — Erreur validation arrêt", e);
-      toast.error("La validation de l'arrêt a échoué, réessayez.");
+      toast.error(extractErrorMessage(e, "La validation de l'arrêt a échoué, réessayez."));
     } finally {
       setPendingArretIds(prev => {
         const next = new Set(prev);

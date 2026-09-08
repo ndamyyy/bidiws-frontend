@@ -22,6 +22,7 @@ import {
 } from "../../../api/appareils-iot.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { useToast } from "../../../hooks/useToast";
+import { extractErrorMessage } from "../../../utils/extractErrorMessage";
 import type { ApiError, AppareilIot, AppareilIotCreeResponse, TypeAppareilIot } from "../../../types";
 import "./AdminAppareilsIotPage.css";
 
@@ -250,7 +251,7 @@ export default function AdminAppareilsIotPage() {
     } catch (err) {
       const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
       console.error("BIDIWS — Erreur désactivation appareil IoT", backendMessage ?? err);
-      toast.error("La désactivation de l'appareil a échoué, réessayez.");
+      toast.error(extractErrorMessage(err, "La désactivation de l'appareil a échoué, réessayez."));
     } finally {
       setPendingIds(prev => {
         const next = new Set(prev);
@@ -268,7 +269,7 @@ export default function AdminAppareilsIotPage() {
     } catch (err) {
       const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
       console.error("BIDIWS — Erreur régénération clé appareil IoT", backendMessage ?? err);
-      toast.error("La régénération de la clé a échoué, réessayez.");
+      toast.error(extractErrorMessage(err, "La régénération de la clé a échoué, réessayez."));
     } finally {
       setPendingIds(prev => {
         const next = new Set(prev);

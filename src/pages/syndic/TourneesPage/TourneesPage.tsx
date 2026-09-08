@@ -13,6 +13,7 @@ import { TypeCollecteIcon }                  from "../../../components/ui/TypeCo
 import { AnimatedCard }                      from "../../../components/ui/AnimatedCard/AnimatedCard";
 import { Button }                            from "../../../components/ui/Button/Button";
 import { useToast }                          from "../../../hooks/useToast";
+import { extractErrorMessage }               from "../../../utils/extractErrorMessage";
 import type { Arret }                        from "../../../types";
 import "./TourneesPage.css";
 
@@ -210,7 +211,7 @@ export default function TourneesPage() {
       await queryClient.invalidateQueries({ queryKey: ["arrets", "tournee"] });
     } catch (e) {
       console.error("BIDIWS — Erreur validation arrêt", e);
-      toast.error("La validation de l'arrêt a échoué, réessayez.");
+      toast.error(extractErrorMessage(e, "La validation de l'arrêt a échoué, réessayez."));
     } finally {
       setPendingArretIds(prev => {
         const next = new Set(prev);

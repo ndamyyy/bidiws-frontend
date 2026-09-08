@@ -23,6 +23,7 @@ import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpi
 import { TypeCollecteIcon } from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import { AnimatedCard } from "../../../components/ui/AnimatedCard/AnimatedCard";
 import { useToast } from "../../../hooks/useToast";
+import { extractErrorMessage } from "../../../utils/extractErrorMessage";
 import type { ApiError, Tournee } from "../../../types";
 import "./AdminTourneesPage.css";
 
@@ -334,7 +335,7 @@ export default function AdminTourneesPage() {
     } catch (err) {
       const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
       console.error("BIDIWS — Erreur annulation tournée", backendMessage ?? err);
-      toast.error("L'annulation de la tournée a échoué, réessayez.");
+      toast.error(extractErrorMessage(err, "L'annulation de la tournée a échoué, réessayez."));
     } finally {
       setAnnulPendingIds(prev => {
         const next = new Set(prev);

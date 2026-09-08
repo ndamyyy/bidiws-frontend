@@ -7,6 +7,7 @@ import { JSX, useState }        from "react";
 import { useNotifications }     from "../../../hooks/useNotifications";
 import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
 import { useToast }             from "../../../hooks/useToast";
+import { extractErrorMessage }  from "../../../utils/extractErrorMessage";
 import type { Notification }    from "../../../types";
 import "./NotificationsPage.css";
 
@@ -123,7 +124,7 @@ export default function NotificationsPage() {
   const handleRead = (id: number): void => {
     marquerLue(id).catch(e => {
       console.error("BIDIWS — Erreur marquerLue", e);
-      toast.error("Impossible de marquer la notification comme lue.");
+      toast.error(extractErrorMessage(e, "Impossible de marquer la notification comme lue."));
     });
   };
 
@@ -133,7 +134,7 @@ export default function NotificationsPage() {
       await marquerToutesLues();
     } catch (e) {
       console.error("BIDIWS — Erreur marquerToutesLues", e);
-      toast.error("Impossible de marquer les notifications comme lues.");
+      toast.error(extractErrorMessage(e, "Impossible de marquer les notifications comme lues."));
     } finally {
       setIsMarkingAll(false);
     }
