@@ -204,25 +204,3 @@
   color: var(--text-secondary);
 }
 
-/* ─── Bouton valider ─── */
-.btn-valider {
-  background: linear-gradient(135deg, var(--success), #2e7d32);
-  border: none;
-  border-radius: 10px;
-  padding: 8px 16px;
-  color: var(--text-inverse);
-  font-family: "DM Sans", sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: transform 0.18s, box-shadow 0.18s;
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--success) 30%, transparent);
-}
-
-.btn-valider:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px color-mix(in srgb, var(--success) 40%, transparent);
-}

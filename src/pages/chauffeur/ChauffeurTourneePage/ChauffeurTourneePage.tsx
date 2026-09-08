@@ -14,6 +14,7 @@ import { validerArret, signalerIncident } from "../../../api/arrets.api";
 import { demarrerTournee, terminerTournee } from "../../../api/tournee.api";
 import { LoadingSpinner }              from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon }            from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
+import { Button }                      from "../../../components/ui/Button/Button";
 import { useToast }                    from "../../../hooks/useToast";
 import type { Arret, ApiError }        from "../../../types";
 import "./ChauffeurTourneePage.css";
@@ -203,22 +204,24 @@ const ArretItem = ({
           </span>
         ) : readOnly ? null : (
           <div className="c-arret-item__actions">
-            <button
-              className="btn-valider-chauffeur"
+            <Button
+              variant="primary"
+              size="sm"
+              loading={isValidating}
+              icon={<IconCheck color="currentColor" size={14} />}
               onClick={() => onValider(arret.id)}
-              disabled={isValidating}
             >
-              <IconCheck color="#fff" size={14} /> {isValidating ? "Validation..." : "Valider"}
-            </button>
-            <button
-              className="btn-incident-chauffeur"
+              {isValidating ? "Validation..." : "Valider"}
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              icon={<IconAlert color="currentColor" />}
               onClick={() => setIncidentOpen(v => !v)}
+              disabled={isValidating}
               title="Signaler un incident sur cet arrêt"
               aria-label="Signaler un incident sur cet arrêt"
-              disabled={isValidating}
-            >
-              <IconAlert color="var(--danger)" />
-            </button>
+            />
           </div>
         )}
       </div>
@@ -235,19 +238,22 @@ const ArretItem = ({
             onKeyDown={(e) => e.key === "Enter" && handleSubmitIncident()}
             autoFocus
           />
-          <button
-            className="btn-incident-submit"
+          <Button
+            variant="danger"
+            size="sm"
+            loading={isSubmitting}
+            disabled={!description.trim()}
             onClick={handleSubmitIncident}
-            disabled={!description.trim() || isSubmitting}
           >
-            {isSubmitting ? "…" : "Envoyer"}
-          </button>
-          <button
-            className="btn-incident-cancel"
+            Envoyer
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => { setIncidentOpen(false); setDescription(""); setIncidentError(""); }}
           >
             Annuler
-          </button>
+          </Button>
           {incidentError && (
             <div className="c-arret-item__incident-error">{incidentError}</div>
           )}
@@ -421,14 +427,15 @@ export default function ChauffeurTourneePage() {
               {demarrerError}
             </div>
           )}
-          <button
-            className="btn-demarrer-chauffeur"
+          <Button
+            variant="primary"
+            fullWidth
+            loading={isStarting}
+            icon={<IconTruck color="currentColor" />}
             onClick={handleDemarrer}
-            disabled={isStarting}
           >
-            <IconTruck color="var(--text-inverse)" />
             {isStarting ? "Démarrage en cours..." : "Démarrer la tournée"}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -513,13 +520,13 @@ export default function ChauffeurTourneePage() {
               {terminerError}
             </div>
           )}
-          <button
-            className="btn-terminer-chauffeur"
+          <Button
+            variant="primary"
+            loading={isTerminating}
             onClick={handleTerminer}
-            disabled={isTerminating}
           >
             {isTerminating ? "Clôture en cours..." : "Terminer la tournée"}
-          </button>
+          </Button>
         </div>
       )}
     </div>

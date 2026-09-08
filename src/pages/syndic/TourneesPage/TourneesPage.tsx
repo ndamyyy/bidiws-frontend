@@ -11,6 +11,7 @@ import { getArretsByTournee, validerArret }  from "../../../api/arrets.api";
 import { LoadingSpinner }                    from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon }                  from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import { AnimatedCard }                      from "../../../components/ui/AnimatedCard/AnimatedCard";
+import { Button }                            from "../../../components/ui/Button/Button";
 import { useToast }                          from "../../../hooks/useToast";
 import type { Arret }                        from "../../../types";
 import "./TourneesPage.css";
@@ -159,9 +160,15 @@ const ArretItem = ({
         <Badge statut={arret.statut} />
         {arret.scoreConfiance > 0 && <ScoreBadge score={arret.scoreConfiance} />}
         {arret.statut === 'EN_ATTENTE' && (
-          <button className="btn-valider" onClick={() => onValider(arret.id)} disabled={isValidating}>
-            <IconCheck color="#fff" /> {isValidating ? "Validation..." : "Valider"}
-          </button>
+          <Button
+            variant="primary"
+            size="sm"
+            loading={isValidating}
+            icon={<IconCheck color="currentColor" />}
+            onClick={() => onValider(arret.id)}
+          >
+            {isValidating ? "Validation..." : "Valider"}
+          </Button>
         )}
       </div>
     </div>
