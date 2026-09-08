@@ -46,56 +46,6 @@
 }
 
 /* ─── Modale ajout résidence ─── */
-.residence-modal__backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  z-index: 300;
-}
-
-.residence-modal__card {
-  width: 100%;
-  max-width: 560px;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: var(--bg-elevated);
-  border: 1px solid var(--overlay-10);
-  border-radius: 16px;
-  padding: 24px;
-}
-
-.residence-modal__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 18px;
-}
-
-.residence-modal__title {
-  font-family: "Syne", sans-serif;
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.residence-modal__close {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0 4px;
-}
-.residence-modal__close:hover {
-  color: var(--text-primary);
-}
-
 .residence-modal__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

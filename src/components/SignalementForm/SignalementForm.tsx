@@ -14,6 +14,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import axios from "axios";
 import { createSignalement } from "../../api/signalements.api";
 import { uploadPhoto } from "../../api/uploads.api";
+import { Modal } from "../ui/Modal/Modal";
 import type { ApiError, TypeSignalement } from "../../types";
 import "./SignalementForm.css";
 
@@ -126,13 +127,7 @@ export default function SignalementForm({
   };
 
   return (
-    <div className="signalement-modal__backdrop" onClick={onClose}>
-      <div className="signalement-modal__card" onClick={(e) => e.stopPropagation()}>
-        <div className="signalement-modal__header">
-          <h2 className="signalement-modal__title">Signaler un problème</h2>
-          <button className="signalement-modal__close" onClick={onClose} title="Fermer" aria-label="Fermer">×</button>
-        </div>
-
+    <Modal onClose={onClose} title="Signaler un problème">
         {succes ? (
           <div>
             <div className="signalement-modal__succes">
@@ -220,7 +215,6 @@ export default function SignalementForm({
             </div>
           </form>
         )}
-      </div>
-    </div>
+    </Modal>
   );
 }

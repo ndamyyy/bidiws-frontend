@@ -17,6 +17,7 @@ import { createCalendrier, desactiverCalendrier } from "../../../api/calendrier-
 import { createConteneur, desactiverConteneur } from "../../../api/conteneurs.api";
 import { LoadingSpinner }                   from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { StaggerContainer, StaggerItem }    from "../../../components/ui/StaggerContainer/StaggerContainer";
+import { Modal }                            from "../../../components/ui/Modal/Modal";
 import { useToast }                         from "../../../hooks/useToast";
 import type { Residence, Arret, ApiError }  from "../../../types";
 import "./ResidencesPage.css";
@@ -501,13 +502,7 @@ const AjouterResidenceModal = ({ onClose }: { onClose: () => void }) => {
   };
 
   return (
-    <div className="residence-modal__backdrop" onClick={onClose}>
-      <div className="residence-modal__card" onClick={(e) => e.stopPropagation()}>
-        <div className="residence-modal__header">
-          <h2 className="residence-modal__title">Ajouter une résidence</h2>
-          <button className="residence-modal__close" onClick={onClose} title="Fermer" aria-label="Fermer">×</button>
-        </div>
-
+    <Modal onClose={onClose} title="Ajouter une résidence" maxWidth={560}>
         <form onSubmit={handleSubmit}>
           {error && <div className="residence-modal__error">{error}</div>}
 
@@ -627,8 +622,7 @@ const AjouterResidenceModal = ({ onClose }: { onClose: () => void }) => {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 };
 

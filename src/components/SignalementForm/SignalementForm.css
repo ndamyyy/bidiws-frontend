@@ -5,56 +5,6 @@
    propre — composant partagé, pas de style couplé à une page.
    ============================================================ */
 
-.signalement-modal__backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  z-index: 300;
-}
-
-.signalement-modal__card {
-  width: 100%;
-  max-width: 480px;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: var(--bg-elevated);
-  border: 1px solid var(--overlay-10);
-  border-radius: 16px;
-  padding: 24px;
-}
-
-.signalement-modal__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 18px;
-}
-
-.signalement-modal__title {
-  font-family: "Syne", sans-serif;
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.signalement-modal__close {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0 4px;
-}
-.signalement-modal__close:hover {
-  color: var(--text-primary);
-}
-
 .signalement-modal__field {
   display: flex;
   flex-direction: column;
