@@ -80,7 +80,10 @@
   /* ── Texte ── */
   --text-primary:   #EDF2FB;
   --text-secondary: #8E9BB5;
-  --text-muted:     #4D5A78;
+  /* #4D5A78 mesurait 2.86:1 sur --text-inverse (#070B14), sous le
+     minimum WCAG (4.5:1) — même teinte (bleu-gris, ~223°), éclaircie
+     pour atteindre 4.67:1. */
+  --text-muted:     #6B7BA3;
   --text-inverse:   #070B14;
   
   /* ── Bordures ── */
@@ -680,7 +683,10 @@ h4, .h4 { font-family: var(--font-display); font-size: clamp(16px, 2vw, 20px); f
 
   --text-primary:   #101828;
   --text-secondary: #55617A;
-  --text-muted:     #94A0B8;
+  /* #94A0B8 mesurait ~2.5:1 sur ce fond (#F7F8FA), sous le minimum
+     WCAG (4.5:1) — même teinte (bleu-gris, ~220°), assombrie pour
+     atteindre 4.69:1. */
+  --text-muted:     #677081;
   /* --text-inverse volontairement inchangé : il sert uniquement de
      couleur de texte sur fond --signal (boutons primaires), qui reste
      un vert clair identique dans les deux thèmes — du texte clair
