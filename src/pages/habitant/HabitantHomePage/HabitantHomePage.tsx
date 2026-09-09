@@ -110,6 +110,25 @@ export default function HabitantHomePage() {
     );
   }
 
+  // Cas déjà identifié : un compte habitant sans lien résidence (aucune
+  // UI pour le créer aujourd'hui) retombait silencieusement sur "Aucune
+  // collecte programmée" — indiscernable d'une résidence réelle sans
+  // calendrier renseigné. Un syndic/admin peut rattacher une résidence
+  // via AdminUsersPage (section "Résidence" du panneau d'édition).
+  if (!residenceLien) {
+    return (
+      <div>
+        <div className="habitant__header">
+          <h1 className="habitant__title">Prochaine collecte</h1>
+        </div>
+        <div style={{ padding: "24px 0", color: "var(--text-secondary)", fontSize: 13 }}>
+          Votre compte n'est pas encore rattaché à une résidence — contactez
+          votre syndic ou l'administrateur.
+        </div>
+      </div>
+    );
+  }
+
   // ── Prochaine collecte : le jour actif le plus proche à partir
   //    d'aujourd'hui (sans comparer l'heure — même simplification que
   //    l'ancien mock, qui affichait toujours le premier jour du

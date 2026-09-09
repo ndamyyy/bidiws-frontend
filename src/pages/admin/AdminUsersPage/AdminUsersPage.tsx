@@ -3,11 +3,12 @@
 // Fichier : src/pages/admin/AdminUsersPage/AdminUsersPage.tsx
 // ============================================================
 
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useAdminUtilisateurs } from "../../../hooks/useAdminUtilisateurs";
 import { useVilles } from "../../../hooks/useVilles";
+import { useResidences, useResidencesHabitant } from "../../../hooks/useResidences";
 import {
   activerUtilisateur,
   desactiverUtilisateur,
@@ -16,6 +17,7 @@ import {
   changerRoleUtilisateur,
   resetMotDePasseUtilisateur,
 } from "../../../api/admin-utilisateurs.api";
+import { changerResidenceHabitant } from "../../../api/residence-habitants.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
 import { FilterGroup } from "../../../components/ui/FilterGroup/FilterGroup";
@@ -88,6 +90,47 @@ const EditUserPanel = ({
   const [passwordError, setPasswordError] = useState<string>("");
   const [isSubmittingPassword, setIsSubmittingPassword] = useState<boolean>(false);
   const [motDePasseReinitialise, setMotDePasseReinitialise] = useState<string>("");
+
+  // ── Résidence (déménagement) — HABITANT uniquement ──
+  const queryClient = useQueryClient();
+  const { data: residences, isLoading: isLoadingResidences } = useResidences();
+  const { data: residencesHabitant } = useResidencesHabitant(
+    utilisateur.role === "HABITANT" ? utilisateur.id : undefined
+  );
+  const residenceActuelle = residencesHabitant?.[0];
+
+  const [editResidenceId, setEditResidenceId] = useState<string>("");
+  const [residenceError, setResidenceError] = useState<string>("");
+  const [isSubmittingResidence, setIsSubmittingResidence] = useState<boolean>(false);
+  const [residenceSuccess, setResidenceSuccess] = useState<boolean>(false);
+
+  // Pré-sélectionne la résidence actuelle une fois chargée — pas au
+  // premier rendu (residencesHabitant arrive après un aller-retour réseau).
+  useEffect(() => {
+    if (residenceActuelle) setEditResidenceId(String(residenceActuelle.residenceId));
+  }, [residenceActuelle]);
+
+  const handleResidenceSubmit = async (e: FormEvent): Promise<void> => {
+    e.preventDefault();
+    setResidenceError("");
+    setResidenceSuccess(false);
+
+    if (!editResidenceId) {
+      setResidenceError("Veuillez sélectionner une résidence.");
+      return;
+    }
+
+    setIsSubmittingResidence(true);
+    try {
+      await changerResidenceHabitant(Number(editResidenceId), utilisateur.id);
+      await queryClient.invalidateQueries({ queryKey: ["residence-habitants"] });
+      setResidenceSuccess(true);
+    } catch (err) {
+      setResidenceError(extractErrorMessage(err, "Erreur lors du changement de résidence."));
+    } finally {
+      setIsSubmittingResidence(false);
+    }
+  };
 
   const handleRoleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
@@ -225,6 +268,41 @@ const EditUserPanel = ({
           </div>
         )}
       </form>
+
+      {/* ── Résidence (déménagement) — uniquement pour un compte HABITANT ── */}
+      {utilisateur.role === "HABITANT" && (
+        <form className="admin-user-edit__form" onSubmit={handleResidenceSubmit}>
+          <div className="admin-user-edit__password-title">Résidence</div>
+          {residenceError && <div className="admin-users__error">{residenceError}</div>}
+          {residenceSuccess && (
+            <div className="admin-users__success">Résidence mise à jour.</div>
+          )}
+          {!residenceActuelle && (
+            <div className="admin-user-edit__reveal-warning" style={{ marginBottom: 10 }}>
+              Cet habitant n'est rattaché à aucune résidence actuellement.
+            </div>
+          )}
+          <div className="admin-user-edit__row">
+            <div className="admin-users__field">
+              <label className="admin-users__label">Résidence</label>
+              <select
+                className="admin-users__select"
+                value={editResidenceId}
+                onChange={(e) => setEditResidenceId(e.target.value)}
+                disabled={isLoadingResidences}
+              >
+                <option value="">Sélectionner...</option>
+                {residences?.map(r => (
+                  <option key={r.id} value={r.id}>{r.nom}</option>
+                ))}
+              </select>
+            </div>
+            <button className="admin-users__submit" type="submit" disabled={isSubmittingResidence}>
+              {isSubmittingResidence ? "Enregistrement..." : residenceActuelle ? "Changer" : "Rattacher"}
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 };

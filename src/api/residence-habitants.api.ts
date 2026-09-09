@@ -31,3 +31,22 @@ export const getResidencesByHabitant = async (
   );
   return response.data;
 };
+
+// ─────────────────────────────────────────
+// CHANGER LA RÉSIDENCE D'UN HABITANT (déménagement)
+// PUT /residence-habitants
+// Retire tout lien existant côté backend avant de poser le nouveau —
+// un habitant ne se retrouve jamais avec deux résidences actives à la
+// fois (voir ResidenceHabitantService.changerResidence).
+// ─────────────────────────────────────────
+
+export const changerResidenceHabitant = async (
+  residenceId: number,
+  habitantId: number
+): Promise<ResidenceHabitant> => {
+  const response = await apiClient.put<ResidenceHabitant>(
+    "/residence-habitants",
+    { residenceId, habitantId }
+  );
+  return response.data;
+};
