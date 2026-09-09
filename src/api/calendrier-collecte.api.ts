@@ -4,7 +4,7 @@
 // ============================================================
 
 import apiClient from "./axios";
-import type { CalendrierCollecte } from "../types";
+import type { CalendrierCollecte, ResidenceADesservir } from "../types";
 
 // ─────────────────────────────────────────
 // DTO REQUÊTE
@@ -65,4 +65,23 @@ export const createCalendrier = async (
 
 export const desactiverCalendrier = async (id: number): Promise<void> => {
   await apiClient.patch(`/calendriers-collecte/${id}/desactiver`);
+};
+
+// ─────────────────────────────────────────
+// RÉSIDENCES À DESSERVIR (suggestion d'arrêts depuis le calendrier)
+// GET /calendriers-collecte/residences-a-desservir?zoneId&date&typeCollecteId
+// Lecture seule — ne crée rien. À l'admin de valider (ou pas) la liste
+// avant toute création groupée d'arrêts.
+// ─────────────────────────────────────────
+
+export const getResidencesADesservir = async (
+  zoneId: number,
+  date: string,
+  typeCollecteId: number
+): Promise<ResidenceADesservir[]> => {
+  const response = await apiClient.get<ResidenceADesservir[]>(
+    "/calendriers-collecte/residences-a-desservir",
+    { params: { zoneId, date, typeCollecteId } }
+  );
+  return response.data;
 };

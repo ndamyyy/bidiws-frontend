@@ -161,6 +161,19 @@ export interface CalendrierCollecte {
   actif               : boolean;
 }
 
+// Résidence suggérée pour l'ajout d'un arrêt sur une tournée, déduite du
+// calendrier de collecte récurrent — forme exacte de
+// ResidenceADesservirDto (backend). nbConteneurs reprend la valeur
+// enregistrée sur la résidence, juste une valeur par défaut pratique
+// pour préremplir le formulaire d'arrêt côté frontend.
+export interface ResidenceADesservir {
+  id           : number;
+  nom          : string;
+  adresse      : string;
+  codePostal   : string;
+  nbConteneurs?: number;
+}
+
 // Forme confirmée contre CamionResponseDto (backend) : villeId/villeNom
 // dénormalisés (Camion.villeId, migration V4) — absents jusqu'ici.
 export interface Camion {

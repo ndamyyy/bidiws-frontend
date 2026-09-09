@@ -7,7 +7,7 @@
 // gérait que la création seule.
 // ============================================================
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useTournees } from "../../../hooks/useTournees";
@@ -19,14 +19,17 @@ import { useResidences } from "../../../hooks/useResidences";
 import { useArretsByTournee } from "../../../hooks/useArrets";
 import { createArret } from "../../../api/arrets.api";
 import { createTournee, annulerTournee } from "../../../api/tournee.api";
+import { getResidencesADesservir } from "../../../api/calendrier-collecte.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon } from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import { AnimatedCard } from "../../../components/ui/AnimatedCard/AnimatedCard";
 import { Input } from "../../../components/ui/Input/Input";
 import { Select } from "../../../components/ui/Select/Select";
+import { Modal } from "../../../components/ui/Modal/Modal";
+import { Button } from "../../../components/ui/Button/Button";
 import { useToast } from "../../../hooks/useToast";
 import { extractErrorMessage } from "../../../utils/extractErrorMessage";
-import type { ApiError, Tournee } from "../../../types";
+import type { ApiError, ResidenceADesservir, Tournee } from "../../../types";
 import "./AdminTourneesPage.css";
 
 // ─────────────────────────────────────────
@@ -166,6 +169,157 @@ const AjouterArretForm = ({
 };
 
 // ─────────────────────────────────────────
+// SUGGESTION D'ARRÊTS DEPUIS LE CALENDRIER
+// GET /calendriers-collecte/residences-a-desservir (lecture seule),
+// puis une liste à cocher/décocher — jamais de création automatique
+// sans validation explicite de l'admin.
+// ─────────────────────────────────────────
+
+const SuggererArretsModal = ({
+  tournee,
+  ordreDepart,
+  residenceIdsExistantes,
+  onClose,
+  onDone,
+}: {
+  tournee: Tournee;
+  ordreDepart: number;
+  residenceIdsExistantes: Set<number>;
+  onClose: () => void;
+  onDone: () => void;
+}) => {
+  const queryClient = useQueryClient();
+  const toast = useToast();
+
+  const [suggestions, setSuggestions] = useState<ResidenceADesservir[] | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+  const [isCreating, setIsCreating] = useState<boolean>(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const result = await getResidencesADesservir(
+          tournee.zoneId as number,
+          tournee.dateTournee,
+          tournee.typeCollecteId
+        );
+        if (cancelled) return;
+        // Une résidence déjà desservie sur cette tournée n'est pas
+        // resuggérée — évite un doublon d'arrêt pour la même résidence.
+        const nouvelles = result.filter(r => !residenceIdsExistantes.has(r.id));
+        setSuggestions(nouvelles);
+        setSelectedIds(new Set(nouvelles.map(r => r.id)));
+      } catch (err) {
+        if (!cancelled) {
+          setError(extractErrorMessage(err, "Erreur lors de la recherche des résidences à desservir."));
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [tournee.zoneId, tournee.dateTournee, tournee.typeCollecteId, residenceIdsExistantes]);
+
+  const toggle = (id: number): void => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const handleConfirm = async (): Promise<void> => {
+    if (!suggestions || selectedIds.size === 0) return;
+
+    setIsCreating(true);
+    setError("");
+    const aCreer = suggestions.filter(r => selectedIds.has(r.id));
+
+    try {
+      await Promise.all(aCreer.map((r, i) =>
+        createArret({
+          tourneeId: tournee.id,
+          residenceId: r.id,
+          ordre: ordreDepart + i,
+          nbConteneurs: r.nbConteneurs ?? 1,
+        })
+      ));
+      await queryClient.invalidateQueries({ queryKey: ["arrets", "tournee", tournee.id] });
+      toast.success(`${aCreer.length} arrêt${aCreer.length > 1 ? "s" : ""} créé${aCreer.length > 1 ? "s" : ""} depuis le calendrier.`);
+      onDone();
+    } catch (err) {
+      // Une requête POST /arrets par résidence, pas une création groupée
+      // atomique côté backend : une partie a pu réussir malgré l'échec —
+      // on rafraîchit quand même la liste pour refléter ce qui a été créé.
+      await queryClient.invalidateQueries({ queryKey: ["arrets", "tournee", tournee.id] });
+      setError(extractErrorMessage(err, "Erreur lors de la création des arrêts."));
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  return (
+    <Modal
+      onClose={onClose}
+      title="Suggestions depuis le calendrier"
+      maxWidth={560}
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose} disabled={isCreating}>
+            Annuler
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleConfirm}
+            loading={isCreating}
+            disabled={isLoading || !suggestions || selectedIds.size === 0}
+          >
+            Créer {selectedIds.size} arrêt{selectedIds.size > 1 ? "s" : ""}
+          </Button>
+        </>
+      }
+    >
+      {error && <div className="admin-tournees__error">{error}</div>}
+
+      {isLoading && <LoadingSpinner />}
+
+      {!isLoading && suggestions && suggestions.length === 0 && (
+        <div style={{ padding: "8px 0", color: "var(--text-secondary)", fontSize: 13 }}>
+          Aucune résidence à desservir trouvée pour cette date et cette zone
+          d'après le calendrier.
+        </div>
+      )}
+
+      {!isLoading && suggestions && suggestions.length > 0 && (
+        <div className="admin-suggestion-list">
+          {suggestions.map(r => (
+            <label key={r.id} className="admin-suggestion-row">
+              <input
+                type="checkbox"
+                checked={selectedIds.has(r.id)}
+                onChange={() => toggle(r.id)}
+              />
+              <div className="admin-suggestion-row__info">
+                <div className="admin-suggestion-row__nom">{r.nom}</div>
+                <div className="admin-suggestion-row__adresse">{r.adresse}, {r.codePostal}</div>
+              </div>
+              <div className="admin-suggestion-row__conteneurs">
+                {r.nbConteneurs ?? 1} bac{(r.nbConteneurs ?? 1) > 1 ? "s" : ""}
+              </div>
+            </label>
+          ))}
+        </div>
+      )}
+    </Modal>
+  );
+};
+
+// ─────────────────────────────────────────
 // CARTE TOURNÉE
 // ─────────────────────────────────────────
 
@@ -189,6 +343,8 @@ const TourneeCard = ({
   const { data: arrets, isLoading: isLoadingArrets } = useArretsByTournee(tournee.id);
 
   const arretsListe = [...(arrets ?? [])].sort((a, b) => a.ordre - b.ordre);
+
+  const [suggestionsOpen, setSuggestionsOpen] = useState<boolean>(false);
 
   return (
     <AnimatedCard className="admin-tournee-card" delay={index * 0.06} glow={false}>
@@ -234,13 +390,36 @@ const TourneeCard = ({
 
       {tournee.statut !== "ANNULEE" && (
         <>
-          <button className="admin-tournee-card__add-arret-toggle" onClick={onToggleAddArret}>
-            {isAddArretOpen ? "Fermer" : "Ajouter un arrêt"}
-          </button>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button className="admin-tournee-card__add-arret-toggle" onClick={onToggleAddArret}>
+              {isAddArretOpen ? "Fermer" : "Ajouter un arrêt"}
+            </button>
+            {/* La zone est nécessaire pour interroger le calendrier (params
+                zoneId/date/typeCollecteId) — désactivé si la tournée n'en a
+                pas, plutôt qu'un appel voué à échouer côté backend. */}
+            <button
+              className="admin-tournee-card__add-arret-toggle"
+              onClick={() => setSuggestionsOpen(true)}
+              disabled={!tournee.zoneId}
+              title={tournee.zoneId ? undefined : "Cette tournée n'a pas de zone assignée."}
+            >
+              Suggérer les arrêts depuis le calendrier
+            </button>
+          </div>
           {isAddArretOpen && (
             <AjouterArretForm tourneeId={tournee.id} onDone={onToggleAddArret} />
           )}
         </>
+      )}
+
+      {suggestionsOpen && (
+        <SuggererArretsModal
+          tournee={tournee}
+          ordreDepart={arretsListe.length + 1}
+          residenceIdsExistantes={new Set(arretsListe.map(a => a.residenceId))}
+          onClose={() => setSuggestionsOpen(false)}
+          onDone={() => setSuggestionsOpen(false)}
+        />
       )}
     </AnimatedCard>
   );
