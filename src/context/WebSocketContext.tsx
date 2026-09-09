@@ -49,7 +49,7 @@ interface WebSocketProviderProps {
 }
 
 export function WebSocketProvider({ children }: WebSocketProviderProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, utilisateur } = useAuth();
   const [connected, setConnected] = useState<boolean>(false);
   const clientRef = useRef<Client | null>(null);
   const subscriptionsRef = useRef<Map<number, PendingSubscription>>(new Map());
@@ -130,7 +130,15 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
         entry.active = null;
       });
     };
-  }, [isAuthenticated, flushPendingSubscriptions]);
+    // utilisateur?.id (pas seulement isAuthenticated) : sans ça, un
+    // changement d'identité sans transition isAuthenticated false→true
+    // (ex. token d'un autre compte déjà présent au montage, puis login
+    // explicite dans le même onglet) laisse tourner l'ancienne connexion
+    // authentifiée pour le MAUVAIS utilisateur — bug confirmé en test :
+    // convertAndSendToUser réussit côté serveur mais rien n'arrive côté
+    // client, puisque la session WS ouverte n'est pas celle du
+    // destinataire réel.
+  }, [isAuthenticated, utilisateur?.id, flushPendingSubscriptions]);
 
   // ── API publique : subscribe(destination, callback) → unsubscribe ──
   const subscribe = useCallback(
