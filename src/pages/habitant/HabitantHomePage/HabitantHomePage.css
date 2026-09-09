@@ -159,53 +159,21 @@
   margin-top: 2px;
 }
 
-/* ─── Grille collectes ─── */
-.habitant__schedule {
-  background: var(--overlay-4);
-  border: 1px solid var(--overlay-7);
-  border-radius: 16px;
-  overflow: hidden;
-  margin-bottom: 20px;
-  animation: fadeUp 0.4s 0.1s both cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.habitant__schedule-header {
-  padding: 16px 22px;
-  border-bottom: 1px solid var(--overlay-6);
-  font-family: "Syne", sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.schedule-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 22px;
-  border-bottom: 1px solid var(--overlay-4);
-  transition: background 0.18s;
-}
-
-.schedule-item:last-child { border-bottom: none; }
-.schedule-item:hover { background: var(--overlay-3); }
-
-.schedule-item__type {
-  flex: 1;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.schedule-item__jour {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.schedule-item__heure {
-  font-size: 13px;
-  font-weight: 600;
+/* Lien vers HabitantCalendrierPage — grille complète de la semaine
+   déplacée là-bas (plus dans cette page), ce bouton la remplace. */
+.habitant__see-calendrier {
+  display: inline-block;
+  margin-top: 16px;
+  background: none;
+  border: none;
   color: var(--signal);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+.habitant__see-calendrier:hover {
+  text-decoration: underline;
 }
 
 /* ─── Conseils ─── */

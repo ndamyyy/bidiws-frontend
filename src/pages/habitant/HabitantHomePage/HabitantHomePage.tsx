@@ -4,6 +4,7 @@
 // ============================================================
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../hooks/useAuth";
 import { useResidencesHabitant } from "../../../hooks/useResidences";
 import { useCalendrierCollecte, useTypesCollecte } from "../../../hooks/useCalendrierCollecte";
@@ -93,6 +94,7 @@ const formatHeure = (heure: string | undefined): string =>
 
 export default function HabitantHomePage() {
   const { utilisateur } = useAuth();
+  const navigate = useNavigate();
   const [signalementOpen, setSignalementOpen] = useState<boolean>(false);
 
   const habitantId = utilisateur?.id;
@@ -266,31 +268,12 @@ export default function HabitantHomePage() {
         ) : (
           <div className="habitant__next-jour">Aucune collecte programmée pour votre résidence.</div>
         )}
-      </div>
-
-      {/* ── Calendrier de collecte ── */}
-      <div className="habitant__schedule">
-        <div className="habitant__schedule-header">
-          Calendrier de collecte — cette semaine
-        </div>
-        {calendrierActif.length === 0 && (
-          <div style={{ padding: "16px 22px", color: "var(--text-secondary)", fontSize: 13 }}>
-            Aucun calendrier de collecte renseigné pour votre résidence.
-          </div>
-        )}
-        {[...calendrierActif]
-          .sort((a, b) => a.jourSemaine - b.jourSemaine)
-          .map((c) => {
-            const tc = typesCollecte?.find(t => t.id === c.typeCollecteId);
-            return (
-              <div key={c.id} className="schedule-item">
-                <TypeCollecteIcon code={tc?.code} size={20} />
-                <div className="schedule-item__type">{c.typeCollecteLibelle}</div>
-                <div className="schedule-item__jour">{JOURS[c.jourSemaine]}</div>
-                <div className="schedule-item__heure">{formatHeure(c.heureEstimee)}</div>
-              </div>
-            );
-          })}
+        <button
+          className="habitant__see-calendrier"
+          onClick={() => navigate("/habitant/calendrier")}
+        >
+          Voir le calendrier complet →
+        </button>
       </div>
 
       {/* ── Conseils ── */}

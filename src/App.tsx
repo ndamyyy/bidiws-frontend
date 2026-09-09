@@ -46,7 +46,9 @@ const GardienHistoPage     = lazy(() => import("./pages/gardien/GardienHistoPage
 const ChauffeurTourneePage = lazy(() => import("./pages/chauffeur/ChauffeurTourneePage/ChauffeurTourneePage"));
 const ChauffeurGpsPage     = lazy(() => import("./pages/chauffeur/ChauffeurGpsPage/ChauffeurGpsPage"));
 
-const HabitantHomePage     = lazy(() => import("./pages/habitant/HabitantHomePage/HabitantHomePage"));
+const HabitantHomePage       = lazy(() => import("./pages/habitant/HabitantHomePage/HabitantHomePage"));
+const HabitantCalendrierPage = lazy(() => import("./pages/habitant/HabitantCalendrierPage/HabitantCalendrierPage"));
+const HabitantHistoriquePage = lazy(() => import("./pages/habitant/HabitantHistoriquePage/HabitantHistoriquePage"));
 
 const AdminDashboardPage    = lazy(() => import("./pages/admin/AdminDashboardPage/AdminDashboardPage"));
 const AdminUsersPage        = lazy(() => import("./pages/admin/AdminUsersPage/AdminUsersPage"));
@@ -276,6 +278,22 @@ function AppShell() {
                   element={
                     <ProtectedRoute roles={["HABITANT", "ADMIN"]}>
                       <HabitantHomePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/habitant/calendrier"
+                  element={
+                    <ProtectedRoute roles={["HABITANT", "ADMIN"]}>
+                      <HabitantCalendrierPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/habitant/historique"
+                  element={
+                    <ProtectedRoute roles={["HABITANT", "ADMIN"]}>
+                      <HabitantHistoriquePage />
                     </ProtectedRoute>
                   }
                 />
