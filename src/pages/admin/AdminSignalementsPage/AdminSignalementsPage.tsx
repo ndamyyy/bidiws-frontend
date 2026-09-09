@@ -13,6 +13,7 @@ import { useSignalementsByStatut } from "../../../hooks/useSignalements";
 import { updateStatutSignalement } from "../../../api/signalements.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { AnimatedCard } from "../../../components/ui/AnimatedCard/AnimatedCard";
+import { FilterGroup } from "../../../components/ui/FilterGroup/FilterGroup";
 import { useToast } from "../../../hooks/useToast";
 import { extractErrorMessage } from "../../../utils/extractErrorMessage";
 import type { ApiError, Signalement, StatutSignalement } from "../../../types";
@@ -199,17 +200,12 @@ export default function AdminSignalementsPage() {
         </p>
       </div>
 
-      <div className="admin-signalements__filters">
-        {STATUTS.map(s => (
-          <button
-            key={s}
-            className={`admin-signalements__filter-pill ${filtreStatut === s ? "admin-signalements__filter-pill--active" : ""}`}
-            onClick={() => setFiltreStatut(s)}
-          >
-            {STATUT_LABEL[s]}
-          </button>
-        ))}
-      </div>
+      <FilterGroup
+        className="admin-signalements__filters"
+        options={STATUTS.map(s => ({ value: s, label: STATUT_LABEL[s] }))}
+        value={filtreStatut}
+        onChange={setFiltreStatut}
+      />
 
       {isError ? (
         <div className="admin-signalements__empty">

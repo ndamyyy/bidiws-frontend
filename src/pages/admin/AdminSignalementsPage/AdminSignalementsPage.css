@@ -24,33 +24,9 @@
   font-size: 13px;
 }
 
-/* ─── Filtre statut ─── */
+/* ─── Filtre statut (FilterGroup — ui-filter-group fournit le reste) ─── */
 .admin-signalements__filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
   margin-bottom: 20px;
-}
-
-.admin-signalements__filter-pill {
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 1px solid var(--overlay-8);
-  background: var(--overlay-4);
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.18s;
-}
-.admin-signalements__filter-pill:hover {
-  border-color: var(--overlay-14);
-  color: var(--text-primary);
-}
-.admin-signalements__filter-pill--active {
-  background: var(--signal-dim-10);
-  border-color: var(--signal-dim-20);
-  color: var(--signal);
 }
 
 /* ─── Liste ─── */

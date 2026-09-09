@@ -10,6 +10,7 @@
 import { useState, type JSX } from "react";
 import { useNotifications } from "../../../hooks/useNotifications";
 import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
+import { FilterGroup } from "../../../components/ui/FilterGroup/FilterGroup";
 import { useToast } from "../../../hooks/useToast";
 import { extractErrorMessage } from "../../../utils/extractErrorMessage";
 import type { Notification } from "../../../types";
@@ -141,21 +142,16 @@ export default function GardienAlertsPage() {
       </div>
 
       {/* ── Filtre ── */}
-      <div className="gardien-alerts__filters">
-        {([
-          ["TOUTES", "Toutes"],
-          ["NON_LUES", "Non lues"],
-          ["LUES", "Lues"],
-        ] as [Filtre, string][]).map(([value, label]) => (
-          <button
-            key={value}
-            className={`gardien-alerts__filter-pill ${filtre === value ? "gardien-alerts__filter-pill--active" : ""}`}
-            onClick={() => setFiltre(value)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      <FilterGroup
+        className="gardien-alerts__filters"
+        options={[
+          { value: "TOUTES" as const, label: "Toutes" },
+          { value: "NON_LUES" as const, label: "Non lues" },
+          { value: "LUES" as const, label: "Lues" },
+        ]}
+        value={filtre}
+        onChange={setFiltre}
+      />
 
       {/* ── Liste ── */}
       {notificationsFiltrees.length === 0 ? (

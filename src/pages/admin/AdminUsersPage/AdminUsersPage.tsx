@@ -18,6 +18,7 @@ import {
 } from "../../../api/admin-utilisateurs.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
+import { FilterGroup } from "../../../components/ui/FilterGroup/FilterGroup";
 import { useToast } from "../../../hooks/useToast";
 import { extractErrorMessage } from "../../../utils/extractErrorMessage";
 import type { ApiError, Role, Utilisateur } from "../../../types";
@@ -543,23 +544,15 @@ export default function AdminUsersPage() {
 
       {/* ── Filtre par rôle ── */}
       {rolesPresents.length > 1 && (
-        <div className="admin-users__filters">
-          <button
-            className={`admin-users__filter-pill ${filtreRole === "TOUS" ? "admin-users__filter-pill--active" : ""}`}
-            onClick={() => setFiltreRole("TOUS")}
-          >
-            Tous
-          </button>
-          {rolesPresents.map(role => (
-            <button
-              key={role}
-              className={`admin-users__filter-pill ${filtreRole === role ? "admin-users__filter-pill--active" : ""}`}
-              onClick={() => setFiltreRole(role)}
-            >
-              {ROLE_LABEL[role] ?? role}
-            </button>
-          ))}
-        </div>
+        <FilterGroup
+          className="admin-users__filters"
+          options={[
+            { value: "TOUS" as const, label: "Tous" },
+            ...rolesPresents.map(role => ({ value: role, label: ROLE_LABEL[role] ?? role })),
+          ]}
+          value={filtreRole}
+          onChange={setFiltreRole}
+        />
       )}
 
       {/* ── Liste ── */}

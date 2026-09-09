@@ -45,32 +45,9 @@
   background: var(--signal-dim-05);
 }
 
-/* ─── Filtre ─── */
+/* ─── Filtre (FilterGroup — ui-filter-group fournit le reste) ─── */
 .gardien-alerts__filters {
-  display: flex;
-  gap: 8px;
   margin-bottom: 16px;
-}
-
-.gardien-alerts__filter-pill {
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 1px solid var(--overlay-8);
-  background: var(--overlay-4);
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.18s;
-}
-.gardien-alerts__filter-pill:hover {
-  border-color: var(--overlay-14);
-  color: var(--text-primary);
-}
-.gardien-alerts__filter-pill--active {
-  background: var(--signal-dim-10);
-  border-color: var(--signal-dim-20);
-  color: var(--signal);
 }
 
 /* ─── Liste ─── */
