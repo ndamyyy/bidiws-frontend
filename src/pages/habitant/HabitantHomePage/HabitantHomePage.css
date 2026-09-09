@@ -23,6 +23,72 @@
 
 .habitant__subtitle { font-size: 13px; color: var(--text-secondary); }
 
+/* ─── Statut du jour (section "Aujourd'hui") — même déclinaison de
+   couleurs sémantiques que GardienHomePage (.gardien__hero), reprise
+   ici sous un préfixe habitant__ propre à cette page ─── */
+.habitant__today-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+}
+
+.habitant__today {
+  border-radius: 18px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  animation: fadeUp 0.4s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.habitant__today--confirmed {
+  background: linear-gradient(135deg, rgba(76,175,80,0.2), rgba(76,175,80,0.06));
+  border: 1.5px solid rgba(76,175,80,0.4);
+  box-shadow: 0 8px 40px rgba(76,175,80,0.15);
+}
+
+.habitant__today--waiting {
+  background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.04));
+  border: 1.5px solid rgba(245,158,11,0.35);
+  box-shadow: 0 8px 40px rgba(245,158,11,0.12);
+}
+
+.habitant__today--approaching {
+  background: linear-gradient(135deg, rgba(33,150,243,0.15), rgba(33,150,243,0.04));
+  border: 1.5px solid rgba(33,150,243,0.35);
+  box-shadow: 0 8px 40px rgba(33,150,243,0.12);
+}
+
+.habitant__today-content {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.habitant__today-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.habitant__today-title {
+  font-family: "Syne", sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+}
+
+.habitant__today-desc {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 /* ─── Prochaine collecte hero ─── */
 .habitant__next {
   background: var(--signal-dim-05);
