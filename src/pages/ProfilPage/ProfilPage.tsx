@@ -10,6 +10,7 @@ import { useState, type FormEvent } from "react";
 import axios from "axios";
 import { useAuth } from "../../hooks/useAuth";
 import { updateMonProfil, changerMonMotDePasse } from "../../api/utilisateurs.api";
+import { Input } from "../../components/ui/Input/Input";
 import type { ApiError, Role } from "../../types";
 import "./ProfilPage.css";
 
@@ -81,45 +82,33 @@ const InfosSection = () => {
         {succes && <div className="profil__succes">Profil mis à jour.</div>}
 
         <div className="profil__grid">
-          <div className="profil__field">
-            <label className="profil__label">Prénom</label>
-            <input
-              className="profil__input"
-              type="text"
-              value={prenom}
-              onChange={(e) => setPrenom(e.target.value)}
-            />
-          </div>
+          <Input
+            label="Prénom"
+            type="text"
+            value={prenom}
+            onChange={(e) => setPrenom(e.target.value)}
+          />
 
-          <div className="profil__field">
-            <label className="profil__label">Nom</label>
-            <input
-              className="profil__input"
-              type="text"
-              value={nom}
-              onChange={(e) => setNom(e.target.value)}
-            />
-          </div>
+          <Input
+            label="Nom"
+            type="text"
+            value={nom}
+            onChange={(e) => setNom(e.target.value)}
+          />
 
-          <div className="profil__field">
-            <label className="profil__label">Email</label>
-            <input
-              className="profil__input"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+          <Input
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-          <div className="profil__field">
-            <label className="profil__label">Téléphone (optionnel)</label>
-            <input
-              className="profil__input"
-              type="tel"
-              value={telephone}
-              onChange={(e) => setTelephone(e.target.value)}
-            />
-          </div>
+          <Input
+            label="Téléphone (optionnel)"
+            type="tel"
+            value={telephone}
+            onChange={(e) => setTelephone(e.target.value)}
+          />
         </div>
 
         <button className="profil__submit" type="submit" disabled={isSubmitting}>
@@ -191,36 +180,29 @@ const MotDePasseSection = () => {
         {succes && <div className="profil__succes">Mot de passe modifié.</div>}
 
         <div className="profil__grid">
-          <div className="profil__field profil__field--full">
-            <label className="profil__label">Mot de passe actuel</label>
-            <input
-              className="profil__input"
+          <div className="profil__field--full">
+            <Input
+              label="Mot de passe actuel"
               type="password"
               value={ancien}
               onChange={(e) => setAncien(e.target.value)}
             />
           </div>
 
-          <div className="profil__field">
-            <label className="profil__label">Nouveau mot de passe</label>
-            <input
-              className="profil__input"
-              type="password"
-              placeholder="8 caractères minimum"
-              value={nouveau}
-              onChange={(e) => setNouveau(e.target.value)}
-            />
-          </div>
+          <Input
+            label="Nouveau mot de passe"
+            type="password"
+            placeholder="8 caractères minimum"
+            value={nouveau}
+            onChange={(e) => setNouveau(e.target.value)}
+          />
 
-          <div className="profil__field">
-            <label className="profil__label">Confirmation</label>
-            <input
-              className="profil__input"
-              type="password"
-              value={confirmation}
-              onChange={(e) => setConfirmation(e.target.value)}
-            />
-          </div>
+          <Input
+            label="Confirmation"
+            type="password"
+            value={confirmation}
+            onChange={(e) => setConfirmation(e.target.value)}
+          />
         </div>
 
         <button className="profil__submit" type="submit" disabled={isSubmitting}>

@@ -7,6 +7,7 @@ import { JSX, useRef, useState } from "react";
 import { useNavigate }     from "react-router-dom";
 import axios                from "axios";
 import { useAuth }         from "../../hooks/useAuth";
+import { Input }          from "../../components/ui/Input/Input";
 import type { Role, ApiError } from "../../types";
 import "./LoginPage.css";
 
@@ -307,18 +308,15 @@ export default function LoginPage() {
 
           {/* ── Champs ── */}
           <div className="login__fields">
-            <div className="login__field">
-              <label className="login__field-label">Email</label>
-              <input
-                ref={emailInputRef}
-                className="login__field-input"
-                type="email"
-                placeholder="votre@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              />
-            </div>
+            <Input
+              ref={emailInputRef}
+              label="Email"
+              type="email"
+              placeholder="votre@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            />
             <div className="login__field">
               <label className="login__field-label">Mot de passe</label>
               <div className="login__field-wrap">

@@ -53,34 +53,7 @@
   margin-bottom: 18px;
 }
 
-.residence-modal__field { display: flex; flex-direction: column; gap: 6px; }
 .residence-modal__field--full { grid-column: 1 / -1; }
-
-.residence-modal__label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.residence-modal__input,
-.residence-modal__select {
-  width: 100%;
-  padding: 10px 14px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 13px;
-  outline: none;
-  transition: all 0.18s;
-}
-.residence-modal__input:focus,
-.residence-modal__select:focus {
-  border-color: var(--signal);
-  box-shadow: 0 0 0 4px var(--signal-dim-05);
-}
 
 .residence-modal__error {
   background: rgba(255, 79, 100, 0.08);
@@ -134,7 +107,6 @@
   .residence-modal__grid {
     grid-template-columns: 1fr;
   }
-  .residence-modal__field { grid-column: 1 / -1; }
 }
 
 .residences__grid {
@@ -361,21 +333,12 @@
   color: var(--critical);
 }
 
-.residence-calendar__select,
-.residence-calendar__input {
-  width: 100%;
+/* Select/Input migrés — même gabarit compact que le bouton Ajouter
+   ci-dessous (12px), plus petit que le défaut d'Input/Select. */
+.residence-calendar__form .ui-select,
+.residence-calendar__form .ui-input {
   padding: 8px 10px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
   font-size: 12px;
-  outline: none;
-}
-.residence-calendar__select:focus,
-.residence-calendar__input:focus {
-  border-color: var(--signal);
-  box-shadow: 0 0 0 3px var(--signal-dim-05);
 }
 
 .residence-calendar__submit {
@@ -497,19 +460,10 @@
   color: var(--critical);
 }
 
-.residence-conteneurs__input {
-  width: 100%;
+/* Input migré — même gabarit compact que .residence-calendar__form. */
+.residence-conteneurs__form .ui-input {
   padding: 8px 10px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
   font-size: 12px;
-  outline: none;
-}
-.residence-conteneurs__input:focus {
-  border-color: var(--signal);
-  box-shadow: 0 0 0 3px var(--signal-dim-05);
 }
 
 .residence-conteneurs__submit {

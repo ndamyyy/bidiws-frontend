@@ -20,8 +20,6 @@
   letter-spacing: 0.06em;
 }
 
-.signalement-modal__input,
-.signalement-modal__select,
 .signalement-modal__textarea {
   width: 100%;
   padding: 10px 14px;
@@ -33,12 +31,8 @@
   outline: none;
   transition: all 0.18s;
   font-family: inherit;
-}
-.signalement-modal__textarea {
   resize: vertical;
 }
-.signalement-modal__input:focus,
-.signalement-modal__select:focus,
 .signalement-modal__textarea:focus {
   border-color: var(--signal);
   box-shadow: 0 0 0 4px var(--signal-dim-05);

@@ -13,6 +13,8 @@ import { useCamions } from "../../../hooks/useCamions";
 import { useVilles } from "../../../hooks/useVilles";
 import { createCamion, updateCamion, desactiverCamion, type CamionRequest } from "../../../api/camions.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import { Input } from "../../../components/ui/Input/Input";
+import { Select } from "../../../components/ui/Select/Select";
 import type { ApiError, Camion } from "../../../types";
 import "./AdminCamionsPage.css";
 
@@ -104,63 +106,45 @@ const CamionForm = ({
       {error && <div className="admin-camions__error">{error}</div>}
 
       <div className="admin-camions__grid">
-        <div className="admin-camions__field">
-          <label className="admin-camions__label">Immatriculation</label>
-          <input
-            className="admin-camions__input"
-            type="text"
-            value={values.immatriculation}
-            onChange={(e) => setValues(v => ({ ...v, immatriculation: e.target.value }))}
-            placeholder="AB-123-CD"
-          />
-        </div>
+        <Input
+          label="Immatriculation"
+          type="text"
+          value={values.immatriculation}
+          onChange={(e) => setValues(v => ({ ...v, immatriculation: e.target.value }))}
+          placeholder="AB-123-CD"
+        />
 
-        <div className="admin-camions__field">
-          <label className="admin-camions__label">Modèle (optionnel)</label>
-          <input
-            className="admin-camions__input"
-            type="text"
-            value={values.modele}
-            onChange={(e) => setValues(v => ({ ...v, modele: e.target.value }))}
-          />
-        </div>
+        <Input
+          label="Modèle (optionnel)"
+          type="text"
+          value={values.modele}
+          onChange={(e) => setValues(v => ({ ...v, modele: e.target.value }))}
+        />
 
-        <div className="admin-camions__field">
-          <label className="admin-camions__label">Type de benne (optionnel)</label>
-          <input
-            className="admin-camions__input"
-            type="text"
-            value={values.typeBenne}
-            onChange={(e) => setValues(v => ({ ...v, typeBenne: e.target.value }))}
-          />
-        </div>
+        <Input
+          label="Type de benne (optionnel)"
+          type="text"
+          value={values.typeBenne}
+          onChange={(e) => setValues(v => ({ ...v, typeBenne: e.target.value }))}
+        />
 
-        <div className="admin-camions__field">
-          <label className="admin-camions__label">Capacité (tonnes, optionnel)</label>
-          <input
-            className="admin-camions__input"
-            type="number"
-            min="0"
-            step="0.1"
-            value={values.capaciteTonnes}
-            onChange={(e) => setValues(v => ({ ...v, capaciteTonnes: e.target.value }))}
-          />
-        </div>
+        <Input
+          label="Capacité (tonnes, optionnel)"
+          type="number"
+          min="0"
+          step="0.1"
+          value={values.capaciteTonnes}
+          onChange={(e) => setValues(v => ({ ...v, capaciteTonnes: e.target.value }))}
+        />
 
-        <div className="admin-camions__field">
-          <label className="admin-camions__label">Ville</label>
-          <select
-            className="admin-camions__select"
-            value={values.villeId}
-            onChange={(e) => setValues(v => ({ ...v, villeId: e.target.value }))}
-            disabled={isLoadingVilles}
-          >
-            <option value="">Sélectionner...</option>
-            {villes?.map(v => (
-              <option key={v.id} value={v.id}>{v.nom}</option>
-            ))}
-          </select>
-        </div>
+        <Select
+          label="Ville"
+          placeholder="Sélectionner..."
+          options={(villes ?? []).map(v => ({ value: String(v.id), label: v.nom }))}
+          value={values.villeId}
+          onChange={(e) => setValues(v => ({ ...v, villeId: e.target.value }))}
+          disabled={isLoadingVilles}
+        />
 
         <div className="admin-camions__field admin-camions__field--checkboxes">
           <label className="admin-camions__checkbox-label">

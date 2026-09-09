@@ -15,6 +15,8 @@ import { useCamions } from "../../../hooks/useCamions";
 import { useAdminUtilisateurs } from "../../../hooks/useAdminUtilisateurs";
 import { getAffectationsByCamion, affecterChauffeurCamion, terminerAffectation } from "../../../api/chauffeur-camions.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import { Input } from "../../../components/ui/Input/Input";
+import { Select } from "../../../components/ui/Select/Select";
 import { useToast } from "../../../hooks/useToast";
 import { extractErrorMessage } from "../../../utils/extractErrorMessage";
 import type { ApiError, ChauffeurCamion } from "../../../types";
@@ -152,43 +154,28 @@ export default function AdminAffectationsPage() {
                 {createError && <div className="admin-affectations__error">{createError}</div>}
 
                 <div className="admin-affectations__grid">
-                  <div className="admin-affectations__field">
-                    <label className="admin-affectations__label">Chauffeur</label>
-                    <select
-                      className="admin-affectations__select"
-                      value={chauffeurId}
-                      onChange={(e) => setChauffeurId(e.target.value)}
-                    >
-                      <option value="">Sélectionner...</option>
-                      {chauffeurs.map(u => (
-                        <option key={u.id} value={u.id}>{u.prenom} {u.nom}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    label="Chauffeur"
+                    placeholder="Sélectionner..."
+                    options={chauffeurs.map(u => ({ value: String(u.id), label: `${u.prenom} ${u.nom}` }))}
+                    value={chauffeurId}
+                    onChange={(e) => setChauffeurId(e.target.value)}
+                  />
 
-                  <div className="admin-affectations__field">
-                    <label className="admin-affectations__label">Camion</label>
-                    <select
-                      className="admin-affectations__select"
-                      value={camionId}
-                      onChange={(e) => setCamionId(e.target.value)}
-                    >
-                      <option value="">Sélectionner...</option>
-                      {camionsListe.map(c => (
-                        <option key={c.id} value={c.id}>{c.immatriculation}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    label="Camion"
+                    placeholder="Sélectionner..."
+                    options={camionsListe.map(c => ({ value: String(c.id), label: c.immatriculation }))}
+                    value={camionId}
+                    onChange={(e) => setCamionId(e.target.value)}
+                  />
 
-                  <div className="admin-affectations__field">
-                    <label className="admin-affectations__label">Date de début</label>
-                    <input
-                      className="admin-affectations__input"
-                      type="date"
-                      value={dateDebut}
-                      onChange={(e) => setDateDebut(e.target.value)}
-                    />
-                  </div>
+                  <Input
+                    label="Date de début"
+                    type="date"
+                    value={dateDebut}
+                    onChange={(e) => setDateDebut(e.target.value)}
+                  />
                 </div>
 
                 <button className="admin-affectations__submit" type="submit" disabled={isSubmittingCreate}>

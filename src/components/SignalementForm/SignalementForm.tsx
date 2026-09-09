@@ -16,6 +16,7 @@ import { uploadPhoto } from "../../api/uploads.api";
 import { createSignalementOffline, OfflineQueuedError } from "../../utils/offlineQueue";
 import { Modal } from "../ui/Modal/Modal";
 import { Button } from "../ui/Button/Button";
+import { Select } from "../ui/Select/Select";
 import type { ApiError, TypeSignalement } from "../../types";
 import "./SignalementForm.css";
 
@@ -152,19 +153,13 @@ export default function SignalementForm({
           <form onSubmit={handleSubmit}>
             {error && <div className="signalement-modal__error">{error}</div>}
 
-            <div className="signalement-modal__field">
-              <label className="signalement-modal__label">Type de problème</label>
-              <select
-                className="signalement-modal__select"
-                value={type}
-                onChange={(e) => setType(e.target.value as TypeSignalement)}
-              >
-                <option value="">Sélectionner...</option>
-                {TYPES.map(t => (
-                  <option key={t} value={t}>{TYPE_LABEL[t]}</option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Type de problème"
+              placeholder="Sélectionner..."
+              options={TYPES.map(t => ({ value: t, label: TYPE_LABEL[t] }))}
+              value={type}
+              onChange={(e) => setType(e.target.value as TypeSignalement)}
+            />
 
             <div className="signalement-modal__field">
               <label className="signalement-modal__label">Description (optionnel)</label>

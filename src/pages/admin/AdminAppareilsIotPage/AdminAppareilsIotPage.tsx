@@ -21,6 +21,8 @@ import {
   regenererCleAppareilIot,
 } from "../../../api/appareils-iot.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
+import { Input } from "../../../components/ui/Input/Input";
+import { Select } from "../../../components/ui/Select/Select";
 import { useToast } from "../../../hooks/useToast";
 import { extractErrorMessage } from "../../../utils/extractErrorMessage";
 import type { ApiError, AppareilIot, AppareilIotCreeResponse, TypeAppareilIot } from "../../../types";
@@ -309,100 +311,73 @@ export default function AdminAppareilsIotPage() {
               {createError && <div className="admin-appareils-iot__error">{createError}</div>}
 
               <div className="admin-appareils-iot__grid">
-                <div className="admin-appareils-iot__field">
-                  <label className="admin-appareils-iot__label">Identifiant matériel</label>
-                  <input
-                    className="admin-appareils-iot__input"
-                    type="text"
-                    value={identifiantMateriel}
-                    onChange={(e) => setIdentifiantMateriel(e.target.value)}
-                    placeholder="Ex. CAPT-RESID12-001"
-                  />
-                </div>
+                <Input
+                  label="Identifiant matériel"
+                  type="text"
+                  value={identifiantMateriel}
+                  onChange={(e) => setIdentifiantMateriel(e.target.value)}
+                  placeholder="Ex. CAPT-RESID12-001"
+                />
 
-                <div className="admin-appareils-iot__field">
-                  <label className="admin-appareils-iot__label">Type d'appareil</label>
-                  <select
-                    className="admin-appareils-iot__select"
-                    value={typeAppareil}
-                    onChange={(e) => setTypeAppareil(e.target.value as TypeAppareilIot)}
-                  >
-                    <option value="CAPTEUR_BENNE">Capteur de benne</option>
-                    <option value="LECTEUR_RFID">Lecteur RFID</option>
-                  </select>
-                </div>
+                <Select
+                  label="Type d'appareil"
+                  options={[
+                    { value: "CAPTEUR_BENNE", label: "Capteur de benne" },
+                    { value: "LECTEUR_RFID", label: "Lecteur RFID" },
+                  ]}
+                  value={typeAppareil}
+                  onChange={(e) => setTypeAppareil(e.target.value as TypeAppareilIot)}
+                />
 
-                <div className="admin-appareils-iot__field">
-                  <label className="admin-appareils-iot__label">Rattachement</label>
-                  <select
-                    className="admin-appareils-iot__select"
-                    value={rattachement}
-                    onChange={(e) => {
-                      setRattachement(e.target.value as Rattachement);
-                      setResidenceId("");
-                      setConteneurId("");
-                      setCamionId("");
-                    }}
-                  >
-                    <option value="CONTENEUR">Conteneur</option>
-                    <option value="CAMION">Camion</option>
-                  </select>
-                </div>
+                <Select
+                  label="Rattachement"
+                  options={[
+                    { value: "CONTENEUR", label: "Conteneur" },
+                    { value: "CAMION", label: "Camion" },
+                  ]}
+                  value={rattachement}
+                  onChange={(e) => {
+                    setRattachement(e.target.value as Rattachement);
+                    setResidenceId("");
+                    setConteneurId("");
+                    setCamionId("");
+                  }}
+                />
 
                 {rattachement === "CONTENEUR" && (
                   <>
-                    <div className="admin-appareils-iot__field">
-                      <label className="admin-appareils-iot__label">Résidence</label>
-                      <select
-                        className="admin-appareils-iot__select"
-                        value={residenceId}
-                        onChange={(e) => {
-                          setResidenceId(e.target.value);
-                          setConteneurId("");
-                        }}
-                        disabled={isLoadingResidences}
-                      >
-                        <option value="">Sélectionner...</option>
-                        {residences?.map(r => (
-                          <option key={r.id} value={r.id}>{r.nom}</option>
-                        ))}
-                      </select>
-                    </div>
+                    <Select
+                      label="Résidence"
+                      placeholder="Sélectionner..."
+                      options={(residences ?? []).map(r => ({ value: String(r.id), label: r.nom }))}
+                      value={residenceId}
+                      onChange={(e) => {
+                        setResidenceId(e.target.value);
+                        setConteneurId("");
+                      }}
+                      disabled={isLoadingResidences}
+                    />
 
-                    <div className="admin-appareils-iot__field">
-                      <label className="admin-appareils-iot__label">Conteneur</label>
-                      <select
-                        className="admin-appareils-iot__select"
-                        value={conteneurId}
-                        onChange={(e) => setConteneurId(e.target.value)}
-                        disabled={!residenceId || isLoadingConteneurs}
-                      >
-                        <option value="">
-                          {residenceId ? "Sélectionner..." : "Choisir une résidence d'abord"}
-                        </option>
-                        {conteneurs?.map(c => (
-                          <option key={c.id} value={c.id}>{c.code}</option>
-                        ))}
-                      </select>
-                    </div>
+                    <Select
+                      label="Conteneur"
+                      placeholder={residenceId ? "Sélectionner..." : "Choisir une résidence d'abord"}
+                      options={(conteneurs ?? []).map(c => ({ value: String(c.id), label: c.code }))}
+                      value={conteneurId}
+                      onChange={(e) => setConteneurId(e.target.value)}
+                      disabled={!residenceId || isLoadingConteneurs}
+                    />
                   </>
                 )}
 
                 {rattachement === "CAMION" && (
-                  <div className="admin-appareils-iot__field">
-                    <label className="admin-appareils-iot__label">Camion</label>
-                    <select
-                      className="admin-appareils-iot__select"
-                      value={camionId}
-                      onChange={(e) => setCamionId(e.target.value)}
-                      disabled={isLoadingCamions}
-                    >
-                      <option value="">Sélectionner...</option>
-                      {camions?.map(c => (
-                        <option key={c.id} value={c.id}>{c.immatriculation}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    label="Camion"
+                    placeholder="Sélectionner..."
+                    options={(camions ?? []).map(c => ({ value: String(c.id), label: c.immatriculation }))}
+                    value={camionId}
+                    onChange={(e) => setCamionId(e.target.value)}
+                    disabled={isLoadingCamions}
+                  />
                 )}
               </div>
 

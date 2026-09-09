@@ -22,6 +22,8 @@ import { createTournee, annulerTournee } from "../../../api/tournee.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon } from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import { AnimatedCard } from "../../../components/ui/AnimatedCard/AnimatedCard";
+import { Input } from "../../../components/ui/Input/Input";
+import { Select } from "../../../components/ui/Select/Select";
 import { useToast } from "../../../hooks/useToast";
 import { extractErrorMessage } from "../../../utils/extractErrorMessage";
 import type { ApiError, Tournee } from "../../../types";
@@ -123,53 +125,38 @@ const AjouterArretForm = ({
     <form className="admin-tournee-card__add-arret-form" onSubmit={handleSubmit}>
       {error && <div className="admin-tournees__error" style={{ gridColumn: "1 / -1" }}>{error}</div>}
 
-      <div className="admin-tournees__field">
-        <label className="admin-tournees__label">Résidence</label>
-        <select
-          className="admin-tournees__select"
-          value={residenceId}
-          onChange={(e) => setResidenceId(e.target.value)}
-          disabled={isLoadingResidences}
-        >
-          <option value="">Sélectionner...</option>
-          {residences?.map(r => (
-            <option key={r.id} value={r.id}>{r.nom}</option>
-          ))}
-        </select>
-      </div>
+      <Select
+        label="Résidence"
+        placeholder="Sélectionner..."
+        options={(residences ?? []).map(r => ({ value: String(r.id), label: r.nom }))}
+        value={residenceId}
+        onChange={(e) => setResidenceId(e.target.value)}
+        disabled={isLoadingResidences}
+      />
 
-      <div className="admin-tournees__field">
-        <label className="admin-tournees__label">Ordre</label>
-        <input
-          className="admin-tournees__input"
-          type="number"
-          min={1}
-          value={ordre}
-          onChange={(e) => setOrdre(e.target.value)}
-        />
-      </div>
+      <Input
+        label="Ordre"
+        type="number"
+        min={1}
+        value={ordre}
+        onChange={(e) => setOrdre(e.target.value)}
+      />
 
-      <div className="admin-tournees__field">
-        <label className="admin-tournees__label">Nb conteneurs</label>
-        <input
-          className="admin-tournees__input"
-          type="number"
-          min={1}
-          value={nbConteneurs}
-          onChange={(e) => setNbConteneurs(e.target.value)}
-        />
-      </div>
+      <Input
+        label="Nb conteneurs"
+        type="number"
+        min={1}
+        value={nbConteneurs}
+        onChange={(e) => setNbConteneurs(e.target.value)}
+      />
 
-      <div className="admin-tournees__field">
-        <label className="admin-tournees__label">Types conteneurs</label>
-        <input
-          className="admin-tournees__input"
-          type="text"
-          placeholder="Optionnel"
-          value={typesConteneurs}
-          onChange={(e) => setTypesConteneurs(e.target.value)}
-        />
-      </div>
+      <Input
+        label="Types conteneurs"
+        type="text"
+        placeholder="Optionnel"
+        value={typesConteneurs}
+        onChange={(e) => setTypesConteneurs(e.target.value)}
+      />
 
       <button className="admin-tournee-card__add-arret-submit" type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Ajout..." : "Ajouter l'arrêt"}
@@ -377,16 +364,12 @@ export default function AdminTourneesPage() {
             {tourneesListe.length} tournée{tourneesListe.length > 1 ? "s" : ""} le {selectedDate}
           </p>
         </div>
-        <div className="admin-tournees__date-field">
-          <label className="admin-tournees__date-label" htmlFor="admin-tournees-date">Date</label>
-          <input
-            id="admin-tournees-date"
-            className="admin-tournees__date-input"
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-          />
-        </div>
+        <Input
+          label="Date"
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+        />
       </div>
 
       {/* ── Création (accordéon) ── */}
@@ -420,75 +403,50 @@ export default function AdminTourneesPage() {
                 )}
 
                 <div className="admin-tournees__grid">
-                  <div className="admin-tournees__field">
-                    <label className="admin-tournees__label">Date</label>
-                    <input
-                      className="admin-tournees__input"
-                      type="date"
-                      value={dateTournee}
-                      onChange={(e) => setDateTournee(e.target.value)}
-                    />
-                  </div>
+                  <Input
+                    label="Date"
+                    type="date"
+                    value={dateTournee}
+                    onChange={(e) => setDateTournee(e.target.value)}
+                  />
 
-                  <div className="admin-tournees__field">
-                    <label className="admin-tournees__label">Type de collecte</label>
-                    <select
-                      className="admin-tournees__select"
-                      value={typeCollecteId}
-                      onChange={(e) => setTypeCollecteId(e.target.value)}
-                    >
-                      <option value="">Sélectionner...</option>
-                      {typesCollecte?.map(t => (
-                        <option key={t.id} value={t.id}>{t.libelle}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    label="Type de collecte"
+                    placeholder="Sélectionner..."
+                    options={(typesCollecte ?? []).map(t => ({ value: String(t.id), label: t.libelle }))}
+                    value={typeCollecteId}
+                    onChange={(e) => setTypeCollecteId(e.target.value)}
+                  />
 
-                  <div className="admin-tournees__field">
-                    <label className="admin-tournees__label">Camion</label>
-                    <select
-                      className="admin-tournees__select"
-                      value={camionId}
-                      onChange={(e) => setCamionId(e.target.value)}
-                    >
-                      <option value="">Sélectionner...</option>
-                      {camions?.map(c => (
-                        <option key={c.id} value={c.id}>
-                          {c.immatriculation}{c.modele ? ` — ${c.modele}` : ""}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    label="Camion"
+                    placeholder="Sélectionner..."
+                    options={(camions ?? []).map(c => ({
+                      value: String(c.id),
+                      label: `${c.immatriculation}${c.modele ? ` — ${c.modele}` : ""}`,
+                    }))}
+                    value={camionId}
+                    onChange={(e) => setCamionId(e.target.value)}
+                  />
 
-                  <div className="admin-tournees__field">
-                    <label className="admin-tournees__label">Chauffeur</label>
-                    <select
-                      className="admin-tournees__select"
-                      value={chauffeurId}
-                      onChange={(e) => setChauffeurId(e.target.value)}
-                    >
-                      <option value="">Sélectionner...</option>
-                      {chauffeurs.map(u => (
-                        <option key={u.id} value={u.id}>{u.prenom} {u.nom}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    label="Chauffeur"
+                    placeholder="Sélectionner..."
+                    options={chauffeurs.map(u => ({ value: String(u.id), label: `${u.prenom} ${u.nom}` }))}
+                    value={chauffeurId}
+                    onChange={(e) => setChauffeurId(e.target.value)}
+                  />
 
-                  <div className="admin-tournees__field">
-                    <label className="admin-tournees__label">Zone (optionnel)</label>
-                    <select
-                      className="admin-tournees__select"
-                      value={zoneId}
-                      onChange={(e) => setZoneId(e.target.value)}
-                    >
-                      <option value="">Aucune</option>
-                      {zones?.map(z => (
-                        <option key={z.id} value={z.id}>
-                          {z.nom}{z.villeNom ? ` (${z.villeNom})` : ""}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    label="Zone (optionnel)"
+                    placeholder="Aucune"
+                    options={(zones ?? []).map(z => ({
+                      value: String(z.id),
+                      label: `${z.nom}${z.villeNom ? ` (${z.villeNom})` : ""}`,
+                    }))}
+                    value={zoneId}
+                    onChange={(e) => setZoneId(e.target.value)}
+                  />
                 </div>
 
                 <button className="admin-tournees__submit" type="submit" disabled={isSubmittingCreate}>

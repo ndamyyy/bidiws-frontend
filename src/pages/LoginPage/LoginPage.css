@@ -373,6 +373,10 @@
 
 @media (min-width: 768px) {
   .login__field-input { padding: 12px 16px; font-size: 14px; }
+  /* Champ email, migré vers <Input> (ui-input) — même palier desktop
+     que le mot de passe (resté sur .login__field-input, le composant
+     Input ne sait pas encore composer un bouton dans le champ). */
+  .login__fields .ui-input { padding: 12px 16px; font-size: 14px; }
 }
 
 .login__field-wrap { position: relative; }

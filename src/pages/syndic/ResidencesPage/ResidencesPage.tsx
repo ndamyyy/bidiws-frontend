@@ -18,6 +18,8 @@ import { createConteneur, desactiverConteneur } from "../../../api/conteneurs.ap
 import { LoadingSpinner }                   from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { StaggerContainer, StaggerItem }    from "../../../components/ui/StaggerContainer/StaggerContainer";
 import { Modal }                            from "../../../components/ui/Modal/Modal";
+import { Input }                            from "../../../components/ui/Input/Input";
+import { Select }                           from "../../../components/ui/Select/Select";
 import { useToast }                         from "../../../hooks/useToast";
 import { extractErrorMessage }              from "../../../utils/extractErrorMessage";
 import type { Residence, Arret, ApiError }  from "../../../types";
@@ -210,31 +212,22 @@ const CalendrierSection = ({ residenceId }: { residenceId: number }) => {
           <form className="residence-calendar__form" onSubmit={handleSubmit}>
             {error && <div className="residence-calendar__error">{error}</div>}
 
-            <select
-              className="residence-calendar__select"
+            <Select
+              placeholder="Type de collecte..."
+              options={(typesCollecte ?? []).map(t => ({ value: String(t.id), label: t.libelle }))}
               value={typeCollecteId}
               onChange={(e) => setTypeCollecteId(e.target.value)}
               disabled={isLoadingTypes}
-            >
-              <option value="">Type de collecte...</option>
-              {typesCollecte?.map(t => (
-                <option key={t.id} value={t.id}>{t.libelle}</option>
-              ))}
-            </select>
+            />
 
-            <select
-              className="residence-calendar__select"
+            <Select
+              placeholder="Jour..."
+              options={JOURS_SEMAINE.map(j => ({ value: String(j.value), label: j.label }))}
               value={jourSemaine}
               onChange={(e) => setJourSemaine(e.target.value)}
-            >
-              <option value="">Jour...</option>
-              {JOURS_SEMAINE.map(j => (
-                <option key={j.value} value={j.value}>{j.label}</option>
-              ))}
-            </select>
+            />
 
-            <input
-              className="residence-calendar__input"
+            <Input
               type="time"
               value={heureEstimee}
               onChange={(e) => setHeureEstimee(e.target.value)}
@@ -360,16 +353,14 @@ const ConteneursSection = ({ residenceId }: { residenceId: number }) => {
           <form className="residence-conteneurs__form" onSubmit={handleSubmit}>
             {error && <div className="residence-conteneurs__error">{error}</div>}
 
-            <input
-              className="residence-conteneurs__input"
+            <Input
               type="text"
               placeholder="Code du conteneur"
               value={code}
               onChange={(e) => setCode(e.target.value)}
             />
 
-            <input
-              className="residence-conteneurs__input"
+            <Input
               type="text"
               placeholder="Tag RFID (optionnel)"
               value={rfidTag}
@@ -508,110 +499,84 @@ const AjouterResidenceModal = ({ onClose }: { onClose: () => void }) => {
           {error && <div className="residence-modal__error">{error}</div>}
 
           <div className="residence-modal__grid">
-            <div className="residence-modal__field residence-modal__field--full">
-              <label className="residence-modal__label">Nom</label>
-              <input
-                className="residence-modal__input"
+            <div className="residence-modal__field--full">
+              <Input
+                label="Nom"
                 type="text"
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
               />
             </div>
 
-            <div className="residence-modal__field residence-modal__field--full">
-              <label className="residence-modal__label">Adresse</label>
-              <input
-                className="residence-modal__input"
+            <div className="residence-modal__field--full">
+              <Input
+                label="Adresse"
                 type="text"
                 value={adresse}
                 onChange={(e) => setAdresse(e.target.value)}
               />
             </div>
 
-            <div className="residence-modal__field residence-modal__field--full">
-              <label className="residence-modal__label">Complément (optionnel)</label>
-              <input
-                className="residence-modal__input"
+            <div className="residence-modal__field--full">
+              <Input
+                label="Complément (optionnel)"
                 type="text"
                 value={complement}
                 onChange={(e) => setComplement(e.target.value)}
               />
             </div>
 
-            <div className="residence-modal__field">
-              <label className="residence-modal__label">Code postal</label>
-              <input
-                className="residence-modal__input"
-                type="text"
-                value={codePostal}
-                onChange={(e) => setCodePostal(e.target.value)}
-              />
-            </div>
+            <Input
+              label="Code postal"
+              type="text"
+              value={codePostal}
+              onChange={(e) => setCodePostal(e.target.value)}
+            />
 
-            <div className="residence-modal__field">
-              <label className="residence-modal__label">Ville</label>
-              <select
-                className="residence-modal__select"
-                value={villeId}
-                onChange={(e) => setVilleId(e.target.value)}
-                disabled={isLoadingVilles}
-              >
-                <option value="">Sélectionner...</option>
-                {villes?.map(v => (
-                  <option key={v.id} value={v.id}>{v.nom}</option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Ville"
+              placeholder="Sélectionner..."
+              options={(villes ?? []).map(v => ({ value: String(v.id), label: v.nom }))}
+              value={villeId}
+              onChange={(e) => setVilleId(e.target.value)}
+              disabled={isLoadingVilles}
+            />
 
-            <div className="residence-modal__field">
-              <label className="residence-modal__label">Zone (optionnel)</label>
-              <select
-                className="residence-modal__select"
-                value={zoneId}
-                onChange={(e) => setZoneId(e.target.value)}
-                disabled={isLoadingZones}
-              >
-                <option value="">Aucune</option>
-                {zones?.map(z => (
-                  <option key={z.id} value={z.id}>
-                    {z.nom}{z.villeNom ? ` (${z.villeNom})` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Zone (optionnel)"
+              placeholder="Aucune"
+              options={(zones ?? []).map(z => ({
+                value: String(z.id),
+                label: `${z.nom}${z.villeNom ? ` (${z.villeNom})` : ""}`,
+              }))}
+              value={zoneId}
+              onChange={(e) => setZoneId(e.target.value)}
+              disabled={isLoadingZones}
+            />
 
-            <div className="residence-modal__field">
-              <label className="residence-modal__label">Rayon détection (m)</label>
-              <input
-                className="residence-modal__input"
-                type="number"
-                placeholder="50"
-                value={rayonDetection}
-                onChange={(e) => setRayonDetection(e.target.value)}
-              />
-            </div>
+            <Input
+              label="Rayon détection (m)"
+              type="number"
+              placeholder="50"
+              value={rayonDetection}
+              onChange={(e) => setRayonDetection(e.target.value)}
+            />
 
-            <div className="residence-modal__field">
-              <label className="residence-modal__label">Latitude (optionnel)</label>
-              <input
-                className="residence-modal__input"
-                type="number"
-                step="any"
-                value={latitude}
-                onChange={(e) => setLatitude(e.target.value)}
-              />
-            </div>
+            <Input
+              label="Latitude (optionnel)"
+              type="number"
+              step="any"
+              value={latitude}
+              onChange={(e) => setLatitude(e.target.value)}
+            />
 
-            <div className="residence-modal__field">
-              <label className="residence-modal__label">Longitude (optionnel)</label>
-              <input
-                className="residence-modal__input"
-                type="number"
-                step="any"
-                value={longitude}
-                onChange={(e) => setLongitude(e.target.value)}
-              />
-            </div>
+            <Input
+              label="Longitude (optionnel)"
+              type="number"
+              step="any"
+              value={longitude}
+              onChange={(e) => setLongitude(e.target.value)}
+            />
           </div>
 
           <div className="residence-modal__actions">
