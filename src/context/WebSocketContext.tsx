@@ -55,10 +55,21 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
   const subscriptionsRef = useRef<Map<number, PendingSubscription>>(new Map());
   const nextIdRef = useRef<number>(0);
 
-  // ── Rejoue les abonnements en attente sur le client connecté ──
+  // ── (Ré)abonne TOUTES les destinations sur le client fraîchement connecté ──
+  // Appelé à chaque onConnect, y compris après une reconnexion automatique
+  // de stompjs. Un STOMP CONNECT ouvre une session serveur vierge : les
+  // abonnements de la connexion précédente n'existent plus côté serveur,
+  // donc un éventuel `entry.active` hérité pointe vers une souscription
+  // morte — on le remplace systématiquement, sans le tester.
+  //
+  // Sans ce ré-abonnement inconditionnel : après une coupure réseau (ou un
+  // redéploiement backend, un réveil de veille…), stompjs se reconnecte et
+  // ré-authentifie bien, mais aucune frame SUBSCRIBE n'est renvoyée — le
+  // serveur a alors une session vivante sans aucun abonnement, et tous les
+  // convertAndSendToUser suivants sont silencieusement perdus jusqu'au
+  // prochain rechargement de page. Bug confirmé bout en bout.
   const flushPendingSubscriptions = useCallback((client: Client): void => {
     subscriptionsRef.current.forEach((entry) => {
-      if (entry.active) return;
       entry.active = client.subscribe(entry.destination, (message: IMessage) => {
         try {
           entry.callback(JSON.parse(message.body));
@@ -69,6 +80,13 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
           );
         }
       });
+    });
+  }, []);
+
+  // ── Marque tous les abonnements comme inactifs (souscription serveur perdue) ──
+  const markSubscriptionsInactive = useCallback((): void => {
+    subscriptionsRef.current.forEach((entry) => {
+      entry.active = null;
     });
   }, []);
 
@@ -102,11 +120,17 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
 
         onDisconnect: () => {
           setConnected(false);
-          // Les abonnements STOMP ne survivent pas à la reconnexion :
-          // on les marque inactifs pour qu'ils soient rejoués au prochain onConnect
-          subscriptionsRef.current.forEach((entry) => {
-            entry.active = null;
-          });
+          markSubscriptionsInactive();
+        },
+
+        // onDisconnect ne se déclenche QUE sur un deactivate() explicite.
+        // Une coupure de transport (réseau, backend redéployé, veille…)
+        // passe par onWebSocketClose : sans ce handler, `connected` resterait
+        // affiché à true et les `entry.active` garderaient des références
+        // mortes, que le prochain onConnect ne remplacerait pas.
+        onWebSocketClose: () => {
+          setConnected(false);
+          markSubscriptionsInactive();
         },
 
         onStompError: (frame) => {
@@ -138,7 +162,7 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
     // convertAndSendToUser réussit côté serveur mais rien n'arrive côté
     // client, puisque la session WS ouverte n'est pas celle du
     // destinataire réel.
-  }, [isAuthenticated, utilisateur?.id, flushPendingSubscriptions]);
+  }, [isAuthenticated, utilisateur?.id, flushPendingSubscriptions, markSubscriptionsInactive]);
 
   // ── API publique : subscribe(destination, callback) → unsubscribe ──
   const subscribe = useCallback(
