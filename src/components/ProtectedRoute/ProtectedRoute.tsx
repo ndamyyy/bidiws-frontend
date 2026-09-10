@@ -6,6 +6,7 @@
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { redirectByRole } from "../../utils/redirectByRole";
 import { Role } from "../../types";
 
 // ─────────────────────────────────────────
@@ -38,9 +39,11 @@ export default function ProtectedRoute({ children, roles }: ProtectedRouteProps)
     return <Navigate to="/login" replace />;
   }
 
-  // Rôle non autorisé → page d'accueil du rôle
+  // Connecté mais mauvais rôle pour cette route → propre espace,
+  // pas l'écran de connexion (déjà authentifié, /login serait un
+  // aller-retour inutile et déroutant)
   if (!roles.includes(utilisateur.role)) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={redirectByRole[utilisateur.role]} replace />;
   }
 
   return <>{children}</>;

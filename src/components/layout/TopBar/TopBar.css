@@ -4,19 +4,61 @@
    ============================================================ */
 
 .topbar {
-  height: 64px;
-  background: rgba(10, 21, 32, 0.95);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  min-height: 64px;
+  background: var(--bg-card-glass);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 28px;
+  /* env(safe-area-inset-top) vaut 0 hors écran à encoche — aucun
+     changement sur desktop. Sur un écran à encoche, ce padding pousse
+     le contenu de la topbar sous l'encoche tout en laissant son fond
+     (position:fixed, top:0) remonter jusqu'en haut de l'écran, plutôt
+     qu'un bandeau vide de la couleur de fond de page au-dessus.
+     height→min-height : laisse ce padding s'ajouter à la hauteur
+     réelle au lieu de comprimer le contenu (box-sizing:border-box
+     global) — .layout__content (Layout.css) suit avec le même
+     calc(--topbar-height + inset) pour continuer à dégager pile. */
+  padding-top: env(safe-area-inset-top);
   position: fixed;
   top: 0;
   left: 240px;
   right: 0;
   z-index: 99;
   backdrop-filter: blur(12px);
+  transition: left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Sidebar repliée en desktop : la topbar reprend toute la largeur.
+   Classe posée sur .layout par Layout.tsx. Sans effet en mobile, où
+   le bloc responsive plus bas force déjà left:0 en permanence. */
+.layout--sidebar-closed .topbar {
+  left: 0;
+}
+
+.topbar__titles {
+  min-width: 0;
+}
+
+/* ─── Bouton menu : ouvre/ferme la sidebar (desktop et mobile) ─── */
+.topbar__menu-btn {
+  display: flex;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+.topbar__menu-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-default);
 }
 
 /* ─── Titre de la page ─── */
@@ -24,13 +66,13 @@
   font-family: "Syne", sans-serif;
   font-size: 18px;
   font-weight: 700;
-  color: #f0f4ff;
+  color: var(--text-primary);
   letter-spacing: -0.3px;
 }
 
 .topbar__subtitle {
   font-size: 12px;
-  color: #6b84a3;
+  color: var(--text-secondary);
   margin-top: 1px;
   font-weight: 400;
 }
@@ -42,14 +84,33 @@
   gap: 12px;
 }
 
+/* ─── Bouton thème ─── */
+.topbar__theme-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.topbar__theme-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-default);
+}
+
 /* ─── Bouton notification ─── */
 .topbar__notif-btn {
   position: relative;
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -58,8 +119,8 @@
 }
 
 .topbar__notif-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--bg-card-hover);
+  border-color: var(--border-default);
 }
 
 .topbar__notif-badge {
@@ -69,23 +130,23 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #ef4444;
+  background: var(--critical);
   color: #fff;
   font-size: 10px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #0a1520;
+  border: 2px solid var(--bg-elevated);
 }
 
 /* ─── Date ─── */
 .topbar__date {
   font-size: 12px;
-  color: #6b84a3;
+  color: var(--text-secondary);
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
 }
 
@@ -96,7 +157,7 @@
   gap: 6px;
   font-size: 11px;
   font-weight: 600;
-  color: #4caf50;
+  color: var(--signal);
   letter-spacing: 0.06em;
 }
 
@@ -104,11 +165,26 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #4caf50;
+  background: var(--success);
   animation: livePulse 1.4s infinite;
 }
 
 @keyframes livePulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%       { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .topbar {
+    left: 0;
+    padding: 0 16px;
+    /* Le raccourci padding ci-dessus remettrait padding-top à 0 —
+       c'est justement sur mobile (écrans à encoche) que ça compte. */
+    padding-top: env(safe-area-inset-top);
+  }
+  .topbar__date,
+  .topbar__live {
+    display: none;
+  }
 }

@@ -1,0 +1,58 @@
+/* ============================================================
+   BIDIWS — Badge
+   Fichier : src/components/ui/Badge/Badge.css
+   ============================================================ */
+
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ui-badge--success {
+  background: var(--success-dim-15);
+  border: 1px solid color-mix(in srgb, var(--success) 25%, transparent);
+  color: var(--success);
+}
+.ui-badge--danger {
+  background: var(--danger-dim-15);
+  border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
+  color: var(--danger);
+}
+.ui-badge--info {
+  background: color-mix(in srgb, var(--info) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--info) 25%, transparent);
+  color: var(--info);
+}
+.ui-badge--warning {
+  background: rgba(255, 176, 32, 0.1);
+  border: 1px solid rgba(255, 176, 32, 0.25);
+  color: var(--alert);
+}
+.ui-badge--neutral {
+  background: color-mix(in srgb, var(--neutral) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--neutral) 25%, transparent);
+  color: var(--neutral);
+}
+
+.ui-badge__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.ui-badge__dot--pulse {
+  animation: ui-badge-pulse 1.4s infinite;
+}
+
+@keyframes ui-badge-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}

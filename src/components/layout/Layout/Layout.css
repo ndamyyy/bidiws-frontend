@@ -3,33 +3,62 @@
    Fichier : src/components/layout/Layout/Layout.css
    ============================================================ */
 
+/* ═══════════════════════════════════════════════════════
+   Layout.css — Structure principale BIDIWS
+   ═══════════════════════════════════════════════════════ */
+
 .layout {
   display: flex;
+  width: 100%;
   min-height: 100vh;
-  background: #0d1b2a;
+  background-color: var(--bg-deep);
+  overflow: hidden;
 }
 
+/* ── Zone contenu principale ── */
 .layout__main {
   flex: 1;
-  margin-left: 240px;   /* largeur sidebar */
-  padding-top: 64px;    /* hauteur topbar  */
-  min-height: 100vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* évite overflow horizontal */
+  background-color: var(--bg-deep);
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.3s var(--ease-smooth);
+}
+
+/* Sidebar repliée en desktop (classe posée par Layout.tsx) : le
+   contenu reprend toute la largeur. Sans effet en mobile, où le
+   media query plus bas force déjà margin-left:0 en permanence
+   (la sidebar y est un overlay, elle ne pousse jamais le contenu). */
+.layout--sidebar-closed .layout__main {
+  margin-left: 0;
 }
 
 .layout__content {
-  padding: 32px 36px;
-  max-width: 1100px;
-  animation: contentFadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  flex: 1;
+  padding: 24px 28px;
+  /* topbar fixe (voir TopBar.css) : sa hauteur réelle grandit de
+     env(safe-area-inset-top) sur un écran à encoche (0 sur desktop,
+     donc calc() retombe exactement sur --topbar-height, inchangé) —
+     margin-top doit suivre pour continuer à la dégager pile, pas
+     .safe-top/padding-top comme le reste de l'app : ce conteneur
+     défile (overflow-y:auto), un padding-top y disparaîtrait au
+     premier scroll alors qu'un margin-top reste un dégagement
+     permanent sous l'élément fixe. */
+  margin-top: calc(var(--topbar-height) + env(safe-area-inset-top));
+  /* Pas de barre de navigation basse dans l'app (menu en sidebar) —
+     même logique que .safe-bottom (styles/index.css) mais avec 24px
+     comme plancher plutôt que son 16px, pour ne pas réduire le
+     padding bas déjà en place ici quand l'encoche est petite. */
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-@keyframes contentFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+@media (max-width: 768px) {
+  .layout__main { margin-left: 0; }
+  .layout__content {
+    padding: 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 }

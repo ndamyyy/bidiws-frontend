@@ -4,60 +4,48 @@
 // ============================================================
 
 import apiClient from "./axios";
-import type { Notification, PageResponse } from "../types";
+import type { Notification } from "../types";
 
 // ─────────────────────────────────────────
-// MES NOTIFICATIONS
-// GET /api/notifications/me
+// NOTIFICATIONS D'UN DESTINATAIRE
+// GET /notifications/destinataire/:destinataireId
+// destinataireId à récupérer via /utilisateurs/moi (auth.api.ts::getMe)
+// Pas d'endpoint séparé pour les non-lues — filtrer côté client sur `lu`
 // ─────────────────────────────────────────
 
-export const getMesNotifications = async (
-  page: number = 0,
-  size: number = 20
-): Promise<PageResponse<Notification>> => {
-  const response = await apiClient.get<PageResponse<Notification>>(
-    "/notifications/me",
-    { params: { page, size } }
-  );
-  return response.data;
-};
-
-// ─────────────────────────────────────────
-// NOTIFICATIONS NON LUES
-// GET /api/notifications/me/non-lues
-// ─────────────────────────────────────────
-
-export const getNotificationsNonLues = async (): Promise<Notification[]> => {
+export const getNotificationsByDestinataire = async (
+  destinataireId: number
+): Promise<Notification[]> => {
   const response = await apiClient.get<Notification[]>(
-    "/notifications/me/non-lues"
+    `/notifications/destinataire/${destinataireId}`
   );
   return response.data;
 };
 
 // ─────────────────────────────────────────
 // COMPTER LES NON LUES
-// GET /api/notifications/me/count
+// GET /notifications/destinataire/:destinataireId/compteur
 // ─────────────────────────────────────────
 
-export const countNotificationsNonLues = async (): Promise<number> => {
-  const response = await apiClient.get<number>("/notifications/me/count");
+export const countNotificationsNonLues = async (
+  destinataireId: number
+): Promise<number> => {
+  const response = await apiClient.get<number>(
+    `/notifications/destinataire/${destinataireId}/compteur`
+  );
   return response.data;
 };
 
 // ─────────────────────────────────────────
 // MARQUER UNE NOTIFICATION COMME LUE
-// PUT /api/notifications/:id/lire
+// PATCH /notifications/:id/lue?destinataireId=X
 // ─────────────────────────────────────────
 
-export const marquerCommeLue = async (id: number): Promise<void> => {
-  await apiClient.put(`/notifications/${id}/lire`);
-};
-
-// ─────────────────────────────────────────
-// MARQUER TOUTES COMME LUES
-// PUT /api/notifications/me/tout-lire
-// ─────────────────────────────────────────
-
-export const marquerToutesCommeLues = async (): Promise<void> => {
-  await apiClient.put("/notifications/me/tout-lire");
+export const marquerCommeLue = async (
+  id: number,
+  destinataireId: number
+): Promise<void> => {
+  await apiClient.patch(`/notifications/${id}/lue`, null, {
+    params: { destinataireId },
+  });
 };

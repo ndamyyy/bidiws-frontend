@@ -1,0 +1,26 @@
+/* ============================================================
+   BIDIWS — Spinner
+   Fichier : src/components/ui/Spinner/Spinner.css
+   Anneau repris tel quel de .loading-spinner__ring-inner
+   (LoadingSpinner), dimensionnable.
+   ============================================================ */
+
+.ui-spinner {
+  display: inline-block;
+  border: 3px solid var(--border-subtle);
+  border-top-color: var(--signal);
+  border-radius: 50%;
+  animation: ui-spinner-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.ui-spinner--sm { width: 16px; height: 16px; border-width: 2px; }
+.ui-spinner--md { width: 24px; height: 24px; border-width: 3px; }
+.ui-spinner--lg { width: 48px; height: 48px; border-width: 3px; }
+
+@keyframes ui-spinner-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* prefers-reduced-motion déjà géré globalement (styles/index.css) —
+   pas de règle locale à dupliquer ici. */

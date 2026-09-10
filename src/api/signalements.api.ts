@@ -4,11 +4,13 @@
 // ============================================================
 
 import apiClient from "./axios";
-import type { Signalement, SignalementRequest, PageResponse } from "../types";
+import type { Signalement, SignalementRequest, StatutSignalement } from "../types";
 
 // ─────────────────────────────────────────
 // CRÉER UN SIGNALEMENT
-// POST /api/signalements
+// POST /signalements
+// photoUrl (si besoin) est une simple chaîne dans le body —
+// l'upload de la photo elle-même est un sujet séparé
 // ─────────────────────────────────────────
 
 export const createSignalement = async (
@@ -19,73 +21,54 @@ export const createSignalement = async (
 };
 
 // ─────────────────────────────────────────
-// CRÉER UN SIGNALEMENT AVEC PHOTO
-// POST /api/signalements (multipart/form-data)
+// SIGNALEMENTS D'UN AUTEUR
+// GET /signalements/auteur/:auteurId
+// auteurId à récupérer via /utilisateurs/moi (auth.api.ts::getMe)
 // ─────────────────────────────────────────
 
-export const createSignalementAvecPhoto = async (
-  data: SignalementRequest,
-  photo: File
-): Promise<Signalement> => {
-  const formData = new FormData();
-  formData.append("photo", photo);
-  formData.append(
-    "signalement",
-    new Blob([JSON.stringify(data)], { type: "application/json" })
-  );
-
-  const response = await apiClient.post<Signalement>(
-    "/signalements/avec-photo",
-    formData,
-    { headers: { "Content-Type": "multipart/form-data" } }
+export const getSignalementsByAuteur = async (
+  auteurId: number
+): Promise<Signalement[]> => {
+  const response = await apiClient.get<Signalement[]>(
+    `/signalements/auteur/${auteurId}`
   );
   return response.data;
 };
 
 // ─────────────────────────────────────────
-// MES SIGNALEMENTS
-// GET /api/signalements/me
+// SIGNALEMENTS PAR STATUT (syndic / admin)
+// GET /signalements?statut=X
+// "statut" est un @RequestParam obligatoire côté backend — confirmé
+// sur le vrai code, aucune route "tous statuts confondus" n'existe.
+// L'appeler sans paramètre renvoie un 400 (masqué en "Erreur interne
+// du serveur" par le GlobalExceptionHandler, qui étiquette tout
+// pareil) — ce n'était pas un vrai problème serveur, juste un
+// paramètre manquant. Confirmé en conditions réelles : 200 avec
+// ?statut=OUVERT sur un compte ADMIN.
 // ─────────────────────────────────────────
 
-export const getMesSignalements = async (
-  page: number = 0,
-  size: number = 10
-): Promise<PageResponse<Signalement>> => {
-  const response = await apiClient.get<PageResponse<Signalement>>(
-    "/signalements/me",
-    { params: { page, size } }
-  );
-  return response.data;
-};
-
-// ─────────────────────────────────────────
-// TOUS LES SIGNALEMENTS (syndic / admin)
-// GET /api/signalements
-// ─────────────────────────────────────────
-
-export const getAllSignalements = async (
-  page: number = 0,
-  size: number = 10
-): Promise<PageResponse<Signalement>> => {
-  const response = await apiClient.get<PageResponse<Signalement>>(
-    "/signalements",
-    { params: { page, size } }
-  );
+export const getSignalementsByStatut = async (
+  statut: StatutSignalement
+): Promise<Signalement[]> => {
+  const response = await apiClient.get<Signalement[]>("/signalements", {
+    params: { statut },
+  });
   return response.data;
 };
 
 // ─────────────────────────────────────────
 // CHANGER STATUT D'UN SIGNALEMENT (admin)
-// PUT /api/signalements/:id/statut
+// PATCH /signalements/:id/statut?statut=X
 // ─────────────────────────────────────────
 
 export const updateStatutSignalement = async (
   id: number,
-  statut: string
+  statut: StatutSignalement
 ): Promise<Signalement> => {
-  const response = await apiClient.put<Signalement>(
+  const response = await apiClient.patch<Signalement>(
     `/signalements/${id}/statut`,
-    { statut }
+    null,
+    { params: { statut } }
   );
   return response.data;
 };

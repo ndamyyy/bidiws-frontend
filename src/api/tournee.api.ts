@@ -4,31 +4,38 @@
 // ============================================================
 
 import apiClient from "./axios";
-import type { Tournee, TourneeRequest, PageResponse } from "../types";
+import type { Tournee, TourneeRequest } from "../types";
 
 // ─────────────────────────────────────────
 // TOURNÉES DU JOUR
-// GET /api/tournees/today
+// GET /tournees?date=YYYY-MM-DD
 // ─────────────────────────────────────────
 
 export const getTourneesAujourdhui = async (): Promise<Tournee[]> => {
-  const response = await apiClient.get<Tournee[]>("/tournees/today");
+  const now = new Date();
+  const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const response = await apiClient.get<Tournee[]>("/tournees", {
+    params: { date },
+  });
   return response.data;
 };
 
 // ─────────────────────────────────────────
 // MA TOURNÉE (chauffeur connecté)
-// GET /api/tournees/ma-tournee
+// GET /tournees?chauffeurId=X
+// chauffeurId à récupérer via /utilisateurs/moi (auth.api.ts::getMe)
 // ─────────────────────────────────────────
 
-export const getMaTournee = async (): Promise<Tournee> => {
-  const response = await apiClient.get<Tournee>("/tournees/ma-tournee");
+export const getMaTournee = async (chauffeurId: number): Promise<Tournee[]> => {
+  const response = await apiClient.get<Tournee[]>("/tournees", {
+    params: { chauffeurId },
+  });
   return response.data;
 };
 
 // ─────────────────────────────────────────
 // UNE TOURNÉE PAR ID
-// GET /api/tournees/:id
+// GET /tournees/:id
 // ─────────────────────────────────────────
 
 export const getTourneeById = async (id: number): Promise<Tournee> => {
@@ -37,23 +44,20 @@ export const getTourneeById = async (id: number): Promise<Tournee> => {
 };
 
 // ─────────────────────────────────────────
-// TOUTES LES TOURNÉES (paginées)
-// GET /api/tournees
+// TOUTES LES TOURNÉES
+// GET /tournees (SANS pagination, params date/chauffeurId optionnels)
 // ─────────────────────────────────────────
 
 export const getAllTournees = async (
-  page: number = 0,
-  size: number = 10
-): Promise<PageResponse<Tournee>> => {
-  const response = await apiClient.get<PageResponse<Tournee>>("/tournees", {
-    params: { page, size },
-  });
+  params?: { date?: string; chauffeurId?: number }
+): Promise<Tournee[]> => {
+  const response = await apiClient.get<Tournee[]>("/tournees", { params });
   return response.data;
 };
 
 // ─────────────────────────────────────────
 // CRÉER UNE TOURNÉE
-// POST /api/tournees
+// POST /tournees
 // ─────────────────────────────────────────
 
 export const createTournee = async (data: TourneeRequest): Promise<Tournee> => {
@@ -63,20 +67,30 @@ export const createTournee = async (data: TourneeRequest): Promise<Tournee> => {
 
 // ─────────────────────────────────────────
 // DÉMARRER UNE TOURNÉE
-// PUT /api/tournees/:id/demarrer
+// PATCH /tournees/:id/demarrer
 // ─────────────────────────────────────────
 
 export const demarrerTournee = async (id: number): Promise<Tournee> => {
-  const response = await apiClient.put<Tournee>(`/tournees/${id}/demarrer`);
+  const response = await apiClient.patch<Tournee>(`/tournees/${id}/demarrer`);
   return response.data;
 };
 
 // ─────────────────────────────────────────
 // TERMINER UNE TOURNÉE
-// PUT /api/tournees/:id/terminer
+// PATCH /tournees/:id/terminer
 // ─────────────────────────────────────────
 
 export const terminerTournee = async (id: number): Promise<Tournee> => {
-  const response = await apiClient.put<Tournee>(`/tournees/${id}/terminer`);
+  const response = await apiClient.patch<Tournee>(`/tournees/${id}/terminer`);
+  return response.data;
+};
+
+// ─────────────────────────────────────────
+// ANNULER UNE TOURNÉE
+// PATCH /tournees/:id/annuler
+// ─────────────────────────────────────────
+
+export const annulerTournee = async (id: number): Promise<Tournee> => {
+  const response = await apiClient.patch<Tournee>(`/tournees/${id}/annuler`);
   return response.data;
 };
