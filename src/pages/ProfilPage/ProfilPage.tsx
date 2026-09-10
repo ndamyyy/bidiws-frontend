@@ -29,6 +29,41 @@ const ROLE_LABEL: Record<Role, string> = {
 };
 
 // ─────────────────────────────────────────
+// ICÔNES ŒIL (afficher / masquer le mot de passe)
+// Mêmes tracés que LoginPage/RegisterPage — pas de composant d'icône
+// partagé dans le projet, chaque page garde les siennes.
+// ─────────────────────────────────────────
+
+const IconEye = ({ color }: { color: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+
+const IconEyeOff = ({ color }: { color: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+    <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
+
+// Bouton œil réutilisé pour les 3 champs mot de passe de la section.
+const ToggleMotDePasse = ({ visible, onToggle }: { visible: boolean; onToggle: () => void }) => (
+  <button
+    type="button"
+    className="ui-field__trailing-btn"
+    onClick={onToggle}
+    tabIndex={-1}
+    title={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+    aria-label={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+  >
+    {visible ? <IconEyeOff color="#6b84a3" /> : <IconEye color="#6b84a3" />}
+  </button>
+);
+
+// ─────────────────────────────────────────
 // SECTION — INFORMATIONS PERSONNELLES
 // ─────────────────────────────────────────
 
@@ -129,6 +164,9 @@ const MotDePasseSection = () => {
   const [ancien, setAncien] = useState<string>("");
   const [nouveau, setNouveau] = useState<string>("");
   const [confirmation, setConfirmation] = useState<string>("");
+  const [showAncien, setShowAncien] = useState<boolean>(false);
+  const [showNouveau, setShowNouveau] = useState<boolean>(false);
+  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [succes, setSucces] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -183,25 +221,34 @@ const MotDePasseSection = () => {
           <div className="profil__field--full">
             <Input
               label="Mot de passe actuel"
-              type="password"
+              type={showAncien ? "text" : "password"}
               value={ancien}
               onChange={(e) => setAncien(e.target.value)}
+              trailingIcon={
+                <ToggleMotDePasse visible={showAncien} onToggle={() => setShowAncien((v) => !v)} />
+              }
             />
           </div>
 
           <Input
             label="Nouveau mot de passe"
-            type="password"
+            type={showNouveau ? "text" : "password"}
             placeholder="8 caractères minimum"
             value={nouveau}
             onChange={(e) => setNouveau(e.target.value)}
+            trailingIcon={
+              <ToggleMotDePasse visible={showNouveau} onToggle={() => setShowNouveau((v) => !v)} />
+            }
           />
 
           <Input
             label="Confirmation"
-            type="password"
+            type={showConfirmation ? "text" : "password"}
             value={confirmation}
             onChange={(e) => setConfirmation(e.target.value)}
+            trailingIcon={
+              <ToggleMotDePasse visible={showConfirmation} onToggle={() => setShowConfirmation((v) => !v)} />
+            }
           />
         </div>
 

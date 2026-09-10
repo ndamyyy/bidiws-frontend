@@ -347,57 +347,15 @@
   margin-bottom: 20px;
 }
 
-.login__field-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.login__field-input {
-  width: 100%;
-  padding: 10px 14px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 13px;
-  outline: none;
-  transition: all var(--t-fast) var(--ease-smooth);
-}
-.login__field-input:focus {
-  border-color: var(--signal);
-  box-shadow: 0 0 0 4px var(--signal-dim-05);
-}
-
 @media (min-width: 768px) {
-  .login__field-input { padding: 12px 16px; font-size: 14px; }
-  /* Champ email, migré vers <Input> (ui-input) — même palier desktop
-     que le mot de passe (resté sur .login__field-input, le composant
-     Input ne sait pas encore composer un bouton dans le champ). */
+  /* Champs email + mot de passe, tous deux migrés vers <Input> (ui-input) —
+     palier desktop identique à l'ancien .login__field-input. */
   .login__fields .ui-input { padding: 12px 16px; font-size: 14px; }
+  /* Le shorthand `padding` ci-dessus écrase le padding-right de
+     .ui-input--with-trailing : on le repose ici pour garder la place du
+     bouton œil du mot de passe. */
+  .login__fields .ui-input--with-trailing { padding-right: 40px; }
 }
-
-.login__field-wrap { position: relative; }
-.login__field-wrap .login__field-input { padding-right: 40px; }
-
-.login__field-toggle {
-  position: absolute;
-  top: 50%;
-  right: 8px;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  padding: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity var(--t-fast) var(--ease-smooth);
-}
-.login__field-toggle:hover { opacity: 1; }
 
 .login__admin-link {
   display: block;

@@ -13,19 +13,32 @@
 // un au-dessus du champ, mais pas tous (ex. filtres de date en ligne).
 
 import { forwardRef, useId } from "react";
-import type { InputHTMLAttributes } from "react";
+import type { InputHTMLAttributes, ReactNode } from "react";
 import "./Input.css";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   /** Message d'erreur — bascule aussi la bordure en --critical. */
   error?: string;
+  /** Icône ou bouton en overlay à droite du champ (ex. afficher/masquer
+   *  le mot de passe). Sans cette prop, le DOM rendu est inchangé. */
+  trailingIcon?: ReactNode;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, id, className = "", ...rest }, ref) => {
+  ({ label, error, trailingIcon, id, className = "", ...rest }, ref) => {
     const generatedId = useId();
     const inputId = id ?? generatedId;
+
+    const field = (
+      <input
+        ref={ref}
+        id={inputId}
+        className={`ui-input ${error ? "ui-input--error" : ""} ${trailingIcon ? "ui-input--with-trailing" : ""} ${className}`}
+        aria-invalid={error ? true : undefined}
+        {...rest}
+      />
+    );
 
     return (
       <div className="ui-field">
@@ -34,13 +47,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {label}
           </label>
         )}
-        <input
-          ref={ref}
-          id={inputId}
-          className={`ui-input ${error ? "ui-input--error" : ""} ${className}`}
-          aria-invalid={error ? true : undefined}
-          {...rest}
-        />
+        {trailingIcon ? (
+          <div className="ui-field__control">
+            {field}
+            <span className="ui-field__trailing">{trailingIcon}</span>
+          </div>
+        ) : (
+          field
+        )}
         {error && <div className="ui-field__error">{error}</div>}
       </div>
     );

@@ -317,20 +317,17 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             />
-            <div className="login__field">
-              <label className="login__field-label">Mot de passe</label>
-              <div className="login__field-wrap">
-                <input
-                  className="login__field-input"
-                  type={showMotDePasse ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={motDePasse}
-                  onChange={(e) => setMotDePasse(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                />
+            <Input
+              label="Mot de passe"
+              type={showMotDePasse ? "text" : "password"}
+              placeholder="••••••••"
+              value={motDePasse}
+              onChange={(e) => setMotDePasse(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              trailingIcon={
                 <button
                   type="button"
-                  className="login__field-toggle"
+                  className="ui-field__trailing-btn"
                   onClick={() => setShowMotDePasse((v) => !v)}
                   tabIndex={-1}
                   title={showMotDePasse ? "Masquer le mot de passe" : "Afficher le mot de passe"}
@@ -338,8 +335,8 @@ export default function LoginPage() {
                 >
                   {showMotDePasse ? <IconEyeOff color="#6b84a3" /> : <IconEye color="#6b84a3" />}
                 </button>
-              </div>
-            </div>
+              }
+            />
           </div>
 
           {/* ── Erreur ── */}

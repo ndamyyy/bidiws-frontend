@@ -51,3 +51,39 @@
   font-size: 11px;
   color: var(--critical);
 }
+
+/* ─── Slot icône/bouton en overlay à droite (prop trailingIcon) ─── */
+.ui-field__control {
+  position: relative;
+  display: flex;
+}
+
+.ui-input--with-trailing {
+  padding-right: 40px;
+}
+
+.ui-field__trailing {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+
+/* Bouton générique dans le slot (ex. afficher/masquer le mot de passe) —
+   dénominateur commun de .login__field-toggle / .register__field-toggle. */
+.ui-field__trailing-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity var(--t-fast) var(--ease-smooth);
+}
+.ui-field__trailing-btn:hover {
+  opacity: 1;
+}
