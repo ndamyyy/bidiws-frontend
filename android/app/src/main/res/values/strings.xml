@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BIDIWS</string>
+    <string name="title_activity_main">BIDIWS</string>
+    <string name="package_name">com.bidiws.app</string>
+    <string name="custom_url_scheme">com.bidiws.app</string>
+</resources>
