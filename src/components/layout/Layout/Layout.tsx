@@ -3,31 +3,88 @@
 // Fichier : src/components/layout/Layout/Layout.tsx
 // ============================================================
 
-import { Outlet } from "react-router-dom";
+import { Suspense, useState, type CSSProperties } from "react";
+import { useLocation, useOutlet } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import Sidebar from "../SideBar/SideBar";
 import TopBar from "../TopBar/TopBar";
+import PageTransition from "../../ui/PageTransition/PageTransition";
+import { ErrorBoundary } from "../../ErrorBoundary/ErrorBoundary";
+import { LoadingSpinner } from "../../ui/LoadingSpinner/LoadingSpinner";
+import { useAuth } from "../../../hooks/useAuth";
+import { ROLE_ACCENT } from "../../../constants/roleColors";
 import "./Layout.css";
+
+const MOBILE_BREAKPOINT = 768;
 
 // ─────────────────────────────────────────
 // COMPOSANT
+// Sidebar ouverte par défaut en desktop (repliable via le bouton menu
+// de la TopBar, redimensionne le contenu) ; fermée par défaut en
+// dessous de 768px, où elle devient un tiroir en overlay ouvert via le
+// même bouton et refermé au clic sur le fond ou au choix d'une page.
 // ─────────────────────────────────────────
 
 export default function Layout() {
-  return (
-    <div className="layout">
+  const location = useLocation();
+  const { utilisateur } = useAuth();
+  // Accent secondaire par rôle (--accent-role) : reprend les couleurs
+  // déjà établies par le sélecteur de LoginPage, pour une identité
+  // cohérente entre la connexion et le tableau de bord. Complément
+  // discret de --signal (accent principal de la marque, inchangé),
+  // pas un remplacement — voir src/constants/roleColors.ts.
+  const accentRole = utilisateur ? ROLE_ACCENT[utilisateur.role] : undefined;
+  // Élément résolu (pas <Outlet/> en direct) : AnimatePresence garde
+  // l'arbre de la page sortante monté le temps de son animation de
+  // sortie, mais <Outlet/> reste abonné au routeur et re-rendrait la
+  // NOUVELLE page à l'intérieur de ce fantôme encore en train de
+  // s'estomper — la sortie ne se termine alors jamais et la page
+  // suivante ne monte jamais (elle reste bloquée à opacity:0, y:-8,
+  // le style de sortie figé). useOutlet() capture l'élément une seule
+  // fois par rendu de Layout, donc l'arbre figé par AnimatePresence
+  // referme l'ancienne page — pas la nouvelle.
+  const outlet = useOutlet();
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > MOBILE_BREAKPOINT);
 
-      {/* ── Sidebar fixe à gauche ── */}
-      <Sidebar />
+  // Referme le tiroir au changement de page, mobile uniquement — sur
+  // desktop la sidebar est un choix persistant de l'utilisateur, pas
+  // un overlay à escamoter. Ajustement d'état pendant le rendu plutôt
+  // qu'un effet, pour éviter un rendu en cascade (pattern recommandé
+  // React quand l'état dépend d'une prop).
+  const [prevPathname, setPrevPathname] = useState(location.pathname);
+  if (location.pathname !== prevPathname) {
+    setPrevPathname(location.pathname);
+    if (window.innerWidth <= MOBILE_BREAKPOINT) {
+      setSidebarOpen(false);
+    }
+  }
+
+  return (
+    <div
+      className={`layout ${!sidebarOpen ? "layout--sidebar-closed" : ""}`}
+      style={accentRole ? ({ "--accent-role": accentRole } as CSSProperties) : undefined}
+    >
+
+      {/* ── Sidebar fixe à gauche (tiroir en mobile, repliable en desktop) ── */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* ── Contenu principal ── */}
       <div className="layout__main">
 
         {/* ── TopBar fixe en haut ── */}
-        <TopBar />
+        <TopBar onMenuClick={() => setSidebarOpen(o => !o)} isSidebarOpen={sidebarOpen} />
 
         {/* ── Pages (Outlet = la page active) ── */}
         <main className="layout__content">
-          <Outlet />
+          <ErrorBoundary>
+            <AnimatePresence mode="wait" initial={false}>
+              <PageTransition key={location.pathname}>
+                <Suspense fallback={<LoadingSpinner />}>
+                  {outlet}
+                </Suspense>
+              </PageTransition>
+            </AnimatePresence>
+          </ErrorBoundary>
         </main>
 
       </div>

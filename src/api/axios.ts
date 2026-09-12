@@ -9,29 +9,17 @@ import type {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
+import { getToken, removeToken } from "./tokenStorage";
+
+// Ré-exportés pour ne pas casser les imports existants
+// (`from "./axios"`) — le stockage lui-même vit dans tokenStorage.ts.
+export { getToken, setToken, removeToken } from "./tokenStorage";
 
 // ─────────────────────────────────────────
 // CONSTANTES
 // ─────────────────────────────────────────
 
-const BASE_URL = (import.meta as { env?: { VITE_API_URL?: string } }).env?.VITE_API_URL ?? "http://localhost:8080/api";
-const TOKEN_KEY = "bidiws_token";
-
-// ─────────────────────────────────────────
-// HELPERS TOKEN
-// ─────────────────────────────────────────
-
-export const getToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY);
-};
-
-export const setToken = (token: string): void => {
-  localStorage.setItem(TOKEN_KEY, token);
-};
-
-export const removeToken = (): void => {
-  localStorage.removeItem(TOKEN_KEY);
-};
+const BASE_URL = (import.meta as { env?: { VITE_API_URL?: string } }).env?.VITE_API_URL ?? "http://localhost:8081/bidiws";
 
 // ─────────────────────────────────────────
 // INSTANCE AXIOS
@@ -53,8 +41,8 @@ const apiClient: AxiosInstance = axios.create({
 // ─────────────────────────────────────────
 
 apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    const token = getToken();
+  async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
+    const token = await getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -77,14 +65,27 @@ apiClient.interceptors.response.use(
   (response: AxiosResponse): AxiosResponse => {
     return response;
   },
-  (error) => {
+  async (error) => {
     const status = error.response?.status;
 
     if (status === 401) {
-      // Token expiré ou invalide → on nettoie et redirige
-      removeToken();
-      localStorage.removeItem("bidiws_user");
-      window.location.href = "/login";
+      // Un 401 sur /auth/login ou /auth/register est un échec de
+      // connexion normal (mauvais mot de passe) — géré localement par
+      // LoginPage, pas une session expirée. Ne pas y appliquer le
+      // nettoyage/redirection global, sinon un mauvais mot de passe
+      // déclenche un rechargement complet de la page.
+      const url = error.config?.url ?? "";
+      const isAuthEndpoint = url.includes("/auth/login") || url.includes("/auth/register");
+      if (!isAuthEndpoint) {
+        // Token expiré ou invalide → on nettoie et redirige. Attendre
+        // removeToken() avant de rediriger : sur un stockage async
+        // (Capacitor Preferences à terme), rediriger avant la fin de
+        // l'écriture laisserait une fenêtre où le token périmé est
+        // encore lu par la prochaine requête sortante.
+        await removeToken();
+        localStorage.removeItem("bidiws_user");
+        window.location.href = "/login";
+      }
     }
 
     if (status === 403) {

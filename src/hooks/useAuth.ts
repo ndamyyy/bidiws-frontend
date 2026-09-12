@@ -4,7 +4,7 @@
 // ============================================================
 
 import { useContext } from "react";
-import { AuthContext, type AuthContextType } from "../context/AuthContext";
+import { AuthContext, type AuthContextType } from "../context/AuthContextValue";
 
 // ─────────────────────────────────────────
 // HOOK

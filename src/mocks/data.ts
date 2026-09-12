@@ -59,43 +59,36 @@ export const MOCK_UTILISATEURS: Utilisateur[] = [
     id: 1, nom: "Admin",   prenom: "BIDIWS",
     email: "admin@bidiws.com", telephone: "06 00 00 00 00",
     role: 'ADMIN', actif: true,
-    createdAt: "2026-01-01T00:00:00", updatedAt: "2026-01-01T00:00:00",
   },
   {
     id: 2, nom: "Dupont",  prenom: "Marcel",
     email: "gardien1@bidiws.com", telephone: "06 12 34 56 78",
     role: 'GARDIEN', actif: true,
-    createdAt: "2026-01-15T00:00:00", updatedAt: "2026-01-15T00:00:00",
   },
   {
     id: 4, nom: "Ba",      prenom: "Karim",
     email: "chauffeur1@bidiws.com", telephone: "06 55 44 33 22",
     role: 'CHAUFFEUR', actif: true,
-    createdAt: "2026-02-01T00:00:00", updatedAt: "2026-02-01T00:00:00",
   },
   {
     id: 5, nom: "Martin",  prenom: "Claire",
     email: "syndic@bidiws.com", telephone: "06 11 22 33 44",
     role: 'SYNDIC', actif: true,
-    createdAt: "2026-01-10T00:00:00", updatedAt: "2026-01-10T00:00:00",
   },
   {
     id: 6, nom: "Chen",    prenom: "Li",
     email: "gardien3@bidiws.com", telephone: "06 33 44 55 66",
     role: 'GARDIEN', actif: true,
-    createdAt: "2026-01-20T00:00:00", updatedAt: "2026-01-20T00:00:00",
   },
   {
     id: 7, nom: "Sissoko", prenom: "Amadou",
     email: "gardien4@bidiws.com", telephone: "06 44 55 66 77",
     role: 'GARDIEN', actif: true,
-    createdAt: "2026-01-20T00:00:00", updatedAt: "2026-01-20T00:00:00",
   },
   {
     id: 8, nom: "Habitant", prenom: "Jean",
     email: "habitant@bidiws.com", telephone: "06 55 66 77 88",
     role: 'HABITANT', actif: true,
-    createdAt: "2026-02-10T00:00:00", updatedAt: "2026-02-10T00:00:00",
   },
 ];
 
@@ -129,47 +122,42 @@ export const MOCK_RESIDENCES: Residence[] = [
   {
     id: 1, nom: "Résidence Les Érables",
     adresse: "12 rue Pasteur", codePostal: "55400",
-    ville: MOCK_VILLES[0], zone: MOCK_ZONES[0],
+    villeId: MOCK_VILLES[0].id, villeNom: MOCK_VILLES[0].nom,
+    zoneId: MOCK_ZONES[0].id, zoneNom: MOCK_ZONES[0].nom,
     latitude: 49.2101, longitude: 5.6349,
     rayonDetection: 50, nbConteneurs: 3, actif: true,
-    createdAt: "2026-01-15T00:00:00",
-    gardiens: [MOCK_UTILISATEURS[1]],
   },
   {
     id: 2, nom: "Résidence du Parc",
     adresse: "4 allée des Tilleuls", codePostal: "55400",
-    ville: MOCK_VILLES[0], zone: MOCK_ZONES[0],
+    villeId: MOCK_VILLES[0].id, villeNom: MOCK_VILLES[0].nom,
+    zoneId: MOCK_ZONES[0].id, zoneNom: MOCK_ZONES[0].nom,
     latitude: 49.2115, longitude: 5.6372,
     rayonDetection: 40, nbConteneurs: 4, actif: true,
-    createdAt: "2026-01-15T00:00:00",
-    gardiens: [MOCK_UTILISATEURS[2]],
   },
   {
     id: 3, nom: "Résidence Voltaire",
     adresse: "27 rue Voltaire", codePostal: "55400",
-    ville: MOCK_VILLES[0], zone: MOCK_ZONES[1],
+    villeId: MOCK_VILLES[0].id, villeNom: MOCK_VILLES[0].nom,
+    zoneId: MOCK_ZONES[1].id, zoneNom: MOCK_ZONES[1].nom,
     latitude: 49.2089, longitude: 5.6401,
     rayonDetection: 50, nbConteneurs: 2, actif: true,
-    createdAt: "2026-01-20T00:00:00",
-    gardiens: [MOCK_UTILISATEURS[6]],
   },
   {
     id: 4, nom: "Les Jardins de Verdun",
     adresse: "8 bd de la Paix", codePostal: "55100",
-    ville: MOCK_VILLES[1], zone: MOCK_ZONES[2],
+    villeId: MOCK_VILLES[1].id, villeNom: MOCK_VILLES[1].nom,
+    zoneId: MOCK_ZONES[2].id, zoneNom: MOCK_ZONES[2].nom,
     latitude: 49.1620, longitude: 5.3880,
     rayonDetection: 60, nbConteneurs: 5, actif: true,
-    createdAt: "2026-02-01T00:00:00",
-    gardiens: [MOCK_UTILISATEURS[7]],
   },
   {
     id: 5, nom: "Résidence Bellevue",
     adresse: "3 rue du Moulin", codePostal: "55400",
-    ville: MOCK_VILLES[0], zone: MOCK_ZONES[0],
+    villeId: MOCK_VILLES[0].id, villeNom: MOCK_VILLES[0].nom,
+    zoneId: MOCK_ZONES[0].id, zoneNom: MOCK_ZONES[0].nom,
     latitude: 49.2130, longitude: 5.6310,
     rayonDetection: 45, nbConteneurs: 2, actif: true,
-    createdAt: "2026-02-10T00:00:00",
-    gardiens: [MOCK_UTILISATEURS[1]],
   },
 ];
 
@@ -179,7 +167,9 @@ export const MOCK_RESIDENCES: Residence[] = [
 
 export const MOCK_ARRETS: Arret[] = [
   {
-    id: 1, tourneeId: 1, residence: MOCK_RESIDENCES[0], ordre: 1,
+    id: 1, tourneeId: 1,
+    residenceId: MOCK_RESIDENCES[0].id, residenceNom: MOCK_RESIDENCES[0].nom, residenceAdresse: MOCK_RESIDENCES[0].adresse,
+    ordre: 1,
     statut: 'COLLECTE_CONFIRMEE',
     heureEstimee:  "2026-06-22T09:30:00",
     heureApproche: "2026-06-22T09:38:00",
@@ -187,10 +177,11 @@ export const MOCK_ARRETS: Arret[] = [
     scoreConfiance: 95, modeDetection: 'GPS_AUTO',
     nbConteneurs: 3, typesConteneurs: "OM×3",
     poidsKg: 142, incident: false,
-    createdAt: "2026-06-22T06:00:00", updatedAt: "2026-06-22T09:45:00",
   },
   {
-    id: 2, tourneeId: 1, residence: MOCK_RESIDENCES[1], ordre: 2,
+    id: 2, tourneeId: 1,
+    residenceId: MOCK_RESIDENCES[1].id, residenceNom: MOCK_RESIDENCES[1].nom, residenceAdresse: MOCK_RESIDENCES[1].adresse,
+    ordre: 2,
     statut: 'COLLECTE_CONFIRMEE',
     heureEstimee:  "2026-06-22T10:00:00",
     heureApproche: "2026-06-22T10:05:00",
@@ -198,31 +189,33 @@ export const MOCK_ARRETS: Arret[] = [
     scoreConfiance: 88, modeDetection: 'VALIDATION_CHAUFFEUR',
     nbConteneurs: 4, typesConteneurs: "OM×4",
     incident: false,
-    createdAt: "2026-06-22T06:00:00", updatedAt: "2026-06-22T10:12:00",
   },
   {
-    id: 3, tourneeId: 1, residence: MOCK_RESIDENCES[4], ordre: 3,
+    id: 3, tourneeId: 1,
+    residenceId: MOCK_RESIDENCES[4].id, residenceNom: MOCK_RESIDENCES[4].nom, residenceAdresse: MOCK_RESIDENCES[4].adresse,
+    ordre: 3,
     statut: 'EN_APPROCHE',
     heureEstimee: "2026-06-22T10:30:00",
     scoreConfiance: 60, modeDetection: 'GPS_AUTO',
     nbConteneurs: 2, incident: false,
-    createdAt: "2026-06-22T06:00:00", updatedAt: "2026-06-22T10:20:00",
   },
   {
-    id: 4, tourneeId: 2, residence: MOCK_RESIDENCES[2], ordre: 1,
+    id: 4, tourneeId: 2,
+    residenceId: MOCK_RESIDENCES[2].id, residenceNom: MOCK_RESIDENCES[2].nom, residenceAdresse: MOCK_RESIDENCES[2].adresse,
+    ordre: 1,
     statut: 'EN_ATTENTE',
     heureEstimee: "2026-06-22T14:00:00",
     scoreConfiance: 0,
     nbConteneurs: 2, incident: false,
-    createdAt: "2026-06-22T06:00:00", updatedAt: "2026-06-22T06:00:00",
   },
   {
-    id: 5, tourneeId: 2, residence: MOCK_RESIDENCES[3], ordre: 2,
+    id: 5, tourneeId: 2,
+    residenceId: MOCK_RESIDENCES[3].id, residenceNom: MOCK_RESIDENCES[3].nom, residenceAdresse: MOCK_RESIDENCES[3].adresse,
+    ordre: 2,
     statut: 'EN_ATTENTE',
     heureEstimee: "2026-06-22T14:30:00",
     scoreConfiance: 0,
     nbConteneurs: 5, incident: false,
-    createdAt: "2026-06-22T06:00:00", updatedAt: "2026-06-22T06:00:00",
   },
 ];
 
@@ -233,26 +226,36 @@ export const MOCK_ARRETS: Arret[] = [
 export const MOCK_TOURNEES: Tournee[] = [
   {
     id: 1,
-    dateTournee:  "2026-06-22",
-    typeCollecte: MOCK_TYPES_COLLECTE[0],
-    camion:       MOCK_CAMIONS[0],
-    chauffeur:    MOCK_UTILISATEURS[3],
-    zone:         MOCK_ZONES[0],
-    statut:       'EN_COURS',
-    heureDebut:   "2026-06-22T08:00:00",
-    createdAt:    "2026-06-21T18:00:00",
-    arrets:       [MOCK_ARRETS[0], MOCK_ARRETS[1], MOCK_ARRETS[2]],
+    dateTournee:           "2026-06-22",
+    typeCollecteId:        MOCK_TYPES_COLLECTE[0].id,
+    typeCollecteLibelle:   MOCK_TYPES_COLLECTE[0].libelle,
+    camionId:              MOCK_CAMIONS[0].id,
+    camionImmatriculation: MOCK_CAMIONS[0].immatriculation,
+    chauffeurId:           MOCK_UTILISATEURS[3].id,
+    chauffeurNom:          MOCK_UTILISATEURS[3].nom,
+    chauffeurPrenom:       MOCK_UTILISATEURS[3].prenom,
+    zoneId:                MOCK_ZONES[0].id,
+    zoneNom:               MOCK_ZONES[0].nom,
+    statut:                'EN_COURS',
+    heureDebut:            "2026-06-22T08:00:00",
+    createdAt:             "2026-06-21T18:00:00",
+    arrets:                [MOCK_ARRETS[0], MOCK_ARRETS[1], MOCK_ARRETS[2]],
   },
   {
     id: 2,
-    dateTournee:  "2026-06-22",
-    typeCollecte: MOCK_TYPES_COLLECTE[1],
-    camion:       MOCK_CAMIONS[1],
-    chauffeur:    MOCK_UTILISATEURS[4],
-    zone:         MOCK_ZONES[1],
-    statut:       'PLANIFIEE',
-    createdAt:    "2026-06-21T18:00:00",
-    arrets:       [MOCK_ARRETS[3], MOCK_ARRETS[4]],
+    dateTournee:           "2026-06-22",
+    typeCollecteId:        MOCK_TYPES_COLLECTE[1].id,
+    typeCollecteLibelle:   MOCK_TYPES_COLLECTE[1].libelle,
+    camionId:              MOCK_CAMIONS[1].id,
+    camionImmatriculation: MOCK_CAMIONS[1].immatriculation,
+    chauffeurId:           MOCK_UTILISATEURS[4].id,
+    chauffeurNom:          MOCK_UTILISATEURS[4].nom,
+    chauffeurPrenom:       MOCK_UTILISATEURS[4].prenom,
+    zoneId:                MOCK_ZONES[1].id,
+    zoneNom:               MOCK_ZONES[1].nom,
+    statut:                'PLANIFIEE',
+    createdAt:             "2026-06-21T18:00:00",
+    arrets:                [MOCK_ARRETS[3], MOCK_ARRETS[4]],
   },
 ];
 
@@ -310,8 +313,9 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
 
 export const MOCK_SIGNALEMENTS: Signalement[] = [
   {
-    id: 1, auteur: MOCK_UTILISATEURS[1],
-    residence: MOCK_RESIDENCES[0], arretId: 1,
+    id: 1,
+    auteurId: MOCK_UTILISATEURS[1].id, auteurNom: MOCK_UTILISATEURS[1].nom, auteurPrenom: MOCK_UTILISATEURS[1].prenom,
+    residenceId: MOCK_RESIDENCES[0].id, residenceNom: MOCK_RESIDENCES[0].nom, arretId: 1,
     type:        'BAC_PLEIN',
     description: "Le bac OM n°2 déborde, non vidé lors du dernier passage.",
     latitude: 49.2101, longitude: 5.6349,
@@ -319,8 +323,9 @@ export const MOCK_SIGNALEMENTS: Signalement[] = [
     createdAt: "2026-06-20T14:30:00",
   },
   {
-    id: 2, auteur: MOCK_UTILISATEURS[6],
-    residence: MOCK_RESIDENCES[2],
+    id: 2,
+    auteurId: MOCK_UTILISATEURS[6].id, auteurNom: MOCK_UTILISATEURS[6].nom, auteurPrenom: MOCK_UTILISATEURS[6].prenom,
+    residenceId: MOCK_RESIDENCES[2].id, residenceNom: MOCK_RESIDENCES[2].nom,
     type:        'DEPOT_SAUVAGE',
     description: "Dépôt sauvage de sacs noirs devant le portail.",
     latitude: 49.2089, longitude: 5.6401,
@@ -358,12 +363,6 @@ export const getNotificationsByUserId = (userId: number): Notification[] =>
 // Récupérer une résidence par ID
 export const getResidenceById = (id: number): Residence | undefined =>
   MOCK_RESIDENCES.find((r) => r.id === id);
-
-// Récupérer les résidences d'un gardien
-export const getResidencesByGardienId = (gardienId: number): Residence[] =>
-  MOCK_RESIDENCES.filter((r) =>
-    r.gardiens.some((g) => g.id === gardienId)
-  );
 
 // Progression d'une tournée en %
 export const getTourneeProgress = (tournee: Tournee): number => {
