@@ -44,12 +44,12 @@ const ICONS: Record<ToastVariant, ReactNode> = {
 };
 
 export interface ToastProps {
-  id: string | number;
+  id: string;
   variant?: ToastVariant;
   message: string;
   /** Durée avant fermeture automatique, en ms. 0 = pas d'auto-dismiss. */
   duration?: number;
-  onDismiss: (id: string | number) => void;
+  onDismiss: (id: string) => void;
 }
 
 export function Toast({ id, variant = "info", message, duration = 4000, onDismiss }: ToastProps) {

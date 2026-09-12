@@ -3,14 +3,16 @@
 // Fichier : src/pages/chauffeur/ChauffeurTourneePage/ChauffeurTourneePage.tsx
 // ============================================================
 
-import { useState }                    from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient }              from "@tanstack/react-query";
 import axios                           from "axios";
+import { Geolocation, type CallbackID } from "@capacitor/geolocation";
 import { useAuth }                     from "../../../hooks/useAuth";
 import { useMaTourneeAujourdhui }      from "../../../hooks/useTournees";
 import { useArretsByTournee }          from "../../../hooks/useArrets";
 import { useTypesCollecte }            from "../../../hooks/useCalendrierCollecte";
 import { demarrerTournee, terminerTournee } from "../../../api/tournee.api";
+import { envoyerSignalGps }            from "../../../api/arrets.api";
 import { LoadingSpinner }              from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon }            from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import { Button }                      from "../../../components/ui/Button/Button";
@@ -19,6 +21,41 @@ import { extractErrorMessage }         from "../../../utils/extractErrorMessage"
 import { validerArretOffline, signalerIncidentOffline, OfflineQueuedError } from "../../../utils/offlineQueue";
 import type { Arret, ApiError }        from "../../../types";
 import "./ChauffeurTourneePage.css";
+
+// ─────────────────────────────────────────
+// PERMISSION DE LOCALISATION
+// checkPermissions() est supporté web + natif ; requestPermissions()
+// est "Not implemented on web" (lève systématiquement côté web) — sur
+// web, ne pas appeler requestPermissions() du tout et laisser
+// watchPosition() déclencher lui-même la demande native du navigateur.
+// Retourne false uniquement quand on est sûr d'un refus explicite,
+// jamais sur une plateforme qui ne sait juste pas répondre.
+// ─────────────────────────────────────────
+
+const demanderPermissionLocalisation = async (): Promise<boolean> => {
+  try {
+    const statut = await Geolocation.checkPermissions();
+    if (statut.location === "granted") return true;
+    if (statut.location === "denied") return false;
+  } catch {
+    // Permissions API indisponible (certains navigateurs/WebViews) —
+    // on tente quand même, watchPosition() fera sa propre demande.
+    return true;
+  }
+
+  try {
+    const demande = await Geolocation.requestPermissions();
+    return demande.location === "granted";
+  } catch {
+    // "Not implemented on web" — pas un refus, juste indisponible ici.
+    return true;
+  }
+};
+
+// Throttle entre deux envois de signal GPS — évite de spammer le
+// backend à chaque callback watchPosition (peut arriver plusieurs
+// fois par seconde en haute précision).
+const INTERVALLE_ENVOI_MS = 12_000;
 
 // Arrêts dans un état terminal (collecte confirmée ou incident) — le
 // seul dont dispose cette page pour décider "tournée terminable", le
@@ -283,6 +320,7 @@ export default function ChauffeurTourneePage() {
   const toast = useToast();
 
   const [gpsOn, setGpsOn] = useState<boolean>(true);
+  const [gpsError, setGpsError] = useState<string>("");
   const [pendingArretIds, setPendingArretIds] = useState<Set<number>>(new Set());
   const [isTerminating, setIsTerminating] = useState<boolean>(false);
   const [terminerError, setTerminerError] = useState<string>("");
@@ -299,6 +337,83 @@ export default function ChauffeurTourneePage() {
   // ── Arrêts de cette tournée ──
   const { data: arrets, isLoading: isLoadingArrets, isError: isErrorArrets } = useArretsByTournee(tournee?.id);
   const arretsListe = arrets ?? [];
+
+  // ── Suivi GPS réel (Capacitor Geolocation) ──
+  // Démarre/arrête watchPosition selon le toggle, pas seulement à
+  // l'activation — un démontage de page (navigation ailleurs) doit
+  // aussi couper le suivi, sinon il continue en arrière-plan sans que
+  // rien à l'écran ne l'indique.
+  const tourneeId = tournee?.id;
+  useEffect(() => {
+    if (!gpsOn || tourneeId === undefined) return;
+
+    let watchId: CallbackID | null = null;
+    let cancelled = false;
+    let dernierEnvoiAt = 0;
+
+    const demarrerSuivi = async (): Promise<void> => {
+      const autorise = await demanderPermissionLocalisation();
+      if (cancelled) return;
+
+      if (!autorise) {
+        setGpsError("Permission de localisation refusée — activez-la dans les paramètres de l'appareil pour le suivi automatique.");
+        setGpsOn(false);
+        return;
+      }
+
+      setGpsError("");
+
+      try {
+        const id = await Geolocation.watchPosition(
+          { enableHighAccuracy: true, timeout: 15000 },
+          (position, err) => {
+            if (cancelled) return;
+
+            if (err || !position) {
+              console.error("BIDIWS GPS — erreur watchPosition", err);
+              setGpsError("Impossible d'obtenir votre position — vérifiez que la localisation est activée.");
+              return;
+            }
+
+            const maintenant = Date.now();
+            if (maintenant - dernierEnvoiAt < INTERVALLE_ENVOI_MS) return;
+            dernierEnvoiAt = maintenant;
+
+            const { latitude, longitude, speed, accuracy } = position.coords;
+            envoyerSignalGps({
+              tourneeId,
+              latitude,
+              longitude,
+              vitesseKmh: speed != null ? speed * 3.6 : undefined,
+              precisionM: accuracy != null ? accuracy : undefined,
+              horodatage: new Date(position.timestamp).toISOString(),
+              source: "APP",
+            }).catch((e) => {
+              console.error("BIDIWS GPS — erreur envoi signal", e);
+            });
+          }
+        );
+        if (cancelled) {
+          void Geolocation.clearWatch({ id });
+          return;
+        }
+        watchId = id;
+      } catch (e) {
+        console.error("BIDIWS GPS — erreur démarrage watchPosition", e);
+        setGpsError("Impossible de démarrer le suivi GPS sur cet appareil.");
+        setGpsOn(false);
+      }
+    };
+
+    void demarrerSuivi();
+
+    return () => {
+      cancelled = true;
+      if (watchId) {
+        void Geolocation.clearWatch({ id: watchId });
+      }
+    };
+  }, [gpsOn, tourneeId]);
 
   const isChargement = isLoadingTournees || isLoadingArrets;
   const isErreur = isErrorTournees || isErrorArrets;
@@ -495,6 +610,12 @@ export default function ChauffeurTourneePage() {
           />
         </button>
       </div>
+
+      {gpsError && (
+        <div style={{ color: "var(--danger)", fontSize: 12, margin: "-8px 0 16px" }}>
+          {gpsError}
+        </div>
+      )}
 
       {/* ── Progression ── */}
       <div className="chauffeur__progress">

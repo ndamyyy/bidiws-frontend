@@ -5,25 +5,27 @@
 //
 // localStorage n'est pas chiffré au repos sur mobile (contrairement à
 // Keychain iOS / Keystore Android) — un vrai problème une fois ce
-// frontend embarqué dans Capacitor. Cette couche isole le stockage du
-// token derrière une interface async : pour l'instant elle utilise
-// encore localStorage (web, Capacitor pas encore intégré au projet),
-// mais l'API est déjà celle qu'impose @capacitor/preferences (get/set/
-// remove tous asynchrones) — le jour où Capacitor est ajouté, seul CE
-// fichier change (les trois fonctions ci-dessous, par leurs
-// équivalents Preferences.get/set/remove), aucun appelant (axios.ts,
-// auth.api.ts, AuthContext.tsx, WebSocketContext.tsx) n'a à bouger.
+// frontend embarqué dans Capacitor. @capacitor/preferences résout ça :
+// backé par Keychain/Keystore sur natif, et par localStorage sur web
+// (fallback intégré au plugin lui-même) — donc le comportement web
+// classique (hors Capacitor) reste inchangé sans code conditionnel ici.
+// Interface déjà async avant ce changement (get/set/remove) : aucun
+// appelant (axios.ts, auth.api.ts, AuthContext.tsx, WebSocketContext.tsx)
+// n'a besoin de bouger.
+
+import { Preferences } from "@capacitor/preferences";
 
 const TOKEN_KEY = "bidiws_token";
 
 export const getToken = async (): Promise<string | null> => {
-  return localStorage.getItem(TOKEN_KEY);
+  const { value } = await Preferences.get({ key: TOKEN_KEY });
+  return value;
 };
 
 export const setToken = async (token: string): Promise<void> => {
-  localStorage.setItem(TOKEN_KEY, token);
+  await Preferences.set({ key: TOKEN_KEY, value: token });
 };
 
 export const removeToken = async (): Promise<void> => {
-  localStorage.removeItem(TOKEN_KEY);
+  await Preferences.remove({ key: TOKEN_KEY });
 };
