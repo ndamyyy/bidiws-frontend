@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { register } from "../../api/auth.api";
+import { Input } from "../../components/ui/Input/Input";
 import type { ApiError, RegisterRequest } from "../../types";
 import "./RegisterPage.css";
 
@@ -178,56 +179,44 @@ export default function RegisterPage() {
 
               <div className="register__fields">
                 <div className="register__fields-row">
-                  <div className="register__field">
-                    <label className="register__field-label">Prénom</label>
-                    <input
-                      ref={nomInputRef}
-                      className="register__field-input"
-                      type="text"
-                      value={prenom}
-                      onChange={(e) => setPrenom(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                      autoFocus
-                    />
-                  </div>
-                  <div className="register__field">
-                    <label className="register__field-label">Nom</label>
-                    <input
-                      className="register__field-input"
-                      type="text"
-                      value={nom}
-                      onChange={(e) => setNom(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                    />
-                  </div>
-                </div>
-
-                <div className="register__field">
-                  <label className="register__field-label">Email</label>
-                  <input
-                    className="register__field-input"
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                  <Input
+                    ref={nomInputRef}
+                    label="Prénom"
+                    type="text"
+                    value={prenom}
+                    onChange={(e) => setPrenom(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                    autoFocus
+                  />
+                  <Input
+                    label="Nom"
+                    type="text"
+                    value={nom}
+                    onChange={(e) => setNom(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                   />
                 </div>
 
-                <div className="register__field">
-                  <label className="register__field-label">Mot de passe</label>
-                  <div className="register__field-wrap">
-                    <input
-                      className="register__field-input"
-                      type={showMotDePasse ? "text" : "password"}
-                      placeholder="8 caractères minimum"
-                      value={motDePasse}
-                      onChange={(e) => setMotDePasse(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                    />
+                <Input
+                  label="Email"
+                  type="email"
+                  placeholder="votre@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                />
+
+                <Input
+                  label="Mot de passe"
+                  type={showMotDePasse ? "text" : "password"}
+                  placeholder="8 caractères minimum"
+                  value={motDePasse}
+                  onChange={(e) => setMotDePasse(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                  trailingIcon={
                     <button
                       type="button"
-                      className="register__field-toggle"
+                      className="ui-field__trailing-btn"
                       onClick={() => setShowMotDePasse((v) => !v)}
                       tabIndex={-1}
                       title={showMotDePasse ? "Masquer le mot de passe" : "Afficher le mot de passe"}
@@ -235,19 +224,16 @@ export default function RegisterPage() {
                     >
                       {showMotDePasse ? <IconEyeOff color="#6b84a3" /> : <IconEye color="#6b84a3" />}
                     </button>
-                  </div>
-                </div>
+                  }
+                />
 
-                <div className="register__field">
-                  <label className="register__field-label">Téléphone (optionnel)</label>
-                  <input
-                    className="register__field-input"
-                    type="tel"
-                    value={telephone}
-                    onChange={(e) => setTelephone(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                  />
-                </div>
+                <Input
+                  label="Téléphone (optionnel)"
+                  type="tel"
+                  value={telephone}
+                  onChange={(e) => setTelephone(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                />
               </div>
 
               {error && <div className="register__error">{error}</div>}

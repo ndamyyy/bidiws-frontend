@@ -252,55 +252,14 @@
   gap: 12px;
 }
 
-.register__field-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  display: block;
-  margin-bottom: 6px;
-}
-
-.register__field-input {
-  width: 100%;
-  padding: 10px 14px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 13px;
-  outline: none;
-  transition: all var(--t-fast) var(--ease-smooth);
-}
-.register__field-input:focus {
-  border-color: var(--signal);
-  box-shadow: 0 0 0 4px var(--signal-dim-05);
-}
-
 @media (min-width: 768px) {
-  .register__field-input { padding: 12px 16px; font-size: 14px; }
+  /* Champs migrés vers <Input> (ui-input) — palier desktop identique à
+     l'ancien .register__field-input. Le shorthand padding écrase le
+     padding-right de .ui-input--with-trailing (bouton œil du mot de
+     passe) : on le repose juste après. */
+  .register__fields .ui-input { padding: 12px 16px; font-size: 14px; }
+  .register__fields .ui-input--with-trailing { padding-right: 40px; }
 }
-
-.register__field-wrap { position: relative; }
-.register__field-wrap .register__field-input { padding-right: 40px; }
-
-.register__field-toggle {
-  position: absolute;
-  top: 50%;
-  right: 8px;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  padding: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity var(--t-fast) var(--ease-smooth);
-}
-.register__field-toggle:hover { opacity: 1; }
 
 .register__login-link {
   display: block;

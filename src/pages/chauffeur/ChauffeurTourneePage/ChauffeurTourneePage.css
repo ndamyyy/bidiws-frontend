@@ -251,19 +251,22 @@
   border-radius: 10px;
 }
 
-.c-arret-item__incident-input {
+/* Migré vers <Input> (ui-input) : le flex:1 qui dimensionnait
+   directement l'ancien <input> s'applique maintenant à son wrapper
+   .ui-field (className atterrit sur l'<input> lui-même, pas sur ce
+   wrapper — voir Input.tsx). Sélecteur à 2 classes / enfant direct
+   pour gagner sur .ui-input quel que soit l'ordre d'import des CSS. */
+.c-arret-item__incident-form > .ui-field {
   flex: 1;
   min-width: 160px;
-  padding: 8px 12px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-subtle);
-  border-radius: 8px;
-  color: var(--text-primary);
-  font-size: 13px;
-  outline: none;
 }
 
-.c-arret-item__incident-input:focus {
+.c-arret-item__incident-form .c-arret-item__incident-input {
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.c-arret-item__incident-form .c-arret-item__incident-input:focus {
   border-color: var(--danger);
   box-shadow: 0 0 0 3px var(--danger-dim-10);
 }

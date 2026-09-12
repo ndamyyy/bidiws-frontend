@@ -16,6 +16,7 @@ import { envoyerSignalGps }            from "../../../api/arrets.api";
 import { LoadingSpinner }              from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { TypeCollecteIcon }            from "../../../components/ui/TypeCollecteIcon/TypeCollecteIcon";
 import { Button }                      from "../../../components/ui/Button/Button";
+import { Input }                       from "../../../components/ui/Input/Input";
 import { useToast }                    from "../../../hooks/useToast";
 import { extractErrorMessage }         from "../../../utils/extractErrorMessage";
 import { validerArretOffline, signalerIncidentOffline, OfflineQueuedError } from "../../../utils/offlineQueue";
@@ -276,7 +277,7 @@ const ArretItem = ({
       {/* Formulaire incident, sous la ligne principale */}
       {incidentOpen && !isTerminal && !readOnly && (
         <div className="c-arret-item__incident-form">
-          <input
+          <Input
             className="c-arret-item__incident-input"
             type="text"
             placeholder="Décrivez brièvement l'incident…"
@@ -285,21 +286,24 @@ const ArretItem = ({
             onKeyDown={(e) => e.key === "Enter" && handleSubmitIncident()}
             autoFocus
           />
-          <Button
-            variant="danger"
-            size="sm"
-            loading={isSubmitting}
-            disabled={!description.trim()}
-            onClick={handleSubmitIncident}
-          >
-            Envoyer
-          </Button>
+          {/* Annuler avant Envoyer (convention de l'app, voir Button.tsx) —
+              et Envoyer reste primary : danger est réservé au point
+              d'entrée "Signaler un incident", pas à la confirmation. */}
           <Button
             variant="secondary"
             size="sm"
             onClick={() => { setIncidentOpen(false); setDescription(""); setIncidentError(""); }}
           >
             Annuler
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            loading={isSubmitting}
+            disabled={!description.trim()}
+            onClick={handleSubmitIncident}
+          >
+            Envoyer
           </Button>
           {incidentError && (
             <div className="c-arret-item__incident-error">{incidentError}</div>

@@ -139,22 +139,15 @@
   color: var(--text-muted);
 }
 
-.admin-signalement-card__statut-select {
+/* Migré vers <Select> (ui-select) — seul le gabarit compact (padding/
+   taille) diffère du défaut partagé, le reste (fond/bordure/focus/
+   disabled) est déjà identique à .ui-select. Sélecteur à 2 classes
+   pour gagner sur .ui-select quel que soit l'ordre d'import des CSS. */
+.admin-signalement-card__footer .admin-signalement-card__statut-select {
   padding: 7px 12px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
   font-size: 12px;
   font-weight: 600;
-  outline: none;
-  cursor: pointer;
 }
-.admin-signalement-card__statut-select:focus {
-  border-color: var(--signal);
+.admin-signalement-card__footer .admin-signalement-card__statut-select:focus {
   box-shadow: 0 0 0 3px var(--signal-dim-05);
-}
-.admin-signalement-card__statut-select:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }

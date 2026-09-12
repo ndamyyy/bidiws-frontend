@@ -17,6 +17,21 @@
 // reprises ici pour éviter d'hériter d'un style jamais éprouvé en
 // conditions réelles ; Button a sa propre feuille, alignée sur ce qui
 // est effectivement à l'écran aujourd'hui.
+//
+// ── Convention d'usage (audité et unifié sur tout le projet) ──
+// Une seule variante par type d'action, partout, pas au cas par cas :
+//   - primary   : l'action qui valide/confirme/soumet (Valider, Envoyer
+//                 le signalement, Créer, Démarrer/Terminer la tournée).
+//   - secondary : action auxiliaire ou d'annulation (Annuler, Réessayer,
+//                 Importer une photo).
+//   - danger    : action réellement destructive (Retirer une photo
+//                 déjà sélectionnée) OU un point d'entrée vers un
+//                 signalement/incident (Signaler un problème/incident) —
+//                 pas la confirmation à l'intérieur de ce formulaire,
+//                 qui reste primary comme toute soumission.
+// Dans un groupe annuler/confirmer, Annuler est toujours en premier
+// (donc à gauche, sauf conteneur en row-reverse) et l'action de
+// confirmation en second (à droite) — jamais l'inverse.
 
 import { forwardRef } from "react";
 import type { ButtonHTMLAttributes, ReactNode } from "react";

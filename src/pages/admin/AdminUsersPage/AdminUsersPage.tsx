@@ -21,6 +21,8 @@ import { changerResidenceHabitant } from "../../../api/residence-habitants.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { StaggerContainer, StaggerItem } from "../../../components/ui/StaggerContainer/StaggerContainer";
 import { FilterGroup } from "../../../components/ui/FilterGroup/FilterGroup";
+import { Input } from "../../../components/ui/Input/Input";
+import { Select } from "../../../components/ui/Select/Select";
 import { useToast } from "../../../hooks/useToast";
 import { extractErrorMessage } from "../../../utils/extractErrorMessage";
 import type { ApiError, Role, Utilisateur } from "../../../types";
@@ -192,34 +194,22 @@ const EditUserPanel = ({
       <form className="admin-user-edit__form" onSubmit={handleRoleSubmit}>
         {roleError && <div className="admin-users__error">{roleError}</div>}
         <div className="admin-user-edit__row">
-          <div className="admin-users__field">
-            <label className="admin-users__label">Rôle</label>
-            <select
-              className="admin-users__select"
-              value={editRole}
-              onChange={(e) => setEditRole(e.target.value as Role)}
-            >
-              {ALL_ROLES.map(r => (
-                <option key={r} value={r}>{ROLE_LABEL[r]}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="Rôle"
+            options={ALL_ROLES.map(r => ({ value: r, label: ROLE_LABEL[r] }))}
+            value={editRole}
+            onChange={(e) => setEditRole(e.target.value as Role)}
+          />
 
           {editRole === "MAIRIE" && (
-            <div className="admin-users__field">
-              <label className="admin-users__label">Ville</label>
-              <select
-                className="admin-users__select"
-                value={editVilleId}
-                onChange={(e) => setEditVilleId(e.target.value)}
-                disabled={isLoadingVilles}
-              >
-                <option value="">Sélectionner...</option>
-                {villes?.map(v => (
-                  <option key={v.id} value={v.id}>{v.nom}</option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Ville"
+              options={villes?.map(v => ({ value: String(v.id), label: v.nom })) ?? []}
+              placeholder="Sélectionner..."
+              value={editVilleId}
+              onChange={(e) => setEditVilleId(e.target.value)}
+              disabled={isLoadingVilles}
+            />
           )}
 
           <button className="admin-users__submit" type="submit" disabled={isSubmittingRole}>
@@ -243,25 +233,19 @@ const EditUserPanel = ({
           </div>
         ) : (
           <div className="admin-user-edit__row">
-            <div className="admin-users__field">
-              <label className="admin-users__label">Nouveau mot de passe</label>
-              <input
-                className="admin-users__input"
-                type="password"
-                placeholder="8 caractères minimum"
-                value={nouveauMotDePasse}
-                onChange={(e) => setNouveauMotDePasse(e.target.value)}
-              />
-            </div>
-            <div className="admin-users__field">
-              <label className="admin-users__label">Confirmation</label>
-              <input
-                className="admin-users__input"
-                type="password"
-                value={confirmation}
-                onChange={(e) => setConfirmation(e.target.value)}
-              />
-            </div>
+            <Input
+              label="Nouveau mot de passe"
+              type="password"
+              placeholder="8 caractères minimum"
+              value={nouveauMotDePasse}
+              onChange={(e) => setNouveauMotDePasse(e.target.value)}
+            />
+            <Input
+              label="Confirmation"
+              type="password"
+              value={confirmation}
+              onChange={(e) => setConfirmation(e.target.value)}
+            />
             <button className="admin-users__submit" type="submit" disabled={isSubmittingPassword}>
               {isSubmittingPassword ? "Réinitialisation..." : "Réinitialiser"}
             </button>
@@ -283,20 +267,14 @@ const EditUserPanel = ({
             </div>
           )}
           <div className="admin-user-edit__row">
-            <div className="admin-users__field">
-              <label className="admin-users__label">Résidence</label>
-              <select
-                className="admin-users__select"
-                value={editResidenceId}
-                onChange={(e) => setEditResidenceId(e.target.value)}
-                disabled={isLoadingResidences}
-              >
-                <option value="">Sélectionner...</option>
-                {residences?.map(r => (
-                  <option key={r.id} value={r.id}>{r.nom}</option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Résidence"
+              options={residences?.map(r => ({ value: String(r.id), label: r.nom })) ?? []}
+              placeholder="Sélectionner..."
+              value={editResidenceId}
+              onChange={(e) => setEditResidenceId(e.target.value)}
+              disabled={isLoadingResidences}
+            />
             <button className="admin-users__submit" type="submit" disabled={isSubmittingResidence}>
               {isSubmittingResidence ? "Enregistrement..." : residenceActuelle ? "Changer" : "Rattacher"}
             </button>
@@ -527,88 +505,61 @@ export default function AdminUsersPage() {
               {createError && <div className="admin-users__error">{createError}</div>}
 
               <div className="admin-users__grid">
-                <div className="admin-users__field">
-                  <label className="admin-users__label">Prénom</label>
-                  <input
-                    className="admin-users__input"
-                    type="text"
-                    value={prenom}
-                    onChange={(e) => setPrenom(e.target.value)}
-                  />
-                </div>
+                <Input
+                  label="Prénom"
+                  type="text"
+                  value={prenom}
+                  onChange={(e) => setPrenom(e.target.value)}
+                />
 
-                <div className="admin-users__field">
-                  <label className="admin-users__label">Nom</label>
-                  <input
-                    className="admin-users__input"
-                    type="text"
-                    value={nom}
-                    onChange={(e) => setNom(e.target.value)}
-                  />
-                </div>
+                <Input
+                  label="Nom"
+                  type="text"
+                  value={nom}
+                  onChange={(e) => setNom(e.target.value)}
+                />
 
-                <div className="admin-users__field">
-                  <label className="admin-users__label">Email</label>
-                  <input
-                    className="admin-users__input"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
+                <Input
+                  label="Email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
 
-                <div className="admin-users__field">
-                  <label className="admin-users__label">Mot de passe</label>
-                  <input
-                    className="admin-users__input"
-                    type="password"
-                    placeholder="8 caractères minimum"
-                    value={motDePasse}
-                    onChange={(e) => setMotDePasse(e.target.value)}
-                  />
-                </div>
+                <Input
+                  label="Mot de passe"
+                  type="password"
+                  placeholder="8 caractères minimum"
+                  value={motDePasse}
+                  onChange={(e) => setMotDePasse(e.target.value)}
+                />
 
-                <div className="admin-users__field">
-                  <label className="admin-users__label">Téléphone (optionnel)</label>
-                  <input
-                    className="admin-users__input"
-                    type="tel"
-                    value={telephone}
-                    onChange={(e) => setTelephone(e.target.value)}
-                  />
-                </div>
+                <Input
+                  label="Téléphone (optionnel)"
+                  type="tel"
+                  value={telephone}
+                  onChange={(e) => setTelephone(e.target.value)}
+                />
 
-                <div className="admin-users__field">
-                  <label className="admin-users__label">Rôle</label>
-                  <select
-                    className="admin-users__select"
-                    value={role}
-                    onChange={(e) => {
-                      setRole(e.target.value as Role);
-                      setVilleId("");
-                    }}
-                  >
-                    {ALL_ROLES.map(r => (
-                      <option key={r} value={r}>{ROLE_LABEL[r]}</option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label="Rôle"
+                  options={ALL_ROLES.map(r => ({ value: r, label: ROLE_LABEL[r] }))}
+                  value={role}
+                  onChange={(e) => {
+                    setRole(e.target.value as Role);
+                    setVilleId("");
+                  }}
+                />
 
                 {role === "MAIRIE" && (
-                  <div className="admin-users__field">
-                    <label className="admin-users__label">Ville</label>
-                    <select
-                      className="admin-users__select"
-                      value={villeId}
-                      onChange={(e) => setVilleId(e.target.value)}
-                      disabled={isLoadingVilles}
-                    >
-                      <option value="">Sélectionner...</option>
-                      {villes?.map(v => (
-                        <option key={v.id} value={v.id}>{v.nom}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    label="Ville"
+                    options={villes?.map(v => ({ value: String(v.id), label: v.nom })) ?? []}
+                    placeholder="Sélectionner..."
+                    value={villeId}
+                    onChange={(e) => setVilleId(e.target.value)}
+                    disabled={isLoadingVilles}
+                  />
                 )}
               </div>
 
