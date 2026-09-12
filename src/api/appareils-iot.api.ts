@@ -6,7 +6,12 @@
 // ============================================================
 
 import apiClient from "./axios";
-import type { AppareilIot, AppareilIotCreeResponse, AppareilIotRequest } from "../types";
+import type {
+  AppareilIot,
+  AppareilIotCreeResponse,
+  AppareilIotImportResultat,
+  AppareilIotRequest,
+} from "../types";
 
 // ─────────────────────────────────────────
 // LISTE DE TOUS LES APPAREILS
@@ -28,6 +33,28 @@ export const createAppareilIot = async (
   data: AppareilIotRequest
 ): Promise<AppareilIotCreeResponse> => {
   const response = await apiClient.post<AppareilIotCreeResponse>("/appareils-iot", data);
+  return response.data;
+};
+
+// ─────────────────────────────────────────
+// IMPORTER UN LOT D'APPAREILS DEPUIS UN CSV
+// POST /appareils-iot/import (multipart, champ "file")
+// Une ligne par appareil, mêmes champs que la création unitaire —
+// résumé détaillé (créés + échecs avec raison), aucune ligne ne bloque
+// les autres côté backend.
+// ─────────────────────────────────────────
+
+export const importerAppareilsIotCsv = async (
+  file: File
+): Promise<AppareilIotImportResultat> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await apiClient.post<AppareilIotImportResultat>(
+    "/appareils-iot/import",
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
   return response.data;
 };
 

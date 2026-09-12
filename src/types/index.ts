@@ -253,6 +253,22 @@ export interface AppareilIotCreeResponse {
   cleApi             : string;
 }
 
+// Forme confirmée contre AppareilIotImportLigneErreurDto : ligne = numéro
+// dans le fichier (1 = en-tête, les données commencent à 2).
+export interface AppareilIotImportLigneErreur {
+  ligne              : number;
+  identifiantMateriel: string;
+  raison             : string;
+}
+
+// Forme confirmée contre AppareilIotImportResultatDto : crees contient
+// les clés API en clair (une seule fois, comme la création unitaire),
+// echecs détaille chaque ligne en erreur — jamais un simple compteur.
+export interface AppareilIotImportResultat {
+  crees : AppareilIotCreeResponse[];
+  echecs: AppareilIotImportLigneErreur[];
+}
+
 // Forme plate confirmée contre le vrai TourneeResponseDto (testé en
 // Postman) — le backend dénormalise typeCollecte/camion/chauffeur/zone
 // au lieu de les imbriquer. `createdAt` n'a pas pu être confirmé
