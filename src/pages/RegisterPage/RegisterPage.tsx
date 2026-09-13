@@ -7,22 +7,18 @@
 // factorisé — même décision explicite que AdminLoginPage vs LoginPage.
 // ============================================================
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { loginSansPersistance, register } from "../../api/auth.api";
-import { changerResidenceHabitant } from "../../api/residence-habitants.api";
-import { useResidencesPubliques } from "../../hooks/useResidences";
+import { register } from "../../api/auth.api";
+import { rechercherAdresses } from "../../api/adresse.api";
 import { Input } from "../../components/ui/Input/Input";
-import type { ApiError, RegisterRequest, ResidencePublique } from "../../types";
+import type { AdresseSuggestion, ApiError, RegisterRequest } from "../../types";
 import "./RegisterPage.css";
 
-// Comparaison insensible aux accents/casse — une adresse tapée sans
-// accent ("residence victor hugo") doit quand meme matcher "Résidence
-// Victor Hugo" (voir CONTEXTE : "les accents, tirets, majuscules font
-// échouer une comparaison de texte").
-const normaliser = (s: string): string =>
-  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+// Debounce API Adresse (data.gouv.fr) — 300-400ms : assez court pour
+// rester réactif, assez long pour ne pas spammer un appel par frappe.
+const DEBOUNCE_ADRESSE_MS = 350;
 
 // ─────────────────────────────────────────
 // ICÔNES
@@ -59,54 +55,74 @@ const IconCheck = ({ color }: { color: string }) => (
 );
 
 // ─────────────────────────────────────────
-// CHAMP RÉSIDENCE — recherche/autocomplete
+// CHAMP ADRESSE — autocomplete API Adresse (data.gouv.fr)
 // Local à cette page (un seul appelant) plutôt qu'un composant
 // components/ui/ générique — pas de second usage aujourd'hui.
 // Deux états mutuellement exclusifs : recherche (input + suggestions)
-// tant qu'aucune résidence n'est choisie, puis une carte de
-// confirmation une fois choisie (jamais les deux en même temps, pour
-// qu'un texte affiché ne puisse jamais désynchroniser de l'id retenu).
+// tant qu'aucune adresse n'est choisie, puis une carte de confirmation
+// une fois choisie (jamais les deux en même temps, pour qu'un texte
+// affiché ne puisse jamais désynchroniser des coordonnées retenues).
+// Le rattachement à une résidence se fait entièrement côté backend
+// (RattachementResidenceService) à partir des coordonnées GPS de la
+// suggestion choisie — ce champ ne fait que les récupérer.
 // ─────────────────────────────────────────
 
-const ResidenceField = ({
-  residences,
-  isLoading,
+const AdresseField = ({
   selected,
   onSelect,
   onClear,
 }: {
-  residences  : ResidencePublique[];
-  isLoading   : boolean;
-  selected    : ResidencePublique | null;
-  onSelect    : (r: ResidencePublique) => void;
-  onClear     : () => void;
+  selected: AdresseSuggestion | null;
+  onSelect: (a: AdresseSuggestion) => void;
+  onClear : () => void;
 }) => {
   const [query, setQuery] = useState<string>("");
   const [focused, setFocused] = useState<boolean>(false);
+  const [suggestions, setSuggestions] = useState<AdresseSuggestion[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const resultats = useMemo(() => {
-    const q = normaliser(query.trim());
-    if (!q) return [];
-    return residences
-      .filter(r => normaliser(`${r.nom} ${r.adresse}`).includes(q))
-      .slice(0, 8);
-  }, [residences, query]);
+  // Debounce + annulation de la requête devenue obsolète (nouvelle
+  // frappe avant que la précédente n'ait répondu) — évite qu'une
+  // réponse tardive n'écrase des suggestions plus récentes.
+  useEffect(() => {
+    const q = query.trim();
+    // Pas de setState ici : rien n'est affiché tant que rechercheActive
+    // (query.trim().length >= 3) est faux de toute façon, un state
+    // "suggestions" pas encore vidé n'a donc aucun effet visible.
+    if (q.length < 3) return;
 
-  const rechercheActive = query.trim().length > 0;
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      setIsLoading(true);
+      rechercherAdresses(q, controller.signal)
+        .then((resultats) => setSuggestions(resultats))
+        .catch((err) => {
+          // AbortError attendu : une frappe plus récente a annulé cette
+          // requête (fetch natif, pas d'annulation axios ici).
+          if ((err as { name?: string }).name === "AbortError") return;
+          setSuggestions([]);
+        })
+        .finally(() => setIsLoading(false));
+    }, DEBOUNCE_ADRESSE_MS);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [query]);
+
+  const rechercheActive = query.trim().length >= 3;
   const dropdownOuvert = focused && !selected && rechercheActive;
 
   if (selected) {
     return (
-      <div className="register__residence-field">
-        <label className="ui-field__label">Votre résidence (optionnel)</label>
-        <div className="register__residence-selected">
-          <div className="register__residence-selected-info">
-            <div className="register__residence-selected-nom">{selected.nom}</div>
-            <div className="register__residence-selected-adresse">
-              {selected.adresse} · {selected.villeNom}
-            </div>
+      <div className="register__adresse-field">
+        <label className="ui-field__label">Votre adresse (optionnel)</label>
+        <div className="register__adresse-selected">
+          <div className="register__adresse-selected-info">
+            <div className="register__adresse-selected-label">{selected.label}</div>
           </div>
-          <button type="button" className="register__residence-changer" onClick={onClear}>
+          <button type="button" className="register__adresse-changer" onClick={onClear}>
             Changer
           </button>
         </div>
@@ -115,41 +131,39 @@ const ResidenceField = ({
   }
 
   return (
-    <div className="register__residence-field">
+    <div className="register__adresse-field">
       <Input
-        label="Votre résidence (optionnel)"
+        label="Votre adresse (optionnel)"
         type="text"
-        placeholder={isLoading ? "Chargement…" : "Rechercher par nom ou adresse…"}
+        placeholder="Commencez à taper votre adresse…"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => setFocused(true)}
         onBlur={() => setTimeout(() => setFocused(false), 150)}
-        disabled={isLoading}
         autoComplete="off"
       />
       {dropdownOuvert && (
-        <div className="register__residence-dropdown">
-          {resultats.length > 0 ? (
-            resultats.map(r => (
+        <div className="register__adresse-dropdown">
+          {isLoading ? (
+            <div className="register__adresse-introuvable">Recherche…</div>
+          ) : suggestions.length > 0 ? (
+            suggestions.map((a) => (
               <button
                 type="button"
-                key={r.id}
-                className="register__residence-option"
+                key={a.label}
+                className="register__adresse-option"
                 onClick={() => {
-                  onSelect(r);
+                  onSelect(a);
                   setQuery("");
                 }}
               >
-                <span className="register__residence-option-nom">{r.nom}</span>
-                <span className="register__residence-option-adresse">{r.adresse} · {r.villeNom}</span>
+                {a.label}
               </button>
             ))
           ) : (
-            <div className="register__residence-introuvable">
-              Votre résidence n'est pas dans la liste ? Elle n'est peut-être pas
-              encore enregistrée dans le système — contactez votre syndic ou
-              votre mairie. Vous pouvez tout de même créer votre compte, le
-              rattachement pourra se faire plus tard.
+            <div className="register__adresse-introuvable">
+              Aucune adresse trouvée. Continuez à taper, ou vérifiez
+              l'orthographe.
             </div>
           )}
         </div>
@@ -177,9 +191,13 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [succes, setSucces] = useState<boolean>(false);
 
-  const [residence, setResidence] = useState<ResidencePublique | null>(null);
-  const [rattachementEchoue, setRattachementEchoue] = useState<boolean>(false);
-  const { data: residencesPubliques, isLoading: isLoadingResidences } = useResidencesPubliques();
+  const [adresse, setAdresse] = useState<AdresseSuggestion | null>(null);
+  // Résultat du rattachement automatique, renvoyé par le backend avec la
+  // réponse d'inscription elle-même (InscriptionResponse) — jamais un
+  // second appel séparé, contrairement à l'ancien flux qui rattachait
+  // après coup via changerResidenceHabitant.
+  const [residenceRattachee, setResidenceRattachee] = useState<string | null>(null);
+  const [zoneNonCouverte, setZoneNonCouverte] = useState<boolean>(false);
 
   const nomInputRef = useRef<HTMLInputElement>(null);
 
@@ -212,26 +230,23 @@ export default function RegisterPage() {
       email: email.trim(),
       motDePasse,
       telephone: telephone.trim() || undefined,
+      adresse: adresse?.adresse,
+      codePostal: adresse?.codePostal,
+      ville: adresse?.ville,
+      latitude: adresse?.latitude,
+      longitude: adresse?.longitude,
     };
 
     setIsSubmitting(true);
     try {
-      const nouvelUtilisateur = await register(data);
+      const resultat = await register(data);
 
-      // Rattachement résidence : jamais deviné, uniquement si l'habitant a
-      // explicitement choisi dans la liste. Un échec ici ne doit jamais
-      // remettre en cause la création du compte, déjà réussie — signalé
-      // séparément via rattachementEchoue plutôt que de basculer sur
-      // l'écran d'erreur.
-      if (residence) {
-        try {
-          const token = await loginSansPersistance({ email: data.email, motDePasse: data.motDePasse });
-          await changerResidenceHabitant(residence.id, nouvelUtilisateur.id, token);
-        } catch {
-          setRattachementEchoue(true);
-        }
-      }
-
+      // Rattachement fait atomiquement par le backend avec la création
+      // du compte (RattachementResidenceService) — la réponse dit
+      // directement ce qui s'est passé, pas de second appel à risque
+      // d'échec séparé comme dans l'ancien flux.
+      setResidenceRattachee(resultat.residenceNom ?? null);
+      setZoneNonCouverte(resultat.zoneNonCouverte);
       setSucces(true);
     } catch (err) {
       const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
@@ -294,15 +309,17 @@ export default function RegisterPage() {
               <p className="register__card-subtitle">
                 Votre compte a bien été créé. Vous pouvez maintenant vous connecter.
               </p>
-              {residence && !rattachementEchoue && (
-                <p className="register__residence-confirmation">
-                  Vous êtes rattaché à {residence.nom}.
+              {residenceRattachee && (
+                <p className="register__adresse-confirmation">
+                  Vous avez été rattaché à {residenceRattachee}.
                 </p>
               )}
-              {residence && rattachementEchoue && (
-                <p className="register__residence-avertissement">
-                  Le rattachement automatique à {residence.nom} a échoué —
-                  contactez votre syndic ou votre mairie pour le finaliser.
+              {zoneNonCouverte && (
+                <p className="register__adresse-avertissement">
+                  Zone non couverte — votre ville n'est pas encore desservie par
+                  BIDIWS. Votre compte est créé, le rattachement à une
+                  résidence pourra se faire dès que votre zone sera prise en
+                  charge.
                 </p>
               )}
               <button className="register__submit" onClick={() => navigate("/login")}>
@@ -374,12 +391,10 @@ export default function RegisterPage() {
                   onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                 />
 
-                <ResidenceField
-                  residences={residencesPubliques ?? []}
-                  isLoading={isLoadingResidences}
-                  selected={residence}
-                  onSelect={setResidence}
-                  onClear={() => setResidence(null)}
+                <AdresseField
+                  selected={adresse}
+                  onSelect={setAdresse}
+                  onClear={() => setAdresse(null)}
                 />
               </div>
 

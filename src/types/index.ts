@@ -417,12 +417,47 @@ export interface LoginRequest {
 // toujours HABITANT côté serveur — l'auto-inscription publique ne peut
 // pas choisir un autre rôle (retiré du DTO backend pour empêcher une
 // escalade de privilège).
+// adresse/codePostal/ville/latitude/longitude : issus de la suggestion
+// choisie sur l'autocomplete API Adresse (data.gouv.fr), tous optionnels
+// — le backend ne tente le rattachement automatique à une résidence que
+// s'ils sont fournis (voir RattachementResidenceService côté backend).
 export interface RegisterRequest {
   nom        : string;
   prenom     : string;
   email      : string;
   motDePasse : string;
   telephone ?: string;
+  adresse   ?: string;
+  codePostal?: string;
+  ville     ?: string;
+  latitude  ?: number;
+  longitude ?: number;
+}
+
+// Réponse de POST /auth/register (InscriptionResponseDto) — résultat du
+// rattachement automatique en plus du compte créé :
+// - residenceId/residenceNom renseignés : rattaché (résidence existante
+//   à proximité immédiate, ou nouvellement créée).
+// - zoneNonCouverte=true                : aucune ville embarquée ne
+//   correspond à l'adresse choisie, compte créé sans résidence.
+// - ni l'un ni l'autre                  : aucune adresse fournie.
+export interface InscriptionResponse {
+  utilisateur     : Utilisateur;
+  residenceId    ?: number;
+  residenceNom   ?: string;
+  zoneNonCouverte : boolean;
+}
+
+// Suggestion d'adresse renvoyée par l'API Adresse du gouvernement
+// français (https://api-adresse.data.gouv.fr/search/) — sous-ensemble
+// utile à BIDIWS, pas la forme brute de l'API (voir adresse.api.ts).
+export interface AdresseSuggestion {
+  label     : string;
+  adresse   : string;
+  codePostal: string;
+  ville     : string;
+  latitude  : number;
+  longitude : number;
 }
 
 export interface TourneeRequest {

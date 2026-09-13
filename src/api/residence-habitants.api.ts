@@ -33,32 +33,25 @@ export const getResidencesByHabitant = async (
 };
 
 // ─────────────────────────────────────────
-// CHANGER LA RÉSIDENCE D'UN HABITANT (déménagement, ou rattachement
-// initial à l'inscription)
+// CHANGER LA RÉSIDENCE D'UN HABITANT (déménagement)
 // PUT /residence-habitants
 // Retire tout lien existant côté backend avant de poser le nouveau —
 // un habitant ne se retrouve jamais avec deux résidences actives à la
 // fois (voir ResidenceHabitantService.changerResidence). Ouvert à
 // l'habitant lui-même côté backend (isSelf), pas seulement aux
-// gestionnaires de la résidence.
-//
-// `token` optionnel : RegisterPage appelle ceci juste après la création
-// du compte, avant que l'utilisateur soit connecté dans l'app (pas de
-// token en storage) — un jeton obtenu ponctuellement via
-// loginSansPersistance() est alors passé explicitement, sans jamais
-// être stocké. Omis, le comportement est inchangé (jeton de la session
-// en cours, comme AdminUsersPage).
+// gestionnaires de la résidence — utilisé ici par AdminUsersPage.
+// Le rattachement initial à l'inscription ne passe plus par cette route
+// depuis que le backend le fait lui-même (RattachementResidenceService,
+// voir UtilisateurService.register).
 // ─────────────────────────────────────────
 
 export const changerResidenceHabitant = async (
   residenceId: number,
-  habitantId: number,
-  token?: string
+  habitantId: number
 ): Promise<ResidenceHabitant> => {
   const response = await apiClient.put<ResidenceHabitant>(
     "/residence-habitants",
-    { residenceId, habitantId },
-    token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+    { residenceId, habitantId }
   );
   return response.data;
 };
