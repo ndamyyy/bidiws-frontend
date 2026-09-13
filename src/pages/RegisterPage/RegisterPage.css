@@ -261,6 +261,119 @@
   .register__fields .ui-input--with-trailing { padding-right: 40px; }
 }
 
+/* ── Champ résidence (autocomplete) ── */
+.register__residence-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.register__residence-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin-top: 4px;
+  background: var(--bg-card-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevated);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.register__residence-option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--overlay-4);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease-smooth);
+}
+.register__residence-option:last-child { border-bottom: none; }
+.register__residence-option:hover { background: var(--overlay-4); }
+
+.register__residence-option-nom {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.register__residence-option-adresse {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.register__residence-introuvable {
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.register__residence-selected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--signal-dim-20);
+  border-radius: var(--radius-md);
+}
+
+.register__residence-selected-nom {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.register__residence-selected-adresse {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.register__residence-changer {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  background: none;
+  border: 1px solid var(--overlay-10);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease-smooth);
+}
+.register__residence-changer:hover {
+  border-color: var(--overlay-20);
+  color: var(--text-primary);
+}
+
+.register__residence-confirmation {
+  font-size: 12px;
+  color: var(--signal);
+  margin-top: -8px;
+  margin-bottom: 16px;
+}
+
+.register__residence-avertissement {
+  font-size: 12px;
+  color: var(--alert);
+  margin-top: -8px;
+  margin-bottom: 16px;
+}
+
 .register__login-link {
   display: block;
   width: 100%;

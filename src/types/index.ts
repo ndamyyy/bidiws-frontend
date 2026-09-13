@@ -134,6 +134,17 @@ export interface Residence {
   actif           : boolean;
 }
 
+// Sous-ensemble public de Residence — servi sans authentification par
+// GET /residences/publiques pour l'autocomplete du formulaire
+// d'inscription, donc sans les champs operationnels internes.
+export interface ResidencePublique {
+  id        : number;
+  nom       : string;
+  adresse   : string;
+  codePostal: string;
+  villeNom  : string;
+}
+
 export interface TypeCollecte {
   id      : number;
   code    : string;

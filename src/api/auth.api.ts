@@ -29,6 +29,20 @@ export const register = async (data: RegisterRequest): Promise<Utilisateur> => {
 };
 
 // ─────────────────────────────────────────
+// LOGIN SANS PERSISTANCE
+// POST /auth/login — jeton renvoyé mais jamais stocké (setToken n'est
+// pas appelé). Sert uniquement à RegisterPage pour un appel authentifié
+// ponctuel juste après l'inscription (rattachement résidence), sans
+// connecter silencieusement l'utilisateur dans l'app — le comportement
+// "pas de connexion automatique après inscription" reste inchangé.
+// ─────────────────────────────────────────
+
+export const loginSansPersistance = async (data: LoginRequest): Promise<string> => {
+  const response = await apiClient.post<AuthResponse>("/auth/login", data);
+  return response.data.token;
+};
+
+// ─────────────────────────────────────────
 // LOGOUT
 // Côté frontend uniquement — on nettoie le stockage local
 // ─────────────────────────────────────────

@@ -4,7 +4,7 @@
 // ============================================================
 
 import apiClient from "./axios";
-import type { Residence } from "../types";
+import type { Residence, ResidencePublique } from "../types";
 
 // ─────────────────────────────────────────
 // LISTE TOUTES LES RÉSIDENCES
@@ -13,6 +13,19 @@ import type { Residence } from "../types";
 
 export const getAllResidences = async (): Promise<Residence[]> => {
   const response = await apiClient.get<Residence[]>("/residences");
+  return response.data;
+};
+
+// ─────────────────────────────────────────
+// RÉSIDENCES ACTIVES, SANS AUTHENTIFICATION
+// GET /residences/publiques
+// Route publique (voir SecurityConfig.PUBLIC_ROUTES côté backend) —
+// alimente l'autocomplete du formulaire d'inscription, avant qu'un
+// compte/token n'existe. Champs volontairement restreints.
+// ─────────────────────────────────────────
+
+export const getResidencesPubliques = async (): Promise<ResidencePublique[]> => {
+  const response = await apiClient.get<ResidencePublique[]>("/residences/publiques");
   return response.data;
 };
 
