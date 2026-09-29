@@ -4,26 +4,34 @@
 // ============================================================
 
 import apiClient from "./axios";
-import type { Residence, PageResponse } from "../types";
+import type { Residence, ResidencePublique } from "../types";
 
 // ─────────────────────────────────────────
 // LISTE TOUTES LES RÉSIDENCES
-// GET /api/residences
+// GET /residences
 // ─────────────────────────────────────────
 
-export const getAllResidences = async (
-  page: number = 0,
-  size: number = 20
-): Promise<PageResponse<Residence>> => {
-  const response = await apiClient.get<PageResponse<Residence>>("/residences", {
-    params: { page, size },
-  });
+export const getAllResidences = async (): Promise<Residence[]> => {
+  const response = await apiClient.get<Residence[]>("/residences");
+  return response.data;
+};
+
+// ─────────────────────────────────────────
+// RÉSIDENCES ACTIVES, SANS AUTHENTIFICATION
+// GET /residences/publiques
+// Route publique (voir SecurityConfig.PUBLIC_ROUTES côté backend) —
+// alimente l'autocomplete du formulaire d'inscription, avant qu'un
+// compte/token n'existe. Champs volontairement restreints.
+// ─────────────────────────────────────────
+
+export const getResidencesPubliques = async (): Promise<ResidencePublique[]> => {
+  const response = await apiClient.get<ResidencePublique[]>("/residences/publiques");
   return response.data;
 };
 
 // ─────────────────────────────────────────
 // UNE RÉSIDENCE PAR ID
-// GET /api/residences/:id
+// GET /residences/:id
 // ─────────────────────────────────────────
 
 export const getResidenceById = async (id: number): Promise<Residence> => {
@@ -32,28 +40,8 @@ export const getResidenceById = async (id: number): Promise<Residence> => {
 };
 
 // ─────────────────────────────────────────
-// MES RÉSIDENCES (pour le gardien connecté)
-// GET /api/residences/mes-residences
-// ─────────────────────────────────────────
-
-export const getMesResidences = async (): Promise<Residence[]> => {
-  const response = await apiClient.get<Residence[]>("/residences/mes-residences");
-  return response.data;
-};
-
-// ─────────────────────────────────────────
-// RÉSIDENCES PAR ZONE
-// GET /api/residences/zone/:zoneId
-// ─────────────────────────────────────────
-
-export const getResidencesByZone = async (zoneId: number): Promise<Residence[]> => {
-  const response = await apiClient.get<Residence[]>(`/residences/zone/${zoneId}`);
-  return response.data;
-};
-
-// ─────────────────────────────────────────
 // CRÉER UNE RÉSIDENCE (admin / syndic)
-// POST /api/residences
+// POST /residences
 // ─────────────────────────────────────────
 
 export interface ResidenceRequest {
@@ -78,7 +66,7 @@ export const createResidence = async (
 
 // ─────────────────────────────────────────
 // MODIFIER UNE RÉSIDENCE
-// PUT /api/residences/:id
+// PUT /residences/:id
 // ─────────────────────────────────────────
 
 export const updateResidence = async (
@@ -91,7 +79,7 @@ export const updateResidence = async (
 
 // ─────────────────────────────────────────
 // ASSIGNER UN GARDIEN À UNE RÉSIDENCE
-// POST /api/residences/:id/gardiens/:gardienId
+// POST /residence-gardiens
 // ─────────────────────────────────────────
 
 export const assignerGardien = async (
@@ -99,7 +87,50 @@ export const assignerGardien = async (
   gardienId: number,
   principal: boolean = true
 ): Promise<void> => {
-  await apiClient.post(`/residences/${residenceId}/gardiens/${gardienId}`, {
+  await apiClient.post("/residence-gardiens", {
+    residenceId,
+    gardienId,
     principal,
   });
+};
+
+// ─────────────────────────────────────────
+// RÉSIDENCES D'UN GARDIEN
+// GET /residence-gardiens/gardien/:gardienId
+// Forme confirmée en conditions réelles (compte gardien de test), y
+// compris gardienNom/gardienPrenom.
+// ─────────────────────────────────────────
+
+export interface ResidenceGardien {
+  residenceId   : number;
+  residenceNom  : string;
+  gardienId     : number;
+  gardienNom   ?: string;
+  gardienPrenom?: string;
+  principal     : boolean;
+}
+
+export const getResidencesByGardien = async (
+  gardienId: number
+): Promise<ResidenceGardien[]> => {
+  const response = await apiClient.get<ResidenceGardien[]>(
+    `/residence-gardiens/gardien/${gardienId}`
+  );
+  return response.data;
+};
+
+// ─────────────────────────────────────────
+// GARDIENS D'UNE RÉSIDENCE
+// GET /residence-gardiens/residence/:residenceId
+// Sens inverse de getResidencesByGardien, jamais testé dans ce sens —
+// même DTO ResidenceGardien supposé par analogie (même contrôleur).
+// ─────────────────────────────────────────
+
+export const getGardiensByResidence = async (
+  residenceId: number
+): Promise<ResidenceGardien[]> => {
+  const response = await apiClient.get<ResidenceGardien[]>(
+    `/residence-gardiens/residence/${residenceId}`
+  );
+  return response.data;
 };

@@ -1,0 +1,38 @@
+/* ═══════════════════════════════════════════════════════════════
+   BIDIWS — SplashScreen
+   ═══════════════════════════════════════════════════════════════ */
+
+.splash {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-deep);
+}
+
+.splash__logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.splash__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--signal-dim-20), var(--data-dim-15));
+  border: 1.5px solid var(--signal-dim-20);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.splash__name {
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -1px;
+}
+.splash__name span { color: var(--signal); }

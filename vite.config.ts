@@ -4,6 +4,11 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
+  // sockjs-client references the Node global `global`, which the browser
+  // doesn't have — Vite needs it aliased or the app crashes on boot.
+  define: {
+    global: "globalThis",
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

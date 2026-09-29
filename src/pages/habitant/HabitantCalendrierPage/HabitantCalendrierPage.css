@@ -1,0 +1,78 @@
+/* ============================================================
+   BIDIWS — HabitantCalendrierPage
+   Fichier : src/pages/habitant/HabitantCalendrierPage/HabitantCalendrierPage.css
+   ============================================================ */
+
+.habitant-calendrier__header {
+  margin-bottom: 20px;
+}
+
+.habitant-calendrier__title {
+  font-family: "Syne", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.habitant-calendrier__subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* ─── Grille collectes — déplacée depuis HabitantHomePage.css,
+   classes .habitant__schedule/.schedule-item inchangées (pas de
+   renommage, juste un déplacement de fichier) ─── */
+.habitant__schedule {
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  animation: fadeUp 0.4s 0.1s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.habitant__schedule-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--overlay-6);
+  font-family: "Syne", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--overlay-4);
+  transition: background 0.18s;
+}
+
+.schedule-item:last-child { border-bottom: none; }
+.schedule-item:hover { background: var(--overlay-3); }
+
+.schedule-item__type {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.schedule-item__jour {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.schedule-item__heure {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--signal);
+}

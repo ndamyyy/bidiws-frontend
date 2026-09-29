@@ -1,0 +1,155 @@
+/* ============================================================
+   BIDIWS — NotificationsPage
+   Fichier : src/pages/syndic/NotificationsPage/NotificationsPage.css
+   ============================================================ */
+
+.notifs__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+}
+
+.notifs__title {
+  font-family: "Syne", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.notifs__subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.notifs__tout-lire {
+  background: var(--overlay-6);
+  border: 1px solid var(--overlay-8);
+  border-radius: 10px;
+  padding: 9px 16px;
+  color: var(--text-secondary);
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.notifs__tout-lire:hover {
+  background: var(--overlay-10);
+  color: var(--text-primary);
+}
+
+/* ─── Liste ─── */
+.notifs__list {
+  background: var(--overlay-4);
+  border: 1px solid var(--overlay-7);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: fadeUp 0.4s both cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Item notif ─── */
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--overlay-4);
+  cursor: pointer;
+  transition: background 0.18s;
+}
+
+/* .notif-item n'est plus l'enfant direct de .notifs__list depuis le
+   passage à StaggerContainer/StaggerItem (wrapper motion.div
+   intermédiaire) — cible le dernier wrapper plutôt que .notif-item
+   lui-même. */
+.notifs__list > *:last-child .notif-item { border-bottom: none; }
+
+.notif-item:hover {
+  background: var(--overlay-3);
+}
+
+.notif-item--unread {
+  background: rgba(76, 175, 80, 0.03);
+}
+
+.notif-item--unread:hover {
+  background: rgba(76, 175, 80, 0.06);
+}
+
+.notif-item__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.notif-item__body { flex: 1; }
+
+.notif-item__titre {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.notif-item__titre--unread {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.notif-item__message {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.notif-item__footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notif-item__time {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.notif-item__canal {
+  font-size: 10px;
+  background: var(--overlay-5);
+  border: 1px solid var(--overlay-8);
+  color: var(--text-secondary);
+  border-radius: 6px;
+  padding: 2px 7px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.notif-item__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
+  margin-top: 6px;
+  animation: pulse 1.4s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}

@@ -1,74 +1,28 @@
-/* eslint-disable react-refresh/only-export-components */
 // ============================================================
 // BIDIWS — Contexte Authentification
 // Fichier : src/context/AuthContext.tsx
 // ============================================================
 
 import {
-  createContext,
   useState,
+  useEffect,
   useCallback,
   type ReactNode,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { login as apiLogin, logout as apiLogout } from "../api/auth.api";
-import { getToken, removeToken } from "../api/axios";
+import { login as apiLogin, logout as apiLogout, getMe } from "../api/auth.api";
+import { getToken, removeToken } from "../api/tokenStorage";
+import { redirectByRole } from "../utils/redirectByRole";
 import type { AuthUser, LoginRequest, Utilisateur } from "../types";
+import { AuthContext, type AuthContextType } from "./AuthContextValue";
 
 // ─────────────────────────────────────────
-// TYPE DU CONTEXTE
+// DURÉE MINIMALE DU SPLASH
+// Évite un flash trop brutal si la validation du token répond
+// quasi instantanément ; ne rallonge jamais une réponse lente.
 // ─────────────────────────────────────────
 
-export interface AuthContextType {
-  authUser       : AuthUser | null;
-  utilisateur    : Utilisateur | null;
-  isAuthenticated: boolean;
-  isLoading      : boolean;
-  login          : (data: LoginRequest) => Promise<void>;
-  logout         : () => void;
-}
-
-// ─────────────────────────────────────────
-// CRÉATION DU CONTEXTE
-// ─────────────────────────────────────────
-
-export const AuthContext = createContext<AuthContextType | null>(null);
-
-// ─────────────────────────────────────────
-// REDIRECT PAR RÔLE
-// ─────────────────────────────────────────
-
-const redirectByRole: Record<Utilisateur["role"], string> = {
-  SYNDIC   : "/syndic/dashboard",
-  BAILLEUR : "/syndic/dashboard",
-  MAIRIE   : "/syndic/dashboard",
-  GARDIEN  : "/gardien/home",
-  CHAUFFEUR: "/chauffeur/tournee",
-  HABITANT : "/habitant/home",
-  ADMIN    : "/admin/dashboard",
-};
-
-// ─────────────────────────────────────────
-// SESSION INITIALE
-// ─────────────────────────────────────────
-
-const getInitialAuthUser = (): AuthUser | null => {
-  const token = getToken();
-  const stored = localStorage.getItem("bidiws_user");
-
-  if (!token || !stored) {
-    return null;
-  }
-
-  try {
-    const utilisateur: Utilisateur = JSON.parse(stored);
-    return { token, utilisateur };
-  } catch {
-    removeToken();
-    localStorage.removeItem("bidiws_user");
-    return null;
-  }
-};
+const MIN_SPLASH_MS = 450;
 
 // ─────────────────────────────────────────
 // PROVIDER
@@ -79,37 +33,91 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [authUser, setAuthUser] = useState<AuthUser | null>(getInitialAuthUser);
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isInitializing, setIsInitializing] = useState<boolean>(true);
   const navigate = useNavigate();
 
+  // ── Revalider la session au montage ──
+  // Le localStorage seul ne suffit pas à savoir si le token est encore
+  // valide (peut avoir expiré côté serveur) — on le vérifie réellement
+  // via GET /utilisateurs/moi pendant l'affichage du SplashScreen.
+  useEffect(() => {
+    let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const revaliderSession = async (): Promise<void> => {
+      const token = await getToken();
+      if (!token) return;
+
+      try {
+        const utilisateur = await getMe();
+        if (cancelled) return;
+        localStorage.setItem("bidiws_user", JSON.stringify(utilisateur));
+        setAuthUser({ token, utilisateur });
+      } catch {
+        await removeToken();
+        localStorage.removeItem("bidiws_user");
+      }
+    };
+
+    const minDelay = new Promise<void>((resolve) => {
+      timeoutId = setTimeout(resolve, MIN_SPLASH_MS);
+    });
+
+    Promise.all([revaliderSession(), minDelay]).finally(() => {
+      if (!cancelled) setIsInitializing(false);
+    });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
   // ── Login ──
-  const login = useCallback(async (data: LoginRequest): Promise<void> => {
+  // Retourne l'utilisateur connecté (voir AuthContextType.login) —
+  // l'appelant peut ainsi vérifier son rôle sans dépendre du contexte,
+  // qui n'a pas encore re-rendu à ce point de l'exécution.
+  const login = useCallback(async (data: LoginRequest): Promise<Utilisateur> => {
     setIsLoading(true);
     try {
       const response = await apiLogin(data);
-      localStorage.setItem("bidiws_user", JSON.stringify(response.utilisateur));
-      setAuthUser({ token: response.token, utilisateur: response.utilisateur });
-      navigate(redirectByRole[response.utilisateur.role]);
+      const utilisateur = await getMe();
+      localStorage.setItem("bidiws_user", JSON.stringify(utilisateur));
+      setAuthUser({ token: response.token, utilisateur });
+      navigate(redirectByRole[utilisateur.role]);
+      return utilisateur;
     } finally {
       setIsLoading(false);
     }
   }, [navigate]);
 
   // ── Logout ──
-  const logout = useCallback((): void => {
-    apiLogout();
+  const logout = useCallback(async (redirectTo: string = "/login"): Promise<void> => {
+    await apiLogout();
     setAuthUser(null);
-    navigate("/login");
+    navigate(redirectTo);
   }, [navigate]);
+
+  // ── Rafraîchir l'utilisateur courant (après modification du profil) ──
+  const refreshUtilisateur = useCallback(async (): Promise<void> => {
+    const token = await getToken();
+    if (!token) return;
+    const utilisateur = await getMe();
+    localStorage.setItem("bidiws_user", JSON.stringify(utilisateur));
+    setAuthUser({ token, utilisateur });
+  }, []);
 
   const value: AuthContextType = {
     authUser,
     utilisateur    : authUser?.utilisateur ?? null,
     isAuthenticated: authUser !== null,
     isLoading,
+    isInitializing,
     login,
     logout,
+    refreshUtilisateur,
   };
 
   return (
