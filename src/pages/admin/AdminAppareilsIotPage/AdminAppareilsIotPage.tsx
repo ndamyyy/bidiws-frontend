@@ -8,7 +8,7 @@
 // (AppareilIotService.appliquerRattachement).
 // ============================================================
 
-import { useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useAppareilsIot } from "../../../hooks/useAppareilsIot";
@@ -18,6 +18,7 @@ import { useConteneursByResidence } from "../../../hooks/useConteneurs";
 import {
   createAppareilIot,
   desactiverAppareilIot,
+  importerAppareilsIotCsv,
   regenererCleAppareilIot,
 } from "../../../api/appareils-iot.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
@@ -25,7 +26,13 @@ import { Input } from "../../../components/ui/Input/Input";
 import { Select } from "../../../components/ui/Select/Select";
 import { useToast } from "../../../hooks/useToast";
 import { extractErrorMessage } from "../../../utils/extractErrorMessage";
-import type { ApiError, AppareilIot, AppareilIotCreeResponse, TypeAppareilIot } from "../../../types";
+import type {
+  ApiError,
+  AppareilIot,
+  AppareilIotCreeResponse,
+  AppareilIotImportResultat,
+  TypeAppareilIot,
+} from "../../../types";
 import "./AdminAppareilsIotPage.css";
 
 // ─────────────────────────────────────────
@@ -106,6 +113,138 @@ const CleApiReveal = ({
 };
 
 // ─────────────────────────────────────────
+// IMPORT CSV — création en masse
+// Une ligne par appareil, mêmes champs que la création unitaire
+// (identifiantMateriel,typeAppareil,conteneurId,camionId). Les clés API
+// générées ne sont jamais affichées en tableau à l'écran (même prudence
+// que la création unitaire) : un fichier de résultat téléchargeable une
+// seule fois, à la place.
+// ─────────────────────────────────────────
+
+const ImportCsvPanel = ({ onImported }: { onImported: () => void }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isImporting, setIsImporting] = useState<boolean>(false);
+  const [importError, setImportError] = useState<string>("");
+  const [resultat, setResultat] = useState<AppareilIotImportResultat | null>(null);
+
+  const handleFileSelect = async (e: ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // permet de resélectionner le même fichier après un échec
+    if (!file) return;
+
+    setImportError("");
+    setResultat(null);
+    setIsImporting(true);
+    try {
+      const res = await importerAppareilsIotCsv(file);
+      setResultat(res);
+      onImported();
+    } catch (err) {
+      const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
+      setImportError(backendMessage ?? "Erreur lors de l'import du fichier.");
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  // Fichier téléchargeable une seule fois — pas d'affichage des clés à
+  // l'écran (URL.createObjectURL + clic programmatique, révoquée
+  // aussitôt, rien ne reste dans le DOM).
+  const handleTelechargerCles = (): void => {
+    if (!resultat || resultat.crees.length === 0) return;
+
+    const lignes = [
+      "identifiantMateriel,cleApi",
+      ...resultat.crees.map(c => `${c.identifiantMateriel},${c.cleApi}`),
+    ];
+    const blob = new Blob([lignes.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const lien = document.createElement("a");
+    lien.href = url;
+    lien.download = `appareils-iot-cles-${Date.now()}.csv`;
+    document.body.appendChild(lien);
+    lien.click();
+    lien.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv,text/csv"
+        onChange={handleFileSelect}
+        style={{ display: "none" }}
+      />
+
+      <p className="admin-appareils-iot__import-hint">
+        Une ligne par appareil, en-tête obligatoire :
+        identifiantMateriel,typeAppareil,conteneurId,camionId (conteneurId
+        ou camionId laissé vide selon le rattachement).
+      </p>
+
+      {importError && <div className="admin-appareils-iot__error">{importError}</div>}
+
+      {!resultat && (
+        <button
+          className="admin-appareils-iot__submit"
+          type="button"
+          disabled={isImporting}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          {isImporting ? "Import en cours..." : "Choisir un fichier CSV"}
+        </button>
+      )}
+
+      {resultat && (
+        <div className="admin-appareils-iot__import-resultat">
+          <div className="admin-appareils-iot__import-summary">
+            {resultat.crees.length} appareil{resultat.crees.length > 1 ? "s" : ""} créé
+            {resultat.crees.length > 1 ? "s" : ""}
+            {resultat.echecs.length > 0 &&
+              ` · ${resultat.echecs.length} échec${resultat.echecs.length > 1 ? "s" : ""}`}
+          </div>
+
+          {resultat.crees.length > 0 && (
+            <div className="admin-appareils-iot__reveal-warning">
+              Les clés API générées ne seront plus jamais affichées après
+              la fermeture de ce résumé — téléchargez-les maintenant.
+            </div>
+          )}
+
+          {resultat.echecs.length > 0 && (
+            <div className="admin-appareils-iot__import-echecs">
+              <div className="admin-appareils-iot__import-echecs-title">Lignes en échec</div>
+              {resultat.echecs.map((echec, i) => (
+                <div key={i} className="admin-appareils-iot__import-echec-row">
+                  <span className="admin-appareils-iot__import-echec-ligne">Ligne {echec.ligne}</span>
+                  <span className="admin-appareils-iot__import-echec-id">
+                    {echec.identifiantMateriel || "(identifiant manquant)"}
+                  </span>
+                  <span className="admin-appareils-iot__import-echec-raison">{echec.raison}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="admin-appareils-iot__reveal-actions">
+            {resultat.crees.length > 0 && (
+              <button className="admin-appareils-iot__reveal-copy" onClick={handleTelechargerCles}>
+                Télécharger les clés ({resultat.crees.length})
+              </button>
+            )}
+            <button className="admin-appareils-iot__reveal-close" onClick={() => setResultat(null)}>
+              Fermer le résumé
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+// ─────────────────────────────────────────
 // LIGNE APPAREIL
 // ─────────────────────────────────────────
 
@@ -179,6 +318,7 @@ export default function AdminAppareilsIotPage() {
   const { data: residences, isLoading: isLoadingResidences } = useResidences();
 
   const [createOpen, setCreateOpen] = useState<boolean>(false);
+  const [importOpen, setImportOpen] = useState<boolean>(false);
   const [identifiantMateriel, setIdentifiantMateriel] = useState<string>("");
   const [typeAppareil, setTypeAppareil] = useState<TypeAppareilIot>("CAPTEUR_BENNE");
   const [rattachement, setRattachement] = useState<Rattachement>("CONTENEUR");
@@ -299,94 +439,108 @@ export default function AdminAppareilsIotPage() {
       {/* ── Encart clé API (révélation unique) ── */}
       {reveal && <CleApiReveal cree={reveal} onClose={() => setReveal(null)} />}
 
-      {/* ── Création (accordéon) ── */}
-      <div className="admin-appareils-iot__create">
-        <button className="admin-appareils-iot__create-toggle" onClick={() => setCreateOpen(o => !o)}>
-          Créer un appareil
-        </button>
+      {/* ── Création unitaire + import CSV, côte à côte ── */}
+      <div className="admin-appareils-iot__actions-row">
+        <div className="admin-appareils-iot__create">
+          <button className="admin-appareils-iot__create-toggle" onClick={() => setCreateOpen(o => !o)}>
+            Créer un appareil
+          </button>
 
-        {createOpen && (
-          <div className="admin-appareils-iot__create-body">
-            <form onSubmit={handleCreateSubmit}>
-              {createError && <div className="admin-appareils-iot__error">{createError}</div>}
+          {createOpen && (
+            <div className="admin-appareils-iot__create-body">
+              <form onSubmit={handleCreateSubmit}>
+                {createError && <div className="admin-appareils-iot__error">{createError}</div>}
 
-              <div className="admin-appareils-iot__grid">
-                <Input
-                  label="Identifiant matériel"
-                  type="text"
-                  value={identifiantMateriel}
-                  onChange={(e) => setIdentifiantMateriel(e.target.value)}
-                  placeholder="Ex. CAPT-RESID12-001"
-                />
-
-                <Select
-                  label="Type d'appareil"
-                  options={[
-                    { value: "CAPTEUR_BENNE", label: "Capteur de benne" },
-                    { value: "LECTEUR_RFID", label: "Lecteur RFID" },
-                  ]}
-                  value={typeAppareil}
-                  onChange={(e) => setTypeAppareil(e.target.value as TypeAppareilIot)}
-                />
-
-                <Select
-                  label="Rattachement"
-                  options={[
-                    { value: "CONTENEUR", label: "Conteneur" },
-                    { value: "CAMION", label: "Camion" },
-                  ]}
-                  value={rattachement}
-                  onChange={(e) => {
-                    setRattachement(e.target.value as Rattachement);
-                    setResidenceId("");
-                    setConteneurId("");
-                    setCamionId("");
-                  }}
-                />
-
-                {rattachement === "CONTENEUR" && (
-                  <>
-                    <Select
-                      label="Résidence"
-                      placeholder="Sélectionner..."
-                      options={(residences ?? []).map(r => ({ value: String(r.id), label: r.nom }))}
-                      value={residenceId}
-                      onChange={(e) => {
-                        setResidenceId(e.target.value);
-                        setConteneurId("");
-                      }}
-                      disabled={isLoadingResidences}
-                    />
-
-                    <Select
-                      label="Conteneur"
-                      placeholder={residenceId ? "Sélectionner..." : "Choisir une résidence d'abord"}
-                      options={(conteneurs ?? []).map(c => ({ value: String(c.id), label: c.code }))}
-                      value={conteneurId}
-                      onChange={(e) => setConteneurId(e.target.value)}
-                      disabled={!residenceId || isLoadingConteneurs}
-                    />
-                  </>
-                )}
-
-                {rattachement === "CAMION" && (
-                  <Select
-                    label="Camion"
-                    placeholder="Sélectionner..."
-                    options={(camions ?? []).map(c => ({ value: String(c.id), label: c.immatriculation }))}
-                    value={camionId}
-                    onChange={(e) => setCamionId(e.target.value)}
-                    disabled={isLoadingCamions}
+                <div className="admin-appareils-iot__grid">
+                  <Input
+                    label="Identifiant matériel"
+                    type="text"
+                    value={identifiantMateriel}
+                    onChange={(e) => setIdentifiantMateriel(e.target.value)}
+                    placeholder="Ex. CAPT-RESID12-001"
                   />
-                )}
-              </div>
 
-              <button className="admin-appareils-iot__submit" type="submit" disabled={isSubmittingCreate}>
-                {isSubmittingCreate ? "Création..." : "Créer l'appareil"}
-              </button>
-            </form>
-          </div>
-        )}
+                  <Select
+                    label="Type d'appareil"
+                    options={[
+                      { value: "CAPTEUR_BENNE", label: "Capteur de benne" },
+                      { value: "LECTEUR_RFID", label: "Lecteur RFID" },
+                    ]}
+                    value={typeAppareil}
+                    onChange={(e) => setTypeAppareil(e.target.value as TypeAppareilIot)}
+                  />
+
+                  <Select
+                    label="Rattachement"
+                    options={[
+                      { value: "CONTENEUR", label: "Conteneur" },
+                      { value: "CAMION", label: "Camion" },
+                    ]}
+                    value={rattachement}
+                    onChange={(e) => {
+                      setRattachement(e.target.value as Rattachement);
+                      setResidenceId("");
+                      setConteneurId("");
+                      setCamionId("");
+                    }}
+                  />
+
+                  {rattachement === "CONTENEUR" && (
+                    <>
+                      <Select
+                        label="Résidence"
+                        placeholder="Sélectionner..."
+                        options={(residences ?? []).map(r => ({ value: String(r.id), label: r.nom }))}
+                        value={residenceId}
+                        onChange={(e) => {
+                          setResidenceId(e.target.value);
+                          setConteneurId("");
+                        }}
+                        disabled={isLoadingResidences}
+                      />
+
+                      <Select
+                        label="Conteneur"
+                        placeholder={residenceId ? "Sélectionner..." : "Choisir une résidence d'abord"}
+                        options={(conteneurs ?? []).map(c => ({ value: String(c.id), label: c.code }))}
+                        value={conteneurId}
+                        onChange={(e) => setConteneurId(e.target.value)}
+                        disabled={!residenceId || isLoadingConteneurs}
+                      />
+                    </>
+                  )}
+
+                  {rattachement === "CAMION" && (
+                    <Select
+                      label="Camion"
+                      placeholder="Sélectionner..."
+                      options={(camions ?? []).map(c => ({ value: String(c.id), label: c.immatriculation }))}
+                      value={camionId}
+                      onChange={(e) => setCamionId(e.target.value)}
+                      disabled={isLoadingCamions}
+                    />
+                  )}
+                </div>
+
+                <button className="admin-appareils-iot__submit" type="submit" disabled={isSubmittingCreate}>
+                  {isSubmittingCreate ? "Création..." : "Créer l'appareil"}
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
+
+        <div className="admin-appareils-iot__create">
+          <button className="admin-appareils-iot__create-toggle" onClick={() => setImportOpen(o => !o)}>
+            Importer un fichier CSV
+          </button>
+
+          {importOpen && (
+            <div className="admin-appareils-iot__create-body">
+              <ImportCsvPanel onImported={() => queryClient.invalidateQueries({ queryKey: ["appareils-iot"] })} />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ── Liste ── */}

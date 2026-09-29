@@ -37,7 +37,12 @@ export const getResidencesByHabitant = async (
 // PUT /residence-habitants
 // Retire tout lien existant côté backend avant de poser le nouveau —
 // un habitant ne se retrouve jamais avec deux résidences actives à la
-// fois (voir ResidenceHabitantService.changerResidence).
+// fois (voir ResidenceHabitantService.changerResidence). Ouvert à
+// l'habitant lui-même côté backend (isSelf), pas seulement aux
+// gestionnaires de la résidence — utilisé ici par AdminUsersPage.
+// Le rattachement initial à l'inscription ne passe plus par cette route
+// depuis que le backend le fait lui-même (RattachementResidenceService,
+// voir UtilisateurService.register).
 // ─────────────────────────────────────────
 
 export const changerResidenceHabitant = async (

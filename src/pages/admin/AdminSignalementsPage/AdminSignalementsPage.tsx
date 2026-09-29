@@ -14,6 +14,7 @@ import { updateStatutSignalement } from "../../../api/signalements.api";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner/LoadingSpinner";
 import { AnimatedCard } from "../../../components/ui/AnimatedCard/AnimatedCard";
 import { FilterGroup } from "../../../components/ui/FilterGroup/FilterGroup";
+import { Select } from "../../../components/ui/Select/Select";
 import { useToast } from "../../../hooks/useToast";
 import { extractErrorMessage } from "../../../utils/extractErrorMessage";
 import type { ApiError, Signalement, StatutSignalement } from "../../../types";
@@ -120,17 +121,14 @@ const SignalementCard = ({
 
       <div className="admin-signalement-card__footer">
         <span className="admin-signalement-card__date">{date}</span>
-        <select
+        <Select
           className="admin-signalement-card__statut-select"
+          options={STATUTS.map(s => ({ value: s, label: STATUT_LABEL[s] }))}
           value={signalement.statut}
           onChange={(e) => onChangeStatut(signalement.id, e.target.value as StatutSignalement)}
           disabled={isPending}
           style={{ color: style.color, borderColor: `${style.color}55` }}
-        >
-          {STATUTS.map(s => (
-            <option key={s} value={s}>{STATUT_LABEL[s]}</option>
-          ))}
-        </select>
+        />
       </div>
     </AnimatedCard>
   );

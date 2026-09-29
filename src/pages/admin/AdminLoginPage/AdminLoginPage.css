@@ -65,56 +65,6 @@
   margin-bottom: 20px;
 }
 
-.admin-login__field {
-  text-align: left;
-}
-
-.admin-login__field-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 6px;
-}
-
-.admin-login__field-input {
-  width: 100%;
-  padding: 10px 14px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 13px;
-  outline: none;
-  transition: all var(--t-fast) var(--ease-smooth);
-}
-.admin-login__field-input:focus {
-  border-color: var(--signal);
-  box-shadow: 0 0 0 4px var(--signal-dim-05);
-}
-
-.admin-login__field-wrap { position: relative; }
-.admin-login__field-wrap .admin-login__field-input { padding-right: 40px; }
-
-.admin-login__field-toggle {
-  position: absolute;
-  top: 50%;
-  right: 8px;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  padding: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity var(--t-fast) var(--ease-smooth);
-}
-.admin-login__field-toggle:hover { opacity: 1; }
-
 /* ── Erreur ── */
 .admin-login__error {
   width: 100%;

@@ -12,6 +12,7 @@ import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../../hooks/useAuth";
+import { Input } from "../../../components/ui/Input/Input";
 import type { ApiError } from "../../../types";
 import "./AdminLoginPage.css";
 
@@ -110,33 +111,27 @@ export default function AdminLoginPage() {
 
         {/* ── Champs ── */}
         <div className="admin-login__fields">
-          <div className="admin-login__field">
-            <label className="admin-login__field-label">Email</label>
-            <input
-              ref={emailInputRef}
-              className="admin-login__field-input"
-              type="email"
-              placeholder="admin@bidiws.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              autoFocus
-            />
-          </div>
-          <div className="admin-login__field">
-            <label className="admin-login__field-label">Mot de passe</label>
-            <div className="admin-login__field-wrap">
-              <input
-                className="admin-login__field-input"
-                type={showMotDePasse ? "text" : "password"}
-                placeholder="••••••••"
-                value={motDePasse}
-                onChange={(e) => setMotDePasse(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              />
+          <Input
+            ref={emailInputRef}
+            label="Email"
+            type="email"
+            placeholder="admin@bidiws.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            autoFocus
+          />
+          <Input
+            label="Mot de passe"
+            type={showMotDePasse ? "text" : "password"}
+            placeholder="••••••••"
+            value={motDePasse}
+            onChange={(e) => setMotDePasse(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            trailingIcon={
               <button
                 type="button"
-                className="admin-login__field-toggle"
+                className="ui-field__trailing-btn"
                 onClick={() => setShowMotDePasse((v) => !v)}
                 tabIndex={-1}
                 title={showMotDePasse ? "Masquer le mot de passe" : "Afficher le mot de passe"}
@@ -144,8 +139,8 @@ export default function AdminLoginPage() {
               >
                 {showMotDePasse ? <IconEyeOff color="#6b84a3" /> : <IconEye color="#6b84a3" />}
               </button>
-            </div>
-          </div>
+            }
+          />
         </div>
 
         {/* ── Erreur ── */}

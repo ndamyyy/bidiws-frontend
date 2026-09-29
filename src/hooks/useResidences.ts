@@ -8,13 +8,14 @@ import {
   getAllResidences,
   getResidenceById,
   getResidencesByGardien,
+  getResidencesPubliques,
   type ResidenceGardien,
 } from "../api/residences.api";
 import {
   getResidencesByHabitant,
   type ResidenceHabitant,
 } from "../api/residence-habitants.api";
-import type { Residence } from "../types";
+import type { Residence, ResidencePublique } from "../types";
 
 // ─────────────────────────────────────────
 // LISTE DE TOUTES LES RÉSIDENCES
@@ -24,6 +25,20 @@ export function useResidences(): UseQueryResult<Residence[]> {
   return useQuery({
     queryKey: ["residences"],
     queryFn: getAllResidences,
+  });
+}
+
+// ─────────────────────────────────────────
+// RÉSIDENCES ACTIVES, SANS AUTHENTIFICATION
+// Utilisée par RegisterPage (autocomplete) — route publique, ne
+// nécessite pas de session pour être appelée.
+// ─────────────────────────────────────────
+
+export function useResidencesPubliques(): UseQueryResult<ResidencePublique[]> {
+  return useQuery({
+    queryKey: ["residences-publiques"],
+    queryFn: getResidencesPubliques,
+    staleTime: 5 * 60 * 1000,
   });
 }
 

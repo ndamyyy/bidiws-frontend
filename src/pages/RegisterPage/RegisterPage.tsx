@@ -11,8 +11,14 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { register } from "../../api/auth.api";
-import type { ApiError, RegisterRequest } from "../../types";
+import { rechercherAdresses } from "../../api/adresse.api";
+import { Input } from "../../components/ui/Input/Input";
+import type { AdresseSuggestion, ApiError, RegisterRequest } from "../../types";
 import "./RegisterPage.css";
+
+// Debounce API Adresse (data.gouv.fr) — 300-400ms : assez court pour
+// rester réactif, assez long pour ne pas spammer un appel par frappe.
+const DEBOUNCE_ADRESSE_MS = 350;
 
 // ─────────────────────────────────────────
 // ICÔNES
@@ -49,6 +55,124 @@ const IconCheck = ({ color }: { color: string }) => (
 );
 
 // ─────────────────────────────────────────
+// CHAMP ADRESSE — autocomplete API Adresse (data.gouv.fr)
+// Local à cette page (un seul appelant) plutôt qu'un composant
+// components/ui/ générique — pas de second usage aujourd'hui.
+// Deux états mutuellement exclusifs : recherche (input + suggestions)
+// tant qu'aucune adresse n'est choisie, puis une carte de confirmation
+// une fois choisie (jamais les deux en même temps, pour qu'un texte
+// affiché ne puisse jamais désynchroniser des coordonnées retenues).
+// Le rattachement à une résidence se fait entièrement côté backend
+// (RattachementResidenceService) à partir des coordonnées GPS de la
+// suggestion choisie — ce champ ne fait que les récupérer.
+// ─────────────────────────────────────────
+
+const AdresseField = ({
+  selected,
+  onSelect,
+  onClear,
+}: {
+  selected: AdresseSuggestion | null;
+  onSelect: (a: AdresseSuggestion) => void;
+  onClear : () => void;
+}) => {
+  const [query, setQuery] = useState<string>("");
+  const [focused, setFocused] = useState<boolean>(false);
+  const [suggestions, setSuggestions] = useState<AdresseSuggestion[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Debounce + annulation de la requête devenue obsolète (nouvelle
+  // frappe avant que la précédente n'ait répondu) — évite qu'une
+  // réponse tardive n'écrase des suggestions plus récentes.
+  useEffect(() => {
+    const q = query.trim();
+    // Pas de setState ici : rien n'est affiché tant que rechercheActive
+    // (query.trim().length >= 3) est faux de toute façon, un state
+    // "suggestions" pas encore vidé n'a donc aucun effet visible.
+    if (q.length < 3) return;
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      setIsLoading(true);
+      rechercherAdresses(q, controller.signal)
+        .then((resultats) => setSuggestions(resultats))
+        .catch((err) => {
+          // AbortError attendu : une frappe plus récente a annulé cette
+          // requête (fetch natif, pas d'annulation axios ici).
+          if ((err as { name?: string }).name === "AbortError") return;
+          setSuggestions([]);
+        })
+        .finally(() => setIsLoading(false));
+    }, DEBOUNCE_ADRESSE_MS);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [query]);
+
+  const rechercheActive = query.trim().length >= 3;
+  const dropdownOuvert = focused && !selected && rechercheActive;
+
+  if (selected) {
+    return (
+      <div className="register__adresse-field">
+        <label className="ui-field__label">Votre adresse (optionnel)</label>
+        <div className="register__adresse-selected">
+          <div className="register__adresse-selected-info">
+            <div className="register__adresse-selected-label">{selected.label}</div>
+          </div>
+          <button type="button" className="register__adresse-changer" onClick={onClear}>
+            Changer
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="register__adresse-field">
+      <Input
+        label="Votre adresse (optionnel)"
+        type="text"
+        placeholder="Commencez à taper votre adresse…"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setTimeout(() => setFocused(false), 150)}
+        autoComplete="off"
+      />
+      {dropdownOuvert && (
+        <div className="register__adresse-dropdown">
+          {isLoading ? (
+            <div className="register__adresse-introuvable">Recherche…</div>
+          ) : suggestions.length > 0 ? (
+            suggestions.map((a) => (
+              <button
+                type="button"
+                key={a.label}
+                className="register__adresse-option"
+                onClick={() => {
+                  onSelect(a);
+                  setQuery("");
+                }}
+              >
+                {a.label}
+              </button>
+            ))
+          ) : (
+            <div className="register__adresse-introuvable">
+              Aucune adresse trouvée. Continuez à taper, ou vérifiez
+              l'orthographe.
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────
 // COMPOSANT
 // ─────────────────────────────────────────
 
@@ -66,6 +190,14 @@ export default function RegisterPage() {
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [succes, setSucces] = useState<boolean>(false);
+
+  const [adresse, setAdresse] = useState<AdresseSuggestion | null>(null);
+  // Résultat du rattachement automatique, renvoyé par le backend avec la
+  // réponse d'inscription elle-même (InscriptionResponse) — jamais un
+  // second appel séparé, contrairement à l'ancien flux qui rattachait
+  // après coup via changerResidenceHabitant.
+  const [residenceRattachee, setResidenceRattachee] = useState<string | null>(null);
+  const [zoneNonCouverte, setZoneNonCouverte] = useState<boolean>(false);
 
   const nomInputRef = useRef<HTMLInputElement>(null);
 
@@ -98,11 +230,23 @@ export default function RegisterPage() {
       email: email.trim(),
       motDePasse,
       telephone: telephone.trim() || undefined,
+      adresse: adresse?.adresse,
+      codePostal: adresse?.codePostal,
+      ville: adresse?.ville,
+      latitude: adresse?.latitude,
+      longitude: adresse?.longitude,
     };
 
     setIsSubmitting(true);
     try {
-      await register(data);
+      const resultat = await register(data);
+
+      // Rattachement fait atomiquement par le backend avec la création
+      // du compte (RattachementResidenceService) — la réponse dit
+      // directement ce qui s'est passé, pas de second appel à risque
+      // d'échec séparé comme dans l'ancien flux.
+      setResidenceRattachee(resultat.residenceNom ?? null);
+      setZoneNonCouverte(resultat.zoneNonCouverte);
       setSucces(true);
     } catch (err) {
       const backendMessage = axios.isAxiosError<ApiError>(err) ? err.response?.data?.message : undefined;
@@ -165,6 +309,19 @@ export default function RegisterPage() {
               <p className="register__card-subtitle">
                 Votre compte a bien été créé. Vous pouvez maintenant vous connecter.
               </p>
+              {residenceRattachee && (
+                <p className="register__adresse-confirmation">
+                  Vous avez été rattaché à {residenceRattachee}.
+                </p>
+              )}
+              {zoneNonCouverte && (
+                <p className="register__adresse-avertissement">
+                  Zone non couverte — votre ville n'est pas encore desservie par
+                  BIDIWS. Votre compte est créé, le rattachement à une
+                  résidence pourra se faire dès que votre zone sera prise en
+                  charge.
+                </p>
+              )}
               <button className="register__submit" onClick={() => navigate("/login")}>
                 Se connecter maintenant
               </button>
@@ -178,56 +335,44 @@ export default function RegisterPage() {
 
               <div className="register__fields">
                 <div className="register__fields-row">
-                  <div className="register__field">
-                    <label className="register__field-label">Prénom</label>
-                    <input
-                      ref={nomInputRef}
-                      className="register__field-input"
-                      type="text"
-                      value={prenom}
-                      onChange={(e) => setPrenom(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                      autoFocus
-                    />
-                  </div>
-                  <div className="register__field">
-                    <label className="register__field-label">Nom</label>
-                    <input
-                      className="register__field-input"
-                      type="text"
-                      value={nom}
-                      onChange={(e) => setNom(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                    />
-                  </div>
-                </div>
-
-                <div className="register__field">
-                  <label className="register__field-label">Email</label>
-                  <input
-                    className="register__field-input"
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                  <Input
+                    ref={nomInputRef}
+                    label="Prénom"
+                    type="text"
+                    value={prenom}
+                    onChange={(e) => setPrenom(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                    autoFocus
+                  />
+                  <Input
+                    label="Nom"
+                    type="text"
+                    value={nom}
+                    onChange={(e) => setNom(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                   />
                 </div>
 
-                <div className="register__field">
-                  <label className="register__field-label">Mot de passe</label>
-                  <div className="register__field-wrap">
-                    <input
-                      className="register__field-input"
-                      type={showMotDePasse ? "text" : "password"}
-                      placeholder="8 caractères minimum"
-                      value={motDePasse}
-                      onChange={(e) => setMotDePasse(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                    />
+                <Input
+                  label="Email"
+                  type="email"
+                  placeholder="votre@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                />
+
+                <Input
+                  label="Mot de passe"
+                  type={showMotDePasse ? "text" : "password"}
+                  placeholder="8 caractères minimum"
+                  value={motDePasse}
+                  onChange={(e) => setMotDePasse(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                  trailingIcon={
                     <button
                       type="button"
-                      className="register__field-toggle"
+                      className="ui-field__trailing-btn"
                       onClick={() => setShowMotDePasse((v) => !v)}
                       tabIndex={-1}
                       title={showMotDePasse ? "Masquer le mot de passe" : "Afficher le mot de passe"}
@@ -235,19 +380,22 @@ export default function RegisterPage() {
                     >
                       {showMotDePasse ? <IconEyeOff color="#6b84a3" /> : <IconEye color="#6b84a3" />}
                     </button>
-                  </div>
-                </div>
+                  }
+                />
 
-                <div className="register__field">
-                  <label className="register__field-label">Téléphone (optionnel)</label>
-                  <input
-                    className="register__field-input"
-                    type="tel"
-                    value={telephone}
-                    onChange={(e) => setTelephone(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                  />
-                </div>
+                <Input
+                  label="Téléphone (optionnel)"
+                  type="tel"
+                  value={telephone}
+                  onChange={(e) => setTelephone(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                />
+
+                <AdresseField
+                  selected={adresse}
+                  onSelect={setAdresse}
+                  onClear={() => setAdresse(null)}
+                />
               </div>
 
               {error && <div className="register__error">{error}</div>}

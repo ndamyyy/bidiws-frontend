@@ -4,7 +4,7 @@
 // ============================================================
 
 import apiClient, { removeToken, setToken } from "./axios";
-import type { AuthResponse, LoginRequest, RegisterRequest, Utilisateur } from "../types";
+import type { AuthResponse, InscriptionResponse, LoginRequest, RegisterRequest, Utilisateur } from "../types";
 
 // ─────────────────────────────────────────
 // LOGIN
@@ -20,11 +20,14 @@ export const login = async (data: LoginRequest): Promise<AuthResponse> => {
 // ─────────────────────────────────────────
 // REGISTER
 // POST /auth/register
-// Ne connecte pas automatiquement — pas de token renvoyé
+// Ne connecte pas automatiquement — pas de token renvoyé. Le
+// rattachement à une résidence (si une adresse est fournie) est
+// désormais fait par le backend lui-même, atomiquement avec la
+// création du compte — voir InscriptionResponse.
 // ─────────────────────────────────────────
 
-export const register = async (data: RegisterRequest): Promise<Utilisateur> => {
-  const response = await apiClient.post<Utilisateur>("/auth/register", data);
+export const register = async (data: RegisterRequest): Promise<InscriptionResponse> => {
+  const response = await apiClient.post<InscriptionResponse>("/auth/register", data);
   return response.data;
 };
 
